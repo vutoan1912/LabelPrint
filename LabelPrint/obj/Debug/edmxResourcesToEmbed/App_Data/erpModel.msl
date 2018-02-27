@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="erpModelStoreContainer" CdmEntityContainer="erpEntities">
+    <EntitySetMapping Name="base_privilege_entity">
+      <EntityTypeMapping TypeName="erpModel.base_privilege_entity">
+        <MappingFragment StoreEntitySet="base_privilege_entity">
+          <ScalarProperty Name="id" ColumnName="id" />
+          <ScalarProperty Name="entity" ColumnName="entity" />
+          <ScalarProperty Name="privilege" ColumnName="privilege" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="base_user">
+      <EntityTypeMapping TypeName="erpModel.base_user">
+        <MappingFragment StoreEntitySet="base_user">
+          <ScalarProperty Name="id" ColumnName="id" />
+          <ScalarProperty Name="user" ColumnName="user" />
+          <ScalarProperty Name="authorities" ColumnName="authorities" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping>

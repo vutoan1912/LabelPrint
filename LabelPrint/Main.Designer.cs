@@ -28,77 +28,105 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.simpleButton1 = new DevExpress.XtraEditors.SimpleButton();
-            this.labelControl1 = new DevExpress.XtraEditors.LabelControl();
-            this.textEdit1 = new DevExpress.XtraEditors.TextEdit();
-            this.labelControl2 = new DevExpress.XtraEditors.LabelControl();
+            this.btnLogin = new DevExpress.XtraEditors.SimpleButton();
+            this.lblUser = new DevExpress.XtraEditors.LabelControl();
+            this.txtUser = new DevExpress.XtraEditors.TextEdit();
+            this.lblPass = new DevExpress.XtraEditors.LabelControl();
             this.txtPass = new DevExpress.XtraEditors.TextEdit();
-            ((System.ComponentModel.ISupportInitialize)(this.textEdit1.Properties)).BeginInit();
+            this.checkRemember = new DevExpress.XtraEditors.CheckEdit();
+            this.lblError = new DevExpress.XtraEditors.LabelControl();
+            ((System.ComponentModel.ISupportInitialize)(this.txtUser.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtPass.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.checkRemember.Properties)).BeginInit();
             this.SuspendLayout();
             // 
-            // simpleButton1
+            // btnLogin
             // 
-            this.simpleButton1.Appearance.Font = new System.Drawing.Font("Tahoma", 10F);
-            this.simpleButton1.Appearance.Options.UseFont = true;
-            this.simpleButton1.Location = new System.Drawing.Point(126, 111);
-            this.simpleButton1.LookAndFeel.SkinName = "Blue";
-            this.simpleButton1.LookAndFeel.UseDefaultLookAndFeel = false;
-            this.simpleButton1.Name = "simpleButton1";
-            this.simpleButton1.Size = new System.Drawing.Size(109, 23);
-            this.simpleButton1.TabIndex = 0;
-            this.simpleButton1.Text = "Login";
+            this.btnLogin.Appearance.Font = new System.Drawing.Font("Tahoma", 10F);
+            this.btnLogin.Appearance.Options.UseFont = true;
+            this.btnLogin.Location = new System.Drawing.Point(126, 133);
+            this.btnLogin.LookAndFeel.SkinName = "Blue";
+            this.btnLogin.LookAndFeel.UseDefaultLookAndFeel = false;
+            this.btnLogin.Name = "btnLogin";
+            this.btnLogin.Size = new System.Drawing.Size(109, 23);
+            this.btnLogin.TabIndex = 0;
+            this.btnLogin.Text = "Login";
+            this.btnLogin.Click += new System.EventHandler(this.simpleButton1_Click);
             // 
-            // labelControl1
+            // lblUser
             // 
-            this.labelControl1.Appearance.Font = new System.Drawing.Font("Tahoma", 10F);
-            this.labelControl1.Location = new System.Drawing.Point(40, 33);
-            this.labelControl1.LookAndFeel.SkinName = "Blue";
-            this.labelControl1.LookAndFeel.UseDefaultLookAndFeel = false;
-            this.labelControl1.Name = "labelControl1";
-            this.labelControl1.Size = new System.Drawing.Size(59, 16);
-            this.labelControl1.TabIndex = 1;
-            this.labelControl1.Text = "UserName";
+            this.lblUser.Appearance.Font = new System.Drawing.Font("Tahoma", 10F);
+            this.lblUser.Location = new System.Drawing.Point(40, 33);
+            this.lblUser.LookAndFeel.SkinName = "Blue";
+            this.lblUser.LookAndFeel.UseDefaultLookAndFeel = false;
+            this.lblUser.Name = "lblUser";
+            this.lblUser.Size = new System.Drawing.Size(59, 16);
+            this.lblUser.TabIndex = 1;
+            this.lblUser.Text = "UserName";
             // 
-            // textEdit1
+            // txtUser
             // 
-            this.textEdit1.Location = new System.Drawing.Point(126, 32);
-            this.textEdit1.Name = "textEdit1";
-            this.textEdit1.Size = new System.Drawing.Size(220, 20);
-            this.textEdit1.TabIndex = 2;
+            this.txtUser.Location = new System.Drawing.Point(126, 32);
+            this.txtUser.Name = "txtUser";
+            this.txtUser.Size = new System.Drawing.Size(220, 20);
+            this.txtUser.TabIndex = 2;
             // 
-            // labelControl2
+            // lblPass
             // 
-            this.labelControl2.Appearance.Font = new System.Drawing.Font("Tahoma", 10F);
-            this.labelControl2.Location = new System.Drawing.Point(44, 72);
-            this.labelControl2.LookAndFeel.SkinName = "Blue";
-            this.labelControl2.LookAndFeel.UseDefaultLookAndFeel = false;
-            this.labelControl2.Name = "labelControl2";
-            this.labelControl2.Size = new System.Drawing.Size(55, 16);
-            this.labelControl2.TabIndex = 3;
-            this.labelControl2.Text = "Password";
+            this.lblPass.Appearance.Font = new System.Drawing.Font("Tahoma", 10F);
+            this.lblPass.Location = new System.Drawing.Point(44, 70);
+            this.lblPass.LookAndFeel.SkinName = "Blue";
+            this.lblPass.LookAndFeel.UseDefaultLookAndFeel = false;
+            this.lblPass.Name = "lblPass";
+            this.lblPass.Size = new System.Drawing.Size(55, 16);
+            this.lblPass.TabIndex = 3;
+            this.lblPass.Text = "Password";
             // 
             // txtPass
             // 
-            this.txtPass.Location = new System.Drawing.Point(126, 71);
+            this.txtPass.Location = new System.Drawing.Point(126, 69);
             this.txtPass.Name = "txtPass";
+            this.txtPass.Properties.PasswordChar = '*';
             this.txtPass.Size = new System.Drawing.Size(220, 20);
             this.txtPass.TabIndex = 4;
+            // 
+            // checkRemember
+            // 
+            this.checkRemember.Location = new System.Drawing.Point(126, 99);
+            this.checkRemember.Name = "checkRemember";
+            this.checkRemember.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 10F);
+            this.checkRemember.Properties.Appearance.Options.UseFont = true;
+            this.checkRemember.Properties.Caption = "Remember me";
+            this.checkRemember.Size = new System.Drawing.Size(109, 20);
+            this.checkRemember.TabIndex = 5;
+            // 
+            // lblError
+            // 
+            this.lblError.Appearance.ForeColor = System.Drawing.Color.Red;
+            this.lblError.Location = new System.Drawing.Point(54, 162);
+            this.lblError.Name = "lblError";
+            this.lblError.Size = new System.Drawing.Size(63, 13);
+            this.lblError.TabIndex = 6;
+            this.lblError.Text = "labelControl1";
+            this.lblError.Visible = false;
             // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(404, 162);
+            this.ClientSize = new System.Drawing.Size(404, 194);
+            this.Controls.Add(this.lblError);
+            this.Controls.Add(this.checkRemember);
             this.Controls.Add(this.txtPass);
-            this.Controls.Add(this.labelControl2);
-            this.Controls.Add(this.textEdit1);
-            this.Controls.Add(this.labelControl1);
-            this.Controls.Add(this.simpleButton1);
+            this.Controls.Add(this.lblPass);
+            this.Controls.Add(this.txtUser);
+            this.Controls.Add(this.lblUser);
+            this.Controls.Add(this.btnLogin);
             this.Name = "Main";
             this.Text = "Login";
-            ((System.ComponentModel.ISupportInitialize)(this.textEdit1.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtUser.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.txtPass.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.checkRemember.Properties)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -106,11 +134,13 @@
 
         #endregion
 
-        private DevExpress.XtraEditors.SimpleButton simpleButton1;
-        private DevExpress.XtraEditors.LabelControl labelControl1;
-        private DevExpress.XtraEditors.TextEdit textEdit1;
-        private DevExpress.XtraEditors.LabelControl labelControl2;
+        private DevExpress.XtraEditors.SimpleButton btnLogin;
+        private DevExpress.XtraEditors.LabelControl lblUser;
+        private DevExpress.XtraEditors.TextEdit txtUser;
+        private DevExpress.XtraEditors.LabelControl lblPass;
         private DevExpress.XtraEditors.TextEdit txtPass;
+        private DevExpress.XtraEditors.CheckEdit checkRemember;
+        private DevExpress.XtraEditors.LabelControl lblError;
     }
 }
 

@@ -34,7 +34,7 @@ namespace LabelPrint.Business
             var http = new HttpClient();
             http.Request.Accept = HttpContentTypes.ApplicationJson;
             http.Request.ContentType = HttpContentTypes.ApplicationXWwwFormUrlEncoded;
-            http.Request.AddExtraHeader("X-Authorization", Config.API_KEY);
+            http.Request.AddExtraHeader("Authorization", Config.API_KEY);
             var response = http.Post(full_url, param, HttpContentTypes.ApplicationJson);
             return response;
         }
@@ -44,7 +44,7 @@ namespace LabelPrint.Business
             string full_url = Config.API_URL + url;
             var http = new HttpClient();
             http.Request.Accept = HttpContentTypes.ApplicationJson;
-            http.Request.AddExtraHeader("X-Authorization", Config.API_KEY);
+            http.Request.AddExtraHeader("Authorization", Config.API_KEY);
             var response = http.Get(full_url, param);
             return response;
         }

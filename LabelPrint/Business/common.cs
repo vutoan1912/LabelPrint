@@ -57,7 +57,7 @@ namespace LabelPrint.Business
                 var data = t.NewRow();
                 foreach (var prop in (IDictionary<string, object>)row)
                 {
-                    data[prop.Key] = prop.Value;
+                    try { data[prop.Key] = prop.Value; } catch { }
                 }
                 t.Rows.Add(data);
             }
@@ -190,6 +190,16 @@ namespace LabelPrint.Business
             {
                 if (value == null) return 0;
                 return Convert.ToInt32(value);
+            }
+            catch { return 0; }
+        }
+
+        public static int ConvertLong(dynamic value)
+        {
+            try
+            {
+                if (value == null) return 0;
+                return Convert.ToInt64(value);
             }
             catch { return 0; }
         }
@@ -393,6 +403,36 @@ namespace LabelPrint.Business
             }
             return item;
         }
+
+        public static DataRow[] SearchExpression(DataTable datatable, string search)
+        {
+            DataRow[] foundRows = datatable.Select(search);
+            return foundRows;
+        }
+
+        public static DataRow FindInMultiPKey(DataTable datatable, string valueSearch)
+        {
+            // Create an array for the key values to find.
+            object[] findTheseVals = new object[1];
+
+            // Set the values of the keys to find.
+            findTheseVals[0] = valueSearch;
+
+            DataRow foundRow = datatable.Rows.Find(findTheseVals);
+            return foundRow;
+        }
+
+        public static DataRow FindByKey(DataTable datatable, string key, string value)
+        {
+            for (int i = 0; i < datatable.Rows.Count; i++)
+            {
+                if (datatable.Rows[i][key] == value)
+                {
+                    return datatable.Rows[i];
+                }
+            }
+            return null;
+        }
     }
 
     public class GridView
@@ -427,7 +467,7 @@ namespace LabelPrint.Business
                 }
             }
             return -1;
-        }
+        }      
 
         public static List<string> GetListStringColumnValue(DevExpress.XtraGrid.Views.Grid.GridView view, string fieldName)
         {
