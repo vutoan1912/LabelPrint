@@ -3,6 +3,7 @@
   <EntityContainer Name="erpEntities" p1:LazyLoadingEnabled="true">
     <EntitySet Name="base_privilege_entity" EntityType="erpModel.base_privilege_entity" />
     <EntitySet Name="base_user" EntityType="erpModel.base_user" />
+    <EntitySet Name="wh_transfer_details" EntityType="erpModel.wh_transfer_details" />
   </EntityContainer>
   <EntityType Name="base_privilege_entity">
     <Key>
@@ -19,5 +20,28 @@
     <Property Name="id" Type="Int32" Nullable="false" />
     <Property Name="user" Type="String" MaxLength="50" Unicode="true" FixedLength="false" />
     <Property Name="authorities" Type="String" MaxLength="50" Unicode="true" FixedLength="false" />
+  </EntityType>
+  <EntityType Name="wh_transfer_details">
+    <Key>
+      <PropertyRef Name="id" />
+    </Key>
+    <Property Name="id" Type="Int64" Nullable="false" />
+    <Property Name="created" Type="DateTime" Precision="3" />
+    <Property Name="updated" Type="DateTime" Precision="3" />
+    <Property Name="transfer_id" Type="Int32" />
+    <Property Name="transfer_item_id" Type="Int32" />
+    <Property Name="product_name" Type="String" MaxLength="100" Unicode="true" FixedLength="false" />
+    <Property Name="product_id" Type="Int32" />
+    <Property Name="man_pn" Type="String" MaxLength="100" Unicode="true" FixedLength="false" />
+    <Property Name="done_quantity" Type="Double" />
+    <Property Name="uom_id" Type="Int32" />
+    <Property Name="uom_name" Type="String" MaxLength="50" Unicode="true" FixedLength="false" />
+    <Property Name="src_location_id" Type="Int32" />
+    <Property Name="dest_location_id" Type="Int32" />
+    <Property Name="dest_package_number" Type="String" MaxLength="50" Unicode="true" FixedLength="false" />
+    <Property Name="man_id" Type="Int32" />
+    <Property Name="status" Type="Int32" />
+    <Property Name="trace_number" Type="String" MaxLength="50" Unicode="true" FixedLength="false" />
+    <Property Name="src_package_number" Type="String" MaxLength="50" Unicode="true" FixedLength="false" />
   </EntityType>
 </Schema>

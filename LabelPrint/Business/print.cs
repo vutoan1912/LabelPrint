@@ -15,7 +15,18 @@ namespace LabelPrint.Business
 {
     class print
     {
+        public static string GetDefaultPrinter()
+        {
+            string PrinterName = "";
+            try
+            {
+                var dialog = new PrintDialog();
+                PrinterName = dialog.PrinterSettings.PrinterName;
+            }
+            catch (Exception ex) { }
 
+            return PrinterName;
+        }
     }
 
     public class MyType
@@ -128,6 +139,8 @@ namespace LabelPrint.Business
 
         public class Encode
         {
+            //Document: CL4NX Programming Reference.pdf
+
             public static Dictionary<string, int> Name2Idx = new Dictionary<string, int>();
             //BASE
             public static string ESC = "\x1B";
@@ -159,8 +172,9 @@ namespace LabelPrint.Business
             public static string font_Barcode_EAN128 = ESC + "BI";
             public static string font_Barcode_UPC_A = ESC + "BL";          //Without HRI
             public static string font_Barcode_UPC_A_HRI = ESC + "BM";      //With HRI
-
             public static string font_QRCode = ESC + "BQ";
+            public static string font_Barcode_DataMatrix = ESC + "BX";
+            public static string font_Barcode_DataMatrix_DataSpecify = ESC + "DC";
             #endregion
 
             #region DEFINE TEXT FONT
@@ -396,6 +410,23 @@ namespace LabelPrint.Business
                 //                                  4  :  Kanji mode
 
                 return font_QRCode + CorrectionLevel + ConcatenationMode + Size + "," + CharacterMode + Space + data;
+            }
+
+            public string gen_data_matrix_barcode(string data, string FormatID = "01", string ErrorCorrectionLevel = "20", string CellWidth = "16", string CellPitch = "16",
+                        string NumberCellsPerLine = "000", string NumberCellsLine = "000", string MirrorImage = "0", string SizeGuideCell = "01")
+            {
+                //Format: <BX>aabbccddeeefffghh
+
+                //a [Format ID] = Valid Range : 01 (Fixed)
+                //b [Error correction level] = Valid Range : 20 (Fixed)
+                //c [Cell width] = Valid Range : 01 to 16 (dot cell)
+                //d [Cell pitch] = Valid Range : 01 to 16 (dot cell)
+                //e [Number of cells per line] = Valid Range : 010 to 144 //000 : (Auto setup)
+                //f [Number of cell lines] = Valid Range : 008 to 414 //000 : (Auto setup)
+                //g [Mirror image] = Valid Range : 0 (Fixed)
+                //h [Size of guide cell] = Valid Range : 01 (Fixed)
+
+                return font_Barcode_DataMatrix + FormatID + ErrorCorrectionLevel + CellWidth + CellPitch + NumberCellsPerLine + NumberCellsLine + MirrorImage + SizeGuideCell + font_Barcode_DataMatrix_DataSpecify + data;
             }
 
             #endregion
@@ -808,6 +839,22 @@ namespace LabelPrint.Business
             data += encode.set_Rotation("2") + encode.set_Vertical("200") + encode.set_Horizontal("940") + encode.set_Pitch("1") + Space + encode.gen_barcode_CODE128(seriNo, "03", "070");
             data += encode.set_Rotation("2") + encode.set_Vertical("120") + encode.set_Horizontal("940") + encode.set_Pitch("20") + encode.gen_text_X23(seriNo);
             data += encode.set_Rotation("2") + encode.set_Vertical("55") + encode.set_Horizontal("940") + encode.set_Pitch("20") + encode.gen_text_X23(wps);
+            data += encode.set_Quantity() + encode.End;
+            Print(data);
+        }
+
+        public void Print_LabelPackage(string barcode_data, string productNo, string packageID, string productNoOld)
+        {
+            Encode encode = new Encode();
+            string data = encode.Start;
+
+            //qrdata = "[)>@06@PHY5ND35N000001@3SPKG_00072@@";
+
+            data += encode.set_Vertical("170") + encode.set_Horizontal("100") + encode.gen_data_matrix_barcode(barcode_data);
+            data += encode.set_Vertical("190") + encode.set_Horizontal("600") + encode.set_Pitch("1") + encode.gen_text_X23("Product No.");
+            data += encode.set_Vertical("290") + encode.set_Horizontal("600") + encode.set_Pitch("1") + encode.gen_text_XL(productNo);
+            data += encode.set_Vertical("390") + encode.set_Horizontal("600") + encode.set_Pitch("1") + encode.gen_text_X23("Package-ID");
+            data += encode.set_Vertical("490") + encode.set_Horizontal("600") + encode.set_Pitch("1") + encode.gen_text_XL(packageID);            
             data += encode.set_Quantity() + encode.End;
             Print(data);
         }

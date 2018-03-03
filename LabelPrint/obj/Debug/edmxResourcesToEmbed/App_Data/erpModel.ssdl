@@ -3,6 +3,7 @@
   <EntityContainer Name="erpModelStoreContainer">
     <EntitySet Name="base_privilege_entity" EntityType="erpModel.Store.base_privilege_entity" store:Type="Tables" Schema="dbo" />
     <EntitySet Name="base_user" EntityType="erpModel.Store.base_user" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="wh_transfer_details" EntityType="erpModel.Store.wh_transfer_details" store:Type="Tables" Schema="dbo" />
   </EntityContainer>
   <EntityType Name="base_privilege_entity">
     <Key>
@@ -19,5 +20,28 @@
     <Property Name="id" Type="int" Nullable="false" />
     <Property Name="user" Type="nvarchar" MaxLength="50" />
     <Property Name="authorities" Type="nvarchar" MaxLength="50" />
+  </EntityType>
+  <EntityType Name="wh_transfer_details">
+    <Key>
+      <PropertyRef Name="id" />
+    </Key>
+    <Property Name="id" Type="bigint" Nullable="false" />
+    <Property Name="created" Type="datetime" />
+    <Property Name="updated" Type="datetime" />
+    <Property Name="transfer_id" Type="int" />
+    <Property Name="transfer_item_id" Type="int" />
+    <Property Name="product_name" Type="nvarchar" MaxLength="100" />
+    <Property Name="product_id" Type="int" />
+    <Property Name="man_pn" Type="nvarchar" MaxLength="100" />
+    <Property Name="done_quantity" Type="float" />
+    <Property Name="uom_id" Type="int" />
+    <Property Name="uom_name" Type="nvarchar" MaxLength="50" />
+    <Property Name="src_location_id" Type="int" />
+    <Property Name="dest_location_id" Type="int" />
+    <Property Name="dest_package_number" Type="nvarchar" MaxLength="50" />
+    <Property Name="man_id" Type="int" />
+    <Property Name="status" Type="int" />
+    <Property Name="trace_number" Type="nvarchar" MaxLength="50" />
+    <Property Name="src_package_number" Type="nvarchar" MaxLength="50" />
   </EntityType>
 </Schema>

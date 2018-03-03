@@ -4,10 +4,11 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="erpModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2008" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+      <Schema Namespace="erpModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2008" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityContainer Name="erpModelStoreContainer">
           <EntitySet Name="base_privilege_entity" EntityType="erpModel.Store.base_privilege_entity" store:Type="Tables" Schema="dbo" />
           <EntitySet Name="base_user" EntityType="erpModel.Store.base_user" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="wh_transfer_details" EntityType="erpModel.Store.wh_transfer_details" store:Type="Tables" Schema="dbo" />
         </EntityContainer>
         <EntityType Name="base_privilege_entity">
           <Key>
@@ -25,13 +26,38 @@
           <Property Name="user" Type="nvarchar" MaxLength="50" />
           <Property Name="authorities" Type="nvarchar" MaxLength="50" />
         </EntityType>
-      </Schema></edmx:StorageModels>
+        <EntityType Name="wh_transfer_details">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="bigint" Nullable="false" />
+          <Property Name="created" Type="datetime" />
+          <Property Name="updated" Type="datetime" />
+          <Property Name="transfer_id" Type="int" />
+          <Property Name="transfer_item_id" Type="int" />
+          <Property Name="product_name" Type="nvarchar" MaxLength="100" />
+          <Property Name="product_id" Type="int" />
+          <Property Name="man_pn" Type="nvarchar" MaxLength="100" />
+          <Property Name="done_quantity" Type="float" />
+          <Property Name="uom_id" Type="int" />
+          <Property Name="uom_name" Type="nvarchar" MaxLength="50" />
+          <Property Name="src_location_id" Type="int" />
+          <Property Name="dest_location_id" Type="int" />
+          <Property Name="dest_package_number" Type="nvarchar" MaxLength="50" />
+          <Property Name="man_id" Type="int" />
+          <Property Name="status" Type="int" />
+          <Property Name="trace_number" Type="nvarchar" MaxLength="50" />
+          <Property Name="src_package_number" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+      </Schema>
+    </edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="erpModel" Alias="Self" p1:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:p1="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
         <EntityContainer Name="erpEntities" p1:LazyLoadingEnabled="true">
           <EntitySet Name="base_privilege_entity" EntityType="erpModel.base_privilege_entity" />
           <EntitySet Name="base_user" EntityType="erpModel.base_user" />
+          <EntitySet Name="wh_transfer_details" EntityType="erpModel.wh_transfer_details" />
         </EntityContainer>
         <EntityType Name="base_privilege_entity">
           <Key>
@@ -48,6 +74,29 @@
           <Property Name="id" Type="Int32" Nullable="false" />
           <Property Name="user" Type="String" MaxLength="50" Unicode="true" FixedLength="false" />
           <Property Name="authorities" Type="String" MaxLength="50" Unicode="true" FixedLength="false" />
+        </EntityType>
+        <EntityType Name="wh_transfer_details">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int64" Nullable="false" />
+          <Property Name="created" Type="DateTime" Precision="3" />
+          <Property Name="updated" Type="DateTime" Precision="3" />
+          <Property Name="transfer_id" Type="Int32" />
+          <Property Name="transfer_item_id" Type="Int32" />
+          <Property Name="product_name" Type="String" MaxLength="100" Unicode="true" FixedLength="false" />
+          <Property Name="product_id" Type="Int32" />
+          <Property Name="man_pn" Type="String" MaxLength="100" Unicode="true" FixedLength="false" />
+          <Property Name="done_quantity" Type="Double" />
+          <Property Name="uom_id" Type="Int32" />
+          <Property Name="uom_name" Type="String" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="src_location_id" Type="Int32" />
+          <Property Name="dest_location_id" Type="Int32" />
+          <Property Name="dest_package_number" Type="String" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="man_id" Type="Int32" />
+          <Property Name="status" Type="Int32" />
+          <Property Name="trace_number" Type="String" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="src_package_number" Type="String" MaxLength="50" Unicode="true" FixedLength="false" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
@@ -70,6 +119,30 @@
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="user" ColumnName="user" />
                 <ScalarProperty Name="authorities" ColumnName="authorities" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="wh_transfer_details">
+            <EntityTypeMapping TypeName="erpModel.wh_transfer_details">
+              <MappingFragment StoreEntitySet="wh_transfer_details">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="created" ColumnName="created" />
+                <ScalarProperty Name="updated" ColumnName="updated" />
+                <ScalarProperty Name="transfer_id" ColumnName="transfer_id" />
+                <ScalarProperty Name="transfer_item_id" ColumnName="transfer_item_id" />
+                <ScalarProperty Name="product_name" ColumnName="product_name" />
+                <ScalarProperty Name="product_id" ColumnName="product_id" />
+                <ScalarProperty Name="man_pn" ColumnName="man_pn" />
+                <ScalarProperty Name="done_quantity" ColumnName="done_quantity" />
+                <ScalarProperty Name="uom_id" ColumnName="uom_id" />
+                <ScalarProperty Name="uom_name" ColumnName="uom_name" />
+                <ScalarProperty Name="src_location_id" ColumnName="src_location_id" />
+                <ScalarProperty Name="dest_location_id" ColumnName="dest_location_id" />
+                <ScalarProperty Name="dest_package_number" ColumnName="dest_package_number" />
+                <ScalarProperty Name="man_id" ColumnName="man_id" />
+                <ScalarProperty Name="status" ColumnName="status" />
+                <ScalarProperty Name="trace_number" ColumnName="trace_number" />
+                <ScalarProperty Name="src_package_number" ColumnName="src_package_number" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

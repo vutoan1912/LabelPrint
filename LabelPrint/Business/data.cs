@@ -202,19 +202,12 @@ namespace LabelPrint.Business
         }
     }
 
-    public interface IUserRepository : IGenericDataRepository<base_user>
-    {
-    }
+    public interface IUserRepository : IGenericDataRepository<base_user>{}
+    public interface IPrivilegeRepository : IGenericDataRepository<base_privilege_entity>{}
+    public interface ITransferDetailsRepository : IGenericDataRepository<wh_transfer_details> { }
 
-    public interface IPrivilegeRepository : IGenericDataRepository<base_privilege_entity>
-    {
-    }
+    public class UserRepository : GenericDataRepository<base_user>, IUserRepository{}
+    public class PrivilegeRepository : GenericDataRepository<base_privilege_entity>, IPrivilegeRepository{}
+    public class TransferDetailsRepository : GenericDataRepository<wh_transfer_details>, ITransferDetailsRepository { }
 
-    public class UserRepository : GenericDataRepository<base_user>, IUserRepository
-    {
-    }
-
-    public class PrivilegeRepository : GenericDataRepository<base_privilege_entity>, IPrivilegeRepository
-    {
-    }
 }

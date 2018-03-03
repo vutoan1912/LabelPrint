@@ -146,6 +146,7 @@
             this.Controls.Add(this.TileInventory);
             this.Name = "DashboardInventory";
             this.Text = "Dashboard";
+            this.Load += new System.EventHandler(this.DashboardInventory_Load);
             this.ResumeLayout(false);
 
         }

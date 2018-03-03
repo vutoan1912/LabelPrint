@@ -351,6 +351,20 @@ namespace LabelPrint.Business
             catch { }
             return Result;
         }
+
+        public static List<string> CreateSequential(int nextNumber, int step, int length, int quantity, string prefix = "")
+        {
+            List<string> result = new List<string>();
+            string form = new String('0', length);
+            int i = nextNumber;
+            while(i <= quantity)
+            {
+                string replace = form.Substring(0, length - i.ToString().Length - 1);
+                result.Add(prefix + replace + i.ToString());
+                i++;
+            }
+            return result;
+        }
     }
 
     public static class DataTableExt

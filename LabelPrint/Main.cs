@@ -77,10 +77,10 @@ namespace LabelPrint
                         i++;
                     }
 
-                    //UserRepository user = new UserRepository();
+                    UserRepository user = new UserRepository();
                     //IList<base_user> arr_delete = user.GetAll();
                     //user.Remove(arr_delete.ToArray());
-                    //user.Add(arr_user.ToArray());
+                    user.Add(arr_user.ToArray());
 
                     this.Hide();
                     var dashboard = new DashboardInventory();

@@ -224,12 +224,16 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>erpModel.edmx</DependentUpon>
     </Compile>
+    <Compile Include="App_Data\wh_transfer_details.cs">
+      <DependentUpon>erpModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Business\api.cs" />
     <Compile Include="Business\auth.cs" />
     <Compile Include="Business\common.cs" />
     <Compile Include="Business\config.cs" />
     <Compile Include="Business\data.cs" />
     <Compile Include="Business\http.cs" />
+    <Compile Include="Business\label.cs" />
     <Compile Include="Business\Language.cs" />
     <Compile Include="Business\print.cs" />
     <Compile Include="Business\Zebra\FileIO.cs" />

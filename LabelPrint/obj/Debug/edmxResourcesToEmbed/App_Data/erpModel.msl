@@ -19,5 +19,29 @@
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
+    <EntitySetMapping Name="wh_transfer_details">
+      <EntityTypeMapping TypeName="erpModel.wh_transfer_details">
+        <MappingFragment StoreEntitySet="wh_transfer_details">
+          <ScalarProperty Name="id" ColumnName="id" />
+          <ScalarProperty Name="created" ColumnName="created" />
+          <ScalarProperty Name="updated" ColumnName="updated" />
+          <ScalarProperty Name="transfer_id" ColumnName="transfer_id" />
+          <ScalarProperty Name="transfer_item_id" ColumnName="transfer_item_id" />
+          <ScalarProperty Name="product_name" ColumnName="product_name" />
+          <ScalarProperty Name="product_id" ColumnName="product_id" />
+          <ScalarProperty Name="man_pn" ColumnName="man_pn" />
+          <ScalarProperty Name="done_quantity" ColumnName="done_quantity" />
+          <ScalarProperty Name="uom_id" ColumnName="uom_id" />
+          <ScalarProperty Name="uom_name" ColumnName="uom_name" />
+          <ScalarProperty Name="src_location_id" ColumnName="src_location_id" />
+          <ScalarProperty Name="dest_location_id" ColumnName="dest_location_id" />
+          <ScalarProperty Name="dest_package_number" ColumnName="dest_package_number" />
+          <ScalarProperty Name="man_id" ColumnName="man_id" />
+          <ScalarProperty Name="status" ColumnName="status" />
+          <ScalarProperty Name="trace_number" ColumnName="trace_number" />
+          <ScalarProperty Name="src_package_number" ColumnName="src_package_number" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
   </EntityContainerMapping>
 </Mapping>
