@@ -18,6 +18,7 @@ namespace LabelPrint.Dashboard
         public DashboardInventory()
         {
             InitializeComponent();
+            syncInventoryLocalToErp ThreadSync = new syncInventoryLocalToErp();
         }
 
         private void tileItem1_ItemClick(object sender, DevExpress.XtraEditors.TileItemEventArgs e)

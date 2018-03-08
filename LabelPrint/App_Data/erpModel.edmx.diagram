@@ -4,7 +4,7 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="4edfd16bb9614409977fbbc1bd2d9218" Name="Diagram1">
+      <Diagram DiagramId="0fa3b30d86464164afc42e7eaa5d2628" Name="Diagram1">
         <EntityTypeShape EntityType="erpModel.base_privilege_entity" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
         <EntityTypeShape EntityType="erpModel.base_user" Width="1.5" PointX="2.75" PointY="0.75" IsExpanded="true" />
         <EntityTypeShape EntityType="erpModel.wh_transfer_details" Width="1.5" PointX="0.75" PointY="3.75" IsExpanded="true" />

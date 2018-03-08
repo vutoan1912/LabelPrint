@@ -17,10 +17,12 @@ using System.Drawing;
 using DevExpress.Utils;
 using System.IO;
 using System.Windows.Forms;
+using System.Web.Script.Serialization;
+using System.Collections;
 
 namespace LabelPrint.Business
 {
-    class Common
+    public static class Common
     {
         public static String GetTimestamp(DateTime value)
         {
@@ -34,11 +36,11 @@ namespace LabelPrint.Business
             return cal.GetWeekOfYear(DateTime.Now, dfi.CalendarWeekRule, dfi.FirstDayOfWeek);
         }
 
-        public static DataTable ToDataTable(List<ExpandoObject> list, string tableName = "myTable")
+        public static DataTable ToDataTable(List<ExpandoObject> list, string tableName = "myTable", int? _length = null)
         {
             if (list == null || list.Count == 0) return null;
             //build columns
-            var props = (IDictionary<string, object>)list[0];
+            var props = _length != null ? (IDictionary<string, object>)list[Common.ConvertInt(_length)] : (IDictionary<string, object>)list[0];
             var t = new DataTable(tableName);
             Type type;
             foreach (var prop in props)
@@ -357,13 +359,102 @@ namespace LabelPrint.Business
             List<string> result = new List<string>();
             string form = new String('0', length);
             int i = nextNumber;
-            while(i <= quantity)
+            while (i < (nextNumber + quantity))
             {
-                string replace = form.Substring(0, length - i.ToString().Length - 1);
+                string replace = form.Substring(0, length - i.ToString().Length);
                 result.Add(prefix + replace + i.ToString());
                 i++;
             }
             return result;
+        }
+
+        public static ExpandoObject ToExpando(this string json)
+        {
+            JavaScriptSerializer serializer = new JavaScriptSerializer();
+            IDictionary<string, object> dictionary = serializer.Deserialize<IDictionary<string, object>>(json);
+            return Expando(dictionary);
+        }
+
+        public static ExpandoObject Expando(this IDictionary<string, object> dictionary)
+        {
+            ExpandoObject expandoObject = new ExpandoObject();
+            IDictionary<string, object> objects = expandoObject;
+
+            foreach (var item in dictionary)
+            {
+                bool processed = false;
+
+                if (item.Value is IDictionary<string, object>)
+                {
+                    objects.Add(item.Key, Expando((IDictionary<string, object>)item.Value));
+                    processed = true;
+                }
+                else if (item.Value is ICollection)
+                {
+                    List<object> itemList = new List<object>();
+
+                    foreach (var item2 in (ICollection)item.Value)
+
+                        if (item2 is IDictionary<string, object>)
+                            itemList.Add(Expando((IDictionary<string, object>)item2));
+                        else
+                            itemList.Add(Expando(new Dictionary<string, object> { { "Unknown", item2 } }));
+
+                    if (itemList.Count > 0)
+                    {
+                        objects.Add(item.Key, itemList);
+                        processed = true;
+                    }
+                }
+
+                if (!processed)
+                    objects.Add(item);
+            }
+
+            return expandoObject;
+        }
+
+        public static string DictionaryStringToJson(this Dictionary<string, string> dictionary)
+        {
+            var kvs = dictionary.Select(kvp => string.Format("\"{0}\":\"{1}\"", kvp.Key, string.Concat(",", kvp.Value)));
+            return string.Concat("{", string.Join(",", kvs), "}");
+        }
+
+        public static Dictionary<string, string> FromJsonToDictionary(this string json)
+        {
+            string[] keyValueArray = json.Replace("{", string.Empty).Replace("}", string.Empty).Replace("\"", string.Empty).Split(',');
+            return keyValueArray.ToDictionary(item => item.Split(':')[0], item => item.Split(':')[1]);
+        }
+
+        public static string DictionaryObjectToJson(Dictionary<string, object> dict)
+        {
+            string entries = "";
+            foreach (KeyValuePair<string, object> entry in dict)
+            {
+                Type type = entry.Value.GetType();
+                if ((entry.Value.ToString().Trim().Substring(0, 1) == "[") || (entry.Value.ToString().Trim().Substring(0, 1) == "{"))
+                {
+                    if (entries.Length > 0)
+                        entries = entries + "," + "\"" + entry.Key + "\":" + entry.Value.ToString();
+                    else
+                        entries = "\"" + entry.Key + "\":" + entry.Value.ToString();
+                }
+                else if (type.Name.ToLower().Contains("string"))
+                {
+                    if (entries.Length > 0)
+                        entries = entries + "," + "\"" + entry.Key + "\":\"" + entry.Value.ToString() + "\"";
+                    else
+                        entries = "\"" + entry.Key + "\":\"" + entry.Value.ToString() + "\"";
+                }
+                else
+                {
+                    if (entries.Length > 0)
+                        entries = entries + "," + "\"" + entry.Key + "\":" + entry.Value.ToString();
+                    else
+                        entries = "\"" + entry.Key + "\":" + entry.Value.ToString();
+                }
+            }
+            return "{" + entries + "}";
         }
     }
 

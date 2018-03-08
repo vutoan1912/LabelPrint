@@ -48,6 +48,29 @@ namespace LabelPrint.Business
             var response = http.Get(full_url, param);
             return response;
         }
+
+        public HttpResponse Put(string url, Object param)
+        {
+            string full_url = Config.API_URL + url;
+            var http = new HttpClient();
+            http.Request.Accept = HttpContentTypes.ApplicationJson;
+            http.Request.ContentType = HttpContentTypes.ApplicationXWwwFormUrlEncoded;
+            http.Request.AddExtraHeader("Authorization", Config.API_KEY);
+            var response = http.Put(full_url, param, HttpContentTypes.ApplicationJson);
+            return response;
+        }
+
+        public HttpResponse Delete(string url, Object param)
+        {
+            string full_url = Config.API_URL + url;
+            var http = new HttpClient();
+            http.Request.Accept = HttpContentTypes.ApplicationJson;
+            http.Request.ContentType = HttpContentTypes.ApplicationXWwwFormUrlEncoded;
+            http.Request.AddExtraHeader("Authorization", Config.API_KEY);
+            var response = http.Delete(full_url, param);
+            return response;
+        }
+
     }
 
     class ApiResponse
