@@ -33,6 +33,8 @@
             DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject2 = new DevExpress.Utils.SerializableAppearanceObject();
             DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject3 = new DevExpress.Utils.SerializableAppearanceObject();
             this.panelControl2 = new DevExpress.XtraEditors.PanelControl();
+            this.txtNumberPerPackage = new DevExpress.XtraEditors.TextEdit();
+            this.labelControl5 = new DevExpress.XtraEditors.LabelControl();
             this.btnAllocate = new DevExpress.XtraEditors.SimpleButton();
             this.gluUomLot = new DevExpress.XtraEditors.GridLookUpEdit();
             this.gridView8 = new DevExpress.XtraGrid.Views.Grid.GridView();
@@ -92,6 +94,7 @@
             this.imgCbxLanguage = new DevExpress.XtraEditors.ImageComboBoxEdit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl2)).BeginInit();
             this.panelControl2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.txtNumberPerPackage.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gluUomLot.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView8)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gluUomPackage.Properties)).BeginInit();
@@ -118,6 +121,8 @@
             // 
             // panelControl2
             // 
+            this.panelControl2.Controls.Add(this.txtNumberPerPackage);
+            this.panelControl2.Controls.Add(this.labelControl5);
             this.panelControl2.Controls.Add(this.btnAllocate);
             this.panelControl2.Controls.Add(this.gluUomLot);
             this.panelControl2.Controls.Add(this.gluUomPackage);
@@ -140,19 +145,45 @@
             this.panelControl2.Size = new System.Drawing.Size(188, 370);
             this.panelControl2.TabIndex = 25;
             // 
+            // txtNumberPerPackage
+            // 
+            this.txtNumberPerPackage.Location = new System.Drawing.Point(83, 174);
+            this.txtNumberPerPackage.Name = "txtNumberPerPackage";
+            this.txtNumberPerPackage.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 9F);
+            this.txtNumberPerPackage.Properties.Appearance.Options.UseFont = true;
+            this.txtNumberPerPackage.Properties.LookAndFeel.SkinName = "Blue";
+            this.txtNumberPerPackage.Properties.LookAndFeel.UseDefaultLookAndFeel = false;
+            this.txtNumberPerPackage.Properties.Mask.MaskType = DevExpress.XtraEditors.Mask.MaskType.Numeric;
+            this.txtNumberPerPackage.Size = new System.Drawing.Size(100, 20);
+            this.txtNumberPerPackage.TabIndex = 48;
+            this.txtNumberPerPackage.Visible = false;
+            // 
+            // labelControl5
+            // 
+            this.labelControl5.Appearance.Font = new System.Drawing.Font("Tahoma", 9F);
+            this.labelControl5.Appearance.ForeColor = System.Drawing.SystemColors.HotTrack;
+            this.labelControl5.Location = new System.Drawing.Point(8, 177);
+            this.labelControl5.LookAndFeel.SkinName = "Blue";
+            this.labelControl5.Name = "labelControl5";
+            this.labelControl5.Size = new System.Drawing.Size(71, 14);
+            this.labelControl5.TabIndex = 47;
+            this.labelControl5.Text = "Số lượng/Gói";
+            this.labelControl5.Visible = false;
+            // 
             // btnAllocate
             // 
-            this.btnAllocate.Location = new System.Drawing.Point(82, 310);
+            this.btnAllocate.Location = new System.Drawing.Point(82, 301);
             this.btnAllocate.LookAndFeel.SkinName = "Blue";
             this.btnAllocate.LookAndFeel.UseDefaultLookAndFeel = false;
             this.btnAllocate.Name = "btnAllocate";
             this.btnAllocate.Size = new System.Drawing.Size(100, 23);
             this.btnAllocate.TabIndex = 31;
             this.btnAllocate.Text = ">>>";
+            this.btnAllocate.Click += new System.EventHandler(this.btnAllocate_Click);
             // 
             // gluUomLot
             // 
-            this.gluUomLot.Location = new System.Drawing.Point(83, 202);
+            this.gluUomLot.Location = new System.Drawing.Point(83, 195);
             this.gluUomLot.Name = "gluUomLot";
             this.gluUomLot.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
@@ -188,7 +219,7 @@
             // 
             // gluUomPackage
             // 
-            this.gluUomPackage.Location = new System.Drawing.Point(82, 149);
+            this.gluUomPackage.Location = new System.Drawing.Point(82, 143);
             this.gluUomPackage.Name = "gluUomPackage";
             this.gluUomPackage.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
@@ -296,7 +327,7 @@
             // 
             // txtNumberLot
             // 
-            this.txtNumberLot.Location = new System.Drawing.Point(82, 260);
+            this.txtNumberLot.Location = new System.Drawing.Point(82, 253);
             this.txtNumberLot.Name = "txtNumberLot";
             this.txtNumberLot.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 9F);
             this.txtNumberLot.Properties.Appearance.Options.UseFont = true;
@@ -307,7 +338,7 @@
             // 
             this.labelControl7.Appearance.Font = new System.Drawing.Font("Tahoma", 9F);
             this.labelControl7.Appearance.ForeColor = System.Drawing.SystemColors.HotTrack;
-            this.labelControl7.Location = new System.Drawing.Point(7, 263);
+            this.labelControl7.Location = new System.Drawing.Point(7, 256);
             this.labelControl7.LookAndFeel.SkinName = "Blue";
             this.labelControl7.Name = "labelControl7";
             this.labelControl7.Size = new System.Drawing.Size(57, 14);
@@ -316,7 +347,7 @@
             // 
             // txtNumberPerLot
             // 
-            this.txtNumberPerLot.Location = new System.Drawing.Point(82, 230);
+            this.txtNumberPerLot.Location = new System.Drawing.Point(82, 223);
             this.txtNumberPerLot.Name = "txtNumberPerLot";
             this.txtNumberPerLot.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 9F);
             this.txtNumberPerLot.Properties.Appearance.Options.UseFont = true;
@@ -327,7 +358,7 @@
             // 
             this.labelControl8.Appearance.Font = new System.Drawing.Font("Tahoma", 9F);
             this.labelControl8.Appearance.ForeColor = System.Drawing.SystemColors.HotTrack;
-            this.labelControl8.Location = new System.Drawing.Point(9, 233);
+            this.labelControl8.Location = new System.Drawing.Point(9, 226);
             this.labelControl8.LookAndFeel.SkinName = "Blue";
             this.labelControl8.Name = "labelControl8";
             this.labelControl8.Size = new System.Drawing.Size(72, 14);
@@ -338,7 +369,7 @@
             // 
             this.labelControl9.Appearance.Font = new System.Drawing.Font("Tahoma", 9F);
             this.labelControl9.Appearance.ForeColor = System.Drawing.SystemColors.HotTrack;
-            this.labelControl9.Location = new System.Drawing.Point(9, 204);
+            this.labelControl9.Location = new System.Drawing.Point(9, 197);
             this.labelControl9.LookAndFeel.SkinName = "Blue";
             this.labelControl9.Name = "labelControl9";
             this.labelControl9.Size = new System.Drawing.Size(45, 14);
@@ -349,7 +380,7 @@
             // 
             this.labelControl4.Appearance.Font = new System.Drawing.Font("Tahoma", 9F);
             this.labelControl4.Appearance.ForeColor = System.Drawing.SystemColors.HotTrack;
-            this.labelControl4.Location = new System.Drawing.Point(10, 151);
+            this.labelControl4.Location = new System.Drawing.Point(10, 145);
             this.labelControl4.LookAndFeel.SkinName = "Blue";
             this.labelControl4.Name = "labelControl4";
             this.labelControl4.Size = new System.Drawing.Size(67, 14);
@@ -429,6 +460,7 @@
             this.btnDelete.Size = new System.Drawing.Size(75, 23);
             this.btnDelete.TabIndex = 29;
             this.btnDelete.Text = "Xóa tem";
+            this.btnDelete.Click += new System.EventHandler(this.btnDelete_Click);
             // 
             // vgListLot
             // 
@@ -544,8 +576,6 @@
             this.clmCountPrint.Caption = "Số lần in";
             this.clmCountPrint.FieldName = "countPrint";
             this.clmCountPrint.Name = "clmCountPrint";
-            this.clmCountPrint.Visible = true;
-            this.clmCountPrint.VisibleIndex = 7;
             this.clmCountPrint.Width = 62;
             // 
             // clmGrvPrint
@@ -573,7 +603,7 @@
             this.clmGrvEdit.FieldName = "grvEdit";
             this.clmGrvEdit.Name = "clmGrvEdit";
             this.clmGrvEdit.Visible = true;
-            this.clmGrvEdit.VisibleIndex = 8;
+            this.clmGrvEdit.VisibleIndex = 7;
             this.clmGrvEdit.Width = 65;
             // 
             // btnGrvEdit
@@ -585,6 +615,7 @@
             this.btnGrvEdit.LookAndFeel.UseDefaultLookAndFeel = false;
             this.btnGrvEdit.Name = "btnGrvEdit";
             this.btnGrvEdit.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.HideTextEditor;
+            this.btnGrvEdit.Click += new System.EventHandler(this.btnGrvEdit_Click);
             // 
             // clmGrvDelete
             // 
@@ -593,7 +624,7 @@
             this.clmGrvDelete.FieldName = "grvDelete";
             this.clmGrvDelete.Name = "clmGrvDelete";
             this.clmGrvDelete.Visible = true;
-            this.clmGrvDelete.VisibleIndex = 9;
+            this.clmGrvDelete.VisibleIndex = 8;
             this.clmGrvDelete.Width = 37;
             // 
             // btnGrvDelete
@@ -605,6 +636,7 @@
             this.btnGrvDelete.LookAndFeel.UseDefaultLookAndFeel = false;
             this.btnGrvDelete.Name = "btnGrvDelete";
             this.btnGrvDelete.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.HideTextEditor;
+            this.btnGrvDelete.Click += new System.EventHandler(this.btnGrvDelete_Click);
             // 
             // clmDetailsTransferId
             // 
@@ -689,6 +721,7 @@
             new DevExpress.XtraEditors.Controls.ImageComboBoxItem("vi-VN", ((short)(1)), 1)});
             this.imgCbxLanguage.Size = new System.Drawing.Size(89, 20);
             this.imgCbxLanguage.TabIndex = 0;
+            this.imgCbxLanguage.Visible = false;
             // 
             // TransferReceiptsDetails
             // 
@@ -708,6 +741,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.panelControl2)).EndInit();
             this.panelControl2.ResumeLayout(false);
             this.panelControl2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.txtNumberPerPackage.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gluUomLot.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView8)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gluUomPackage.Properties)).EndInit();
@@ -796,6 +830,8 @@
         private DevExpress.XtraGrid.Columns.GridColumn clmGrvDelete;
         private DevExpress.XtraEditors.Repository.RepositoryItemButtonEdit btnGrvEdit;
         private DevExpress.XtraEditors.Repository.RepositoryItemButtonEdit btnGrvDelete;
+        private DevExpress.XtraEditors.TextEdit txtNumberPerPackage;
+        private DevExpress.XtraEditors.LabelControl labelControl5;
 
     }
 }

@@ -25,7 +25,7 @@ namespace LabelPrint.Inventory
         private CultureInfo culture;
         public DataTable dt_request_paper;
         public DataTable dt_products;
-        public DataTable dt_trans_details;
+        public DataTable dt_trans_details = new DataTable();
         public List<wh_transfer_details> list_transfer_details;
         public Dictionary<string, dynamic> transfer_info;
 
@@ -406,149 +406,257 @@ namespace LabelPrint.Inventory
 
         private void btnAllocate_Click(object sender, EventArgs e)
         {
-            if (txtNumberPerPackage.Text.Trim().Length == 0
-                || txtNumberPerLot.Text.Trim().Length == 0
-                || txtNumberPackage.Text.Trim().Length == 0
-                || txtNumberLot.Text.Trim().Length == 0)
+            if (txtNumberPerPackage.Text.Trim().Length == 0 && txtNumberPackage.Text.Trim().Length == 0
+                && txtNumberPerLot.Text.Trim().Length == 0 && txtNumberLot.Text.Trim().Length == 0)
             {
                 MessageBox.Show("The request to enter required information is missing");
+                return;
             }
+
+            //if (Common.ConvertDouble(txtNumberPerPackage.Text) < (Common.ConvertDouble(txtNumberPerLot.Text) * Common.ConvertInt(txtNumberLot.Text)))
+            //{
+            //    MessageBox.Show("The total amount of lot is greater than the number of the package");
+            //    return;
+            //}
 
             bool status_reserve = true;
             List<string> List_allocate_package = new List<string>();
             List<string> List_allocate_lot = new List<string>();
 
-            //allocate package
-            string url_package = "sequences/4/reserve/" + txtNumberPackage.Text;
-            HttpResponse res_package = HTTP.Instance.Post(url_package, null);
-
-            if (res_package.StatusCode == System.Net.HttpStatusCode.OK)
+            if (txtNumberPerPackage.Text.Trim().Length > 0 && txtNumberPackage.Text.Trim().Length > 0 && Common.ConvertInt(txtNumberPackage.Text.Trim()) > 0)
             {
-                try
-                {
-                    var serializer_package = new JavaScriptSerializer();
-                    dynamic data_package = serializer_package.Deserialize(res_package.RawText, typeof(object));
+                //allocate package
+                string url_package = "sequences/4/reserve/" + txtNumberPackage.Text;
+                HttpResponse res_package = HTTP.Instance.Post(url_package, null);
 
-                    List_allocate_package = Common.CreateSequential(Common.ConvertInt(data_package["nextNumber"]), Common.ConvertInt(data_package["step"]), Common.ConvertInt(data_package["length"]), Common.ConvertInt(txtNumberPackage.Text), data_package["prefix"]);
+                if (res_package.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    try
+                    {
+                        var serializer_package = new JavaScriptSerializer();
+                        dynamic data_package = serializer_package.Deserialize(res_package.RawText, typeof(object));
+
+                        List_allocate_package = Common.CreateSequential(Common.ConvertInt(data_package["nextNumber"]), Common.ConvertInt(data_package["step"]), Common.ConvertInt(data_package["length"]), Common.ConvertInt(txtNumberPackage.Text), data_package["prefix"]);
+                    }
+                    catch (Exception ex)
+                    {
+                        status_reserve = false;
+                    };
                 }
-                catch (Exception ex)
+                else
                 {
                     status_reserve = false;
-                };
-            }
-            else
-            {
-                status_reserve = false;
-            }
-
-            //allocate lot
-            int number_allocate_lot = Common.ConvertInt(txtNumberLot.Text) * Common.ConvertInt(txtNumberPackage.Text);
-            string url_lot = "sequences/2/reserve/" + Convert.ToString(number_allocate_lot);
-            HttpResponse res_lot = HTTP.Instance.Post(url_lot, null);
-
-            if (res_lot.StatusCode == System.Net.HttpStatusCode.OK)
-            {
-                try
-                {
-                    var serializer_lot = new JavaScriptSerializer();
-                    dynamic data_lot = serializer_lot.Deserialize(res_lot.RawText, typeof(object));
-
-                    List_allocate_lot = Common.CreateSequential(Common.ConvertInt(data_lot["nextNumber"]), Common.ConvertInt(data_lot["step"]), Common.ConvertInt(data_lot["length"]), number_allocate_lot, data_lot["prefix"]);
                 }
-                catch (Exception ex)
+            }
+
+            if (txtNumberPerLot.Text.Trim().Length > 0 && txtNumberLot.Text.Trim().Length > 0 && Common.ConvertInt(txtNumberLot.Text.Trim()) > 0)
+            {
+                //allocate lot
+                int number_allocate_lot = 0;
+                if (Common.ConvertInt(txtNumberPackage.Text) > 0)
+                {
+                    number_allocate_lot = Common.ConvertInt(txtNumberLot.Text) * Common.ConvertInt(txtNumberPackage.Text);
+                }
+                else
+                {
+                    number_allocate_lot = Common.ConvertInt(txtNumberLot.Text);
+                }
+                
+                string url_lot = "sequences/2/reserve/" + Convert.ToString(number_allocate_lot);
+                HttpResponse res_lot = HTTP.Instance.Post(url_lot, null);
+
+                if (res_lot.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    try
+                    {
+                        var serializer_lot = new JavaScriptSerializer();
+                        dynamic data_lot = serializer_lot.Deserialize(res_lot.RawText, typeof(object));
+
+                        List_allocate_lot = Common.CreateSequential(Common.ConvertInt(data_lot["nextNumber"]), Common.ConvertInt(data_lot["step"]), Common.ConvertInt(data_lot["length"]), number_allocate_lot, data_lot["prefix"]);
+                    }
+                    catch (Exception ex)
+                    {
+                        status_reserve = false;
+                    };
+                }
+                else
                 {
                     status_reserve = false;
-                };
-            }
-            else
-            {
-                status_reserve = false;
-            }
-
-            DataRow data = grvListPart.GetDataRow(grvListPart.GetSelectedRows().FirstOrDefault());
-            long maxID = 0;
-            using (erpEntities dbContext = new erpEntities())
-            {
-                wh_transfer_details wtd = dbContext.wh_transfer_details.OrderByDescending(u => u.id).FirstOrDefault();
-                if (wtd != null) maxID = wtd.id + 1;
+                }
             }
 
             if (status_reserve)
             {
+                DataRow data = grvListPart.GetDataRow(grvListPart.GetSelectedRows().FirstOrDefault());
+                long maxID = 0;
+                using (erpEntities dbContext = new erpEntities())
+                {
+                    wh_transfer_details wtd = dbContext.wh_transfer_details.OrderByDescending(u => u.id).FirstOrDefault();
+                    if (wtd != null) maxID = wtd.id + 1;
+                }
                 this.dt_trans_details = checkStructureDatatable(dt_trans_details);
 
                 TransferDetailsRepository TransferDetails = new TransferDetailsRepository();
                 list_transfer_details = new List<wh_transfer_details>();
-                foreach (string pack in List_allocate_package)
+
+                if (List_allocate_package.Count > 0 && List_allocate_lot.Count > 0)
                 {
-                    wh_transfer_details wtd = new wh_transfer_details();
-                    wtd.src_package_number = txtSourceNumber.Text;
-                    wtd.created = DateTime.Now;
-                    wtd.dest_location_id = Common.ConvertInt(gluDestinationLocation.EditValue);
-                    wtd.dest_package_number = pack;
-                    wtd.done_quantity = Common.ConvertDouble(txtNumberPerPackage.Text);
-                    wtd.id = maxID;
-                    wtd.man_id = Common.ConvertInt(data["manId"]);
-                    //wtd.man_pn = Convert.ToString(data["manPn"]);
-                    try { wtd.man_pn = Convert.ToString(data["manPn"]); }
-                    catch (Exception ex) { wtd.man_pn = null; };
-                    wtd.product_id = Common.ConvertInt(data["productId"]);
-                    wtd.product_name = Convert.ToString(data["productName"]);
-                    wtd.src_location_id = Common.ConvertInt(gluSourceLocation.EditValue);
-                    wtd.status = 0;
-                    wtd.transfer_id = Common.ConvertInt(gluTransferNumber.EditValue);
-                    wtd.transfer_item_id = Common.ConvertInt(data["id"]);
-                    wtd.trace_number = null;
-                    wtd.src_package_number = txtSourceNumber.Text;
-                    list_transfer_details.Add(wtd);
+                    #region allocate package & lot
 
-                    //add to table list package
-                    addPackageDataRow(wtd.src_package_number, wtd.dest_package_number, wtd.trace_number, Common.ConvertInt(wtd.src_location_id),
-                        Common.ConvertInt(wtd.dest_location_id), Common.ConvertInt(wtd.done_quantity), Common.ConvertInt(wtd.transfer_id),
-                        Common.ConvertInt(wtd.transfer_item_id), Common.ConvertInt(wtd.product_id), Common.ConvertInt(wtd.man_id));
+                    #region allocate package
+                    //foreach (string pack in List_allocate_package)
+                    //{
+                    //    wh_transfer_details wtd = new wh_transfer_details();
+                    //    wtd.src_package_number = txtSourceNumber.Text;
+                    //    wtd.created = DateTime.Now;
+                    //    wtd.dest_location_id = Common.ConvertInt(gluDestinationLocation.EditValue);
+                    //    wtd.dest_package_number = pack;
+                    //    wtd.done_quantity = Common.ConvertDouble(txtNumberPerPackage.Text) - (Common.ConvertDouble(txtNumberPerLot.Text) * Common.ConvertInt(txtNumberLot.Text));
+                    //    wtd.id = maxID;
+                    //    wtd.man_id = Common.ConvertInt(data["manId"]);
+                    //    //wtd.man_pn = Convert.ToString(data["manPn"]);
+                    //    try { wtd.man_pn = Convert.ToString(data["manPn"]); }
+                    //    catch (Exception ex) { wtd.man_pn = null; };
+                    //    wtd.product_id = Common.ConvertInt(data["productId"]);
+                    //    wtd.product_name = Convert.ToString(data["productName"]);
+                    //    wtd.src_location_id = Common.ConvertInt(gluSourceLocation.EditValue);
+                    //    wtd.status = 0;
+                    //    wtd.transfer_id = Common.ConvertInt(gluTransferNumber.EditValue);
+                    //    wtd.transfer_item_id = Common.ConvertInt(data["id"]);
+                    //    wtd.trace_number = null;
+                    //    wtd.src_package_number = txtSourceNumber.Text;
+                    //    list_transfer_details.Add(wtd);
 
-                    //Print
-                    LabelPackage labelPackage = new LabelPackage(wtd.product_name, pack, "");
-                    labelPackage.Template();
+                    //    //add to table list package
+                    //    addPackageDataRow(wtd.src_package_number, wtd.dest_package_number, wtd.trace_number, Common.ConvertInt(wtd.src_location_id),
+                    //        Common.ConvertInt(wtd.dest_location_id), Common.ConvertInt(wtd.done_quantity), Common.ConvertInt(wtd.transfer_id),
+                    //        Common.ConvertInt(wtd.transfer_item_id), Common.ConvertInt(wtd.product_id), Common.ConvertInt(wtd.man_id));
 
-                    maxID++;
+                    //    maxID++;
+                    //}
+                    #endregion
+
+                    int count_lot_per_package = 0; int i = 0;
+                    foreach (string lot in List_allocate_lot)
+                    {
+                        wh_transfer_details wtd = new wh_transfer_details();
+                        wtd.created = DateTime.Now;
+                        wtd.src_package_number = txtSourceNumber.Text;
+                        wtd.dest_location_id = Common.ConvertInt(gluDestinationLocation.EditValue);
+                        wtd.dest_package_number = List_allocate_package[i];
+                        wtd.done_quantity = Common.ConvertDouble(txtNumberPerLot.Text);
+                        wtd.id = maxID;
+                        wtd.man_id = Common.ConvertInt(data["manId"]);
+                        //wtd.man_pn = Convert.ToString(data["manPn"]);
+                        try { wtd.man_pn = Convert.ToString(data["manPn"]); }
+                        catch (Exception ex) { wtd.man_pn = null; }
+                        wtd.product_id = Common.ConvertInt(data["productId"]);
+                        wtd.product_name = Convert.ToString(data["productName"]);
+                        wtd.src_location_id = Common.ConvertInt(gluSourceLocation.EditValue);
+                        wtd.status = 0;
+                        wtd.transfer_id = Common.ConvertInt(gluTransferNumber.EditValue);
+                        wtd.transfer_item_id = Common.ConvertInt(data["id"]);
+                        wtd.trace_number = lot;
+                        list_transfer_details.Add(wtd);
+
+                        //add to table list package
+                        addPackageDataRow(wtd.src_package_number, wtd.dest_package_number, wtd.trace_number, Common.ConvertInt(wtd.src_location_id),
+                            Common.ConvertInt(wtd.dest_location_id), Common.ConvertInt(wtd.done_quantity), Common.ConvertInt(wtd.transfer_id),
+                            Common.ConvertInt(wtd.transfer_item_id), Common.ConvertInt(wtd.product_id), Common.ConvertInt(wtd.man_id));
+
+                        //Print package
+                        if (count_lot_per_package == 0)
+                        {
+                            LabelPackage labelPackage = new LabelPackage(wtd.product_name, List_allocate_package[i], "");
+                            labelPackage.Template();
+                        }
+
+                        //Print
+                        LabelPackage labelLot = new LabelPackage(wtd.product_name, lot, "");
+                        labelLot.Template();
+
+                        maxID++;
+                        count_lot_per_package++;
+                        if (count_lot_per_package >= Common.ConvertInt(txtNumberLot.Text)) { i++; count_lot_per_package = 0; }
+                    }
+                    #endregion
                 }
-
-                int count_lot_per_package = 0; int i = 0;
-                foreach (string lot in List_allocate_lot)
+                else if (List_allocate_package.Count > 0)
                 {
-                    wh_transfer_details wtd = new wh_transfer_details();
-                    wtd.created = DateTime.Now;
-                    wtd.src_package_number = txtSourceNumber.Text;
-                    wtd.dest_location_id = Common.ConvertInt(gluDestinationLocation.EditValue);
-                    wtd.dest_package_number = List_allocate_package[i];
-                    wtd.done_quantity = Common.ConvertDouble(txtNumberPerLot.Text);
-                    wtd.id = maxID;
-                    wtd.man_id = Common.ConvertInt(data["manId"]);
-                    //wtd.man_pn = Convert.ToString(data["manPn"]);
-                    try { wtd.man_pn = Convert.ToString(data["manPn"]); }
-                    catch (Exception ex) { wtd.man_pn = null; }
-                    wtd.product_id = Common.ConvertInt(data["productId"]);
-                    wtd.product_name = Convert.ToString(data["productName"]);
-                    wtd.src_location_id = Common.ConvertInt(gluSourceLocation.EditValue);
-                    wtd.status = 0;
-                    wtd.transfer_id = Common.ConvertInt(gluTransferNumber.EditValue);
-                    wtd.transfer_item_id = Common.ConvertInt(data["id"]);
-                    wtd.trace_number = lot;
-                    list_transfer_details.Add(wtd);
+                    #region allocate Package
+                    foreach (string pack in List_allocate_package)
+                    {
+                        wh_transfer_details wtd = new wh_transfer_details();
+                        wtd.src_package_number = txtSourceNumber.Text;
+                        wtd.created = DateTime.Now;
+                        wtd.dest_location_id = Common.ConvertInt(gluDestinationLocation.EditValue);
+                        wtd.dest_package_number = pack;
+                        wtd.done_quantity = Common.ConvertDouble(txtNumberPerPackage.Text);
+                        wtd.id = maxID;
+                        wtd.man_id = Common.ConvertInt(data["manId"]);
+                        //wtd.man_pn = Convert.ToString(data["manPn"]);
+                        try { wtd.man_pn = Convert.ToString(data["manPn"]); }
+                        catch (Exception ex) { wtd.man_pn = null; };
+                        wtd.product_id = Common.ConvertInt(data["productId"]);
+                        wtd.product_name = Convert.ToString(data["productName"]);
+                        wtd.src_location_id = Common.ConvertInt(gluSourceLocation.EditValue);
+                        wtd.status = 0;
+                        wtd.transfer_id = Common.ConvertInt(gluTransferNumber.EditValue);
+                        wtd.transfer_item_id = Common.ConvertInt(data["id"]);
+                        wtd.trace_number = "";
+                        wtd.src_package_number = txtSourceNumber.Text;
+                        list_transfer_details.Add(wtd);
 
-                    //add to table list package
-                    addPackageDataRow(wtd.src_package_number, wtd.dest_package_number, wtd.trace_number, Common.ConvertInt(wtd.src_location_id),
-                        Common.ConvertInt(wtd.dest_location_id), Common.ConvertInt(wtd.done_quantity), Common.ConvertInt(wtd.transfer_id), 
-                        Common.ConvertInt(wtd.transfer_item_id), Common.ConvertInt(wtd.product_id), Common.ConvertInt(wtd.man_id));
+                        //add to table list package
+                        addPackageDataRow(wtd.src_package_number, wtd.dest_package_number, wtd.trace_number, Common.ConvertInt(wtd.src_location_id),
+                            Common.ConvertInt(wtd.dest_location_id), Common.ConvertInt(wtd.done_quantity), Common.ConvertInt(wtd.transfer_id),
+                            Common.ConvertInt(wtd.transfer_item_id), Common.ConvertInt(wtd.product_id), Common.ConvertInt(wtd.man_id));
 
-                    //Print
-                    LabelPackage labelPackage = new LabelPackage(wtd.product_name, lot, "");
-                    labelPackage.Template();
+                        //Print package
+                        LabelPackage labelPackage = new LabelPackage(wtd.product_name, pack, "");
+                        labelPackage.Template();
 
-                    maxID++;
-                    count_lot_per_package++;
-                    if (count_lot_per_package >= Common.ConvertInt(txtNumberLot.Text)) { i++; count_lot_per_package = 0; }
+                        maxID++;
+                    }
+                    #endregion
+                }
+                else if (List_allocate_lot.Count > 0)
+                {
+                    #region allocate Lot
+                    foreach (string lot in List_allocate_lot)
+                    {
+                        wh_transfer_details wtd = new wh_transfer_details();
+                        wtd.created = DateTime.Now;
+                        wtd.src_package_number = txtSourceNumber.Text;
+                        wtd.dest_location_id = Common.ConvertInt(gluDestinationLocation.EditValue);
+                        wtd.dest_package_number = "";
+                        wtd.done_quantity = Common.ConvertDouble(txtNumberPerLot.Text);
+                        wtd.id = maxID;
+                        wtd.man_id = Common.ConvertInt(data["manId"]);
+                        //wtd.man_pn = Convert.ToString(data["manPn"]);
+                        try { wtd.man_pn = Convert.ToString(data["manPn"]); }
+                        catch (Exception ex) { wtd.man_pn = null; }
+                        wtd.product_id = Common.ConvertInt(data["productId"]);
+                        wtd.product_name = Convert.ToString(data["productName"]);
+                        wtd.src_location_id = Common.ConvertInt(gluSourceLocation.EditValue);
+                        wtd.status = 0;
+                        wtd.transfer_id = Common.ConvertInt(gluTransferNumber.EditValue);
+                        wtd.transfer_item_id = Common.ConvertInt(data["id"]);
+                        wtd.trace_number = lot;
+                        list_transfer_details.Add(wtd);
+
+                        //add to table list package
+                        addPackageDataRow(wtd.src_package_number, wtd.dest_package_number, wtd.trace_number, Common.ConvertInt(wtd.src_location_id),
+                            Common.ConvertInt(wtd.dest_location_id), Common.ConvertInt(wtd.done_quantity), Common.ConvertInt(wtd.transfer_id),
+                            Common.ConvertInt(wtd.transfer_item_id), Common.ConvertInt(wtd.product_id), Common.ConvertInt(wtd.man_id));
+
+                        //Print Lot
+                        LabelPackage labelLot = new LabelPackage(wtd.product_name, lot, "");
+                        labelLot.Template();
+
+                        maxID++;
+                    }
+                    #endregion
                 }
 
                 vgListPackage.DataSource = dt_trans_details;
@@ -578,7 +686,7 @@ namespace LabelPrint.Inventory
                 myR["transferItemId"] = _transferItemId;
                 myR["productId"] = _productId;
                 myR["manId"] = _manId;
-                myR["lotId"] = _lotId;
+                //myR["lotId"] = _lotId;
                 myR["countPrint"] = _printed;
 
                 this.dt_trans_details.Rows.Add(myR);
@@ -636,7 +744,7 @@ namespace LabelPrint.Inventory
                     if (Common.ConvertDouble(txtNumberPerPackage.Text) % Common.ConvertDouble(txtNumberPerLot.Text) == 0)
                         txtNumberLot.Text = Convert.ToString(Common.ConvertDouble(txtNumberPerPackage.Text) / Common.ConvertDouble(txtNumberPerLot.Text));
                     else
-                        txtNumberLot.Text = Convert.ToString((Common.ConvertDouble(txtNumberPerPackage.Text) / Common.ConvertDouble(txtNumberPerLot.Text)) + 1);
+                        txtNumberLot.Text = Convert.ToString(Math.Floor((Common.ConvertDouble(txtNumberPerPackage.Text) / Common.ConvertDouble(txtNumberPerLot.Text))) + 1);
                 }
                 else if (txtNumberLot.Text != null && txtNumberLot.Text.Length > 0)
                 {
@@ -652,7 +760,7 @@ namespace LabelPrint.Inventory
                 if (Common.ConvertDouble(txtNumberPerPackage.Text) % Common.ConvertDouble(txtNumberPerLot.Text) == 0)
                     txtNumberLot.Text = Convert.ToString(Common.ConvertDouble(txtNumberPerPackage.Text) / Common.ConvertDouble(txtNumberPerLot.Text));
                 else
-                    txtNumberLot.Text = Convert.ToString((Common.ConvertDouble(txtNumberPerPackage.Text) / Common.ConvertDouble(txtNumberPerLot.Text)) + 1);
+                    txtNumberLot.Text = Convert.ToString(Math.Floor((Common.ConvertDouble(txtNumberPerPackage.Text) / Common.ConvertDouble(txtNumberPerLot.Text))) + 1);
             }
         }
 
@@ -663,7 +771,7 @@ namespace LabelPrint.Inventory
                 if (Common.ConvertDouble(txtNumberPerPackage.Text) % Common.ConvertDouble(txtNumberLot.Text) == 0)
                     txtNumberPerLot.Text = Convert.ToString(Common.ConvertDouble(txtNumberPerPackage.Text) / Common.ConvertDouble(txtNumberLot.Text));
                 else
-                    txtNumberPerLot.Text = Convert.ToString(Common.ConvertDouble(txtNumberPerPackage.Text) / Common.ConvertDouble(txtNumberLot.Text));
+                    txtNumberPerLot.Text = Convert.ToString(Math.Floor(Common.ConvertDouble(txtNumberPerPackage.Text) / Common.ConvertDouble(txtNumberLot.Text)));
             }
         }
 
@@ -715,8 +823,15 @@ namespace LabelPrint.Inventory
         {
             TransferReceiptsDetails frmTransferReceiptsDetails = new TransferReceiptsDetails();
             dynamic row = grvListPackage.GetRow(grvListPackage.FocusedRowHandle);
-            frmTransferReceiptsDetails.PackageID = Convert.ToString(row["destPackageNumber"]);
             frmTransferReceiptsDetails.ID = Common.ConvertInt(row["id"]);
+            frmTransferReceiptsDetails.transfer_info = this.transfer_info;
+            frmTransferReceiptsDetails.PackageID = Convert.ToString(row["destPackageNumber"]);
+            //frmTransferReceiptsDetails.SourcePackageNumber = Common.ConvertInt(row["id"]);
+            //frmTransferReceiptsDetails.SourceLocationId = Common.ConvertInt(row["id"]);
+            //frmTransferReceiptsDetails.DestLocationId = Common.ConvertInt(row["id"]);
+            //frmTransferReceiptsDetails.UomPackageId = Common.ConvertInt(row["id"]);
+            //frmTransferReceiptsDetails.UomLotId = Common.ConvertInt(row["id"]);
+            //frmTransferReceiptsDetails.DoneQuantityPackage = Common.ConvertInt(row["doneQuantity"]);
             frmTransferReceiptsDetails.ShowDialog();
         }
 
@@ -732,7 +847,8 @@ namespace LabelPrint.Inventory
                 transfer_info_delete.Remove("removedTransferItems");
                 transfer_info_delete.Remove("transferDetails");
                 transfer_info_delete.Remove("active");
-                string _id_delete = "[" + Convert.ToString(grvListPackage.FocusedRowHandle) + "]";
+                DataRow row = grvListPackage.GetDataRow(grvListPackage.FocusedRowHandle);
+                string _id_delete = "[" + Convert.ToString(row["id"]) + "]";
                 transfer_info_delete["removedTransferDetails"] = _id_delete;
                 string param_put = Common.DictionaryObjectToJson(transfer_info_delete);
 
@@ -797,7 +913,8 @@ namespace LabelPrint.Inventory
             if (e.Column.Caption == "edit")
             {
                 var _id = grvListPackage.GetRowCellValue(e.RowHandle, "id");
-                if (Common.ConvertInt(_id) == -1)
+                var _traceNumber = grvListPackage.GetRowCellValue(e.RowHandle, "traceNumber");
+                if (Common.ConvertInt(_id) == -1 || Convert.ToString(_traceNumber).Length > 0)
                 {
                     RepositoryItemButtonEdit ritem = new RepositoryItemButtonEdit();
                     ritem.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.HideTextEditor;
