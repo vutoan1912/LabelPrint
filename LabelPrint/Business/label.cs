@@ -18,7 +18,7 @@ namespace LabelPrint.Business
             return true;
         }
 
-        //start char
+        //code char
         public static string packageID = "3S";
         public static string productNo = "P";
 
@@ -79,24 +79,22 @@ namespace LabelPrint.Business
 
         public bool ParseString(string labelContent)
         {
-            if (labelContent.StartsWith(ObjectDefine.Prefix) && (labelContent.Substring(labelContent.Length - 3, 2) == ObjectDefine.End))
+            string endChar = labelContent.Substring(labelContent.Length - 2, 2);
+            if (labelContent.StartsWith(ObjectDefine.Prefix) && (endChar == ObjectDefine.End))
             {
-                labelContent = labelContent.Substring(ObjectDefine.Prefix.Length - 1, labelContent.Length - 1);
-                labelContent = labelContent.Substring(0, labelContent.Length - 3);
+                labelContent = labelContent.Substring(ObjectDefine.Prefix.Length, labelContent.Length - ObjectDefine.Prefix.Length);
+                labelContent = labelContent.Substring(0, labelContent.Length - 2);
             }
             else return false;
-            try
+
+            string[] tem_data = labelContent.Split(ObjectDefine.Separator);
+            foreach (string item in tem_data)
             {
-                string[] tem_data = labelContent.Split(ObjectDefine.Separator);
-                foreach (string item in tem_data)
-                {
-                    if (item.StartsWith(ObjectDefine.productNo))
-                        _product_no = item.Substring(ObjectDefine.productNo.Length - 1, labelContent.Length - 1);
-                    else if (item.StartsWith(ObjectDefine.packageID))
-                        _package_id = item.Substring(ObjectDefine.packageID.Length - 1, labelContent.Length - 1);
-                }
+                if (item.StartsWith(ObjectDefine.productNo))
+                    _product_no = item.Substring(ObjectDefine.productNo.Length, item.Length - ObjectDefine.productNo.Length);
+                else if (item.StartsWith(ObjectDefine.packageID))
+                    _package_id = item.Substring(ObjectDefine.packageID.Length, item.Length - ObjectDefine.packageID.Length);
             }
-            catch (Exception ex) { return false; }
             return true;
         }
 

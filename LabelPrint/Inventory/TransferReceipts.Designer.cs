@@ -103,7 +103,7 @@
             this.grvListPart = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.clmID = new DevExpress.XtraGrid.Columns.GridColumn();
             this.clmProductName = new DevExpress.XtraGrid.Columns.GridColumn();
-            this.clmDescription = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.clmProductDescription = new DevExpress.XtraGrid.Columns.GridColumn();
             this.clmManPN = new DevExpress.XtraGrid.Columns.GridColumn();
             this.clmUom = new DevExpress.XtraGrid.Columns.GridColumn();
             this.clmInitialQuantity = new DevExpress.XtraGrid.Columns.GridColumn();
@@ -131,6 +131,7 @@
             this.lblName = new System.Windows.Forms.Label();
             this.imgCbxLanguage = new DevExpress.XtraEditors.ImageComboBoxEdit();
             this.imgLanguage = new DevExpress.Utils.ImageCollection(this.components);
+            this.clmInternalReference = new DevExpress.XtraGrid.Columns.GridColumn();
             ((System.ComponentModel.ISupportInitialize)(this.xtraTabControl1)).BeginInit();
             this.xtraTabControl1.SuspendLayout();
             this.tabTransfer.SuspendLayout();
@@ -217,10 +218,14 @@
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.gluTransferNumber.Properties.NullText = "";
             this.gluTransferNumber.Properties.PopupFilterMode = DevExpress.XtraEditors.PopupFilterMode.Contains;
+            this.gluTransferNumber.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.Standard;
             this.gluTransferNumber.Properties.View = this.gridLookUpEdit1View;
             this.gluTransferNumber.Size = new System.Drawing.Size(225, 20);
             this.gluTransferNumber.TabIndex = 30;
+            this.gluTransferNumber.ProcessNewValue += new DevExpress.XtraEditors.Controls.ProcessNewValueEventHandler(this.gluTransferNumber_ProcessNewValue);
             this.gluTransferNumber.EditValueChanged += new System.EventHandler(this.gridLookUpEdit1_EditValueChanged);
+            this.gluTransferNumber.KeyDown += new System.Windows.Forms.KeyEventHandler(this.gluTransferNumber_KeyDown);
+            this.gluTransferNumber.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.gluTransferNumber_KeyPress);
             // 
             // gridLookUpEdit1View
             // 
@@ -877,8 +882,9 @@
             // 
             this.grvListPart.Columns.AddRange(new DevExpress.XtraGrid.Columns.GridColumn[] {
             this.clmID,
+            this.clmInternalReference,
             this.clmProductName,
-            this.clmDescription,
+            this.clmProductDescription,
             this.clmManPN,
             this.clmUom,
             this.clmInitialQuantity,
@@ -906,18 +912,16 @@
             this.clmProductName.Caption = "Product Name";
             this.clmProductName.FieldName = "productName";
             this.clmProductName.Name = "clmProductName";
-            this.clmProductName.Visible = true;
-            this.clmProductName.VisibleIndex = 0;
             this.clmProductName.Width = 130;
             // 
-            // clmDescription
+            // clmProductDescription
             // 
-            this.clmDescription.Caption = "Description";
-            this.clmDescription.FieldName = "description";
-            this.clmDescription.Name = "clmDescription";
-            this.clmDescription.Visible = true;
-            this.clmDescription.VisibleIndex = 1;
-            this.clmDescription.Width = 231;
+            this.clmProductDescription.Caption = "Description";
+            this.clmProductDescription.FieldName = "productDescription";
+            this.clmProductDescription.Name = "clmProductDescription";
+            this.clmProductDescription.Visible = true;
+            this.clmProductDescription.VisibleIndex = 1;
+            this.clmProductDescription.Width = 231;
             // 
             // clmManPN
             // 
@@ -1165,6 +1169,14 @@
             this.imgLanguage.Images.SetKeyName(0, "if_Australia_2361509.png");
             this.imgLanguage.Images.SetKeyName(1, "if_Vietnam_flat_92420.png");
             // 
+            // clmInternalReference
+            // 
+            this.clmInternalReference.Caption = "Product Name";
+            this.clmInternalReference.FieldName = "internalReference";
+            this.clmInternalReference.Name = "clmInternalReference";
+            this.clmInternalReference.Visible = true;
+            this.clmInternalReference.VisibleIndex = 0;
+            // 
             // TransferReceipts
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1174,7 +1186,9 @@
             this.Controls.Add(this.xtraTabControl1);
             this.Name = "TransferReceipts";
             this.Text = "TransferReceipts";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.TransferReceipts_FormClosing);
             this.Load += new System.EventHandler(this.TransferReceipts_Load);
+            this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TransferReceipts_KeyPress);
             ((System.ComponentModel.ISupportInitialize)(this.xtraTabControl1)).EndInit();
             this.xtraTabControl1.ResumeLayout(false);
             this.tabTransfer.ResumeLayout(false);
@@ -1242,7 +1256,7 @@
         private DevExpress.XtraGrid.Views.Grid.GridView grvListPart;
         private DevExpress.XtraGrid.Columns.GridColumn clmID;
         private DevExpress.XtraGrid.Columns.GridColumn clmProductName;
-        private DevExpress.XtraGrid.Columns.GridColumn clmDescription;
+        private DevExpress.XtraGrid.Columns.GridColumn clmProductDescription;
         private DevExpress.XtraGrid.Columns.GridColumn clmPrint;
         private DevExpress.XtraEditors.Repository.RepositoryItemButtonEdit repositoryItemButtonEdit2;
         private DevExpress.XtraEditors.Repository.RepositoryItemCheckEdit repositoryItemCheckEdit1;
@@ -1318,6 +1332,7 @@
         private DevExpress.XtraEditors.Repository.RepositoryItemButtonEdit btnEdit;
         private DevExpress.XtraGrid.Columns.GridColumn clmDelete;
         private DevExpress.XtraEditors.Repository.RepositoryItemButtonEdit btnDeletePack;
+        private DevExpress.XtraGrid.Columns.GridColumn clmInternalReference;
 
     }
 }

@@ -18,21 +18,42 @@ namespace LabelPrint.Inventory
 {
     public partial class TransferReceiptsDetails : Form
     {
+        //param form
         public int ID;
         public string PackageID;
+        public string ProductName;
         public string SourcePackageNumber;
         public int SourceLocationId;
         public int DestLocationId;
         public int UomPackageId;
         public int UomLotId;
         public int DoneQuantityPackage;
-        public DataTable dt_lots;
+        public int ManId;
+        public string ManPn;
+        public int ProductId;
+        public int TransferId;
+        public int TransferItemId;
+        public string InternalReference;
+        public string Reference;
+        //init param
+        
         public Dictionary<string, dynamic> transfer_info;
         public dynamic package_info;
+        public bool CheckAllocate = false;
+
+        private DataTable _dt_lots = new DataTable();
+
+        public DataTable dt_lots { set { _dt_lots = value; } get { return _dt_lots; } }
 
         public TransferReceiptsDetails()
         {
             InitializeComponent();
+        }
+
+        private void TransferReceiptsDetails_Load(object sender, EventArgs e)
+        {
+            loadData();
+            loadFormData();
         }
 
         private void loadData()
@@ -40,78 +61,74 @@ namespace LabelPrint.Inventory
             txtPackageID.Text = PackageID;
 
             #region Load list Lots
-            string url = "transfer-details/search?query=destPackageNumber==" + PackageID;
-            var param = new { };
-            HttpResponse res = HTTP.Instance.Get(url, param);
-
-            if (res.StatusCode == System.Net.HttpStatusCode.OK)
+            if (ID > 0)
             {
-                try
-                {
-                    List<ExpandoObject> list_request_paper = new List<ExpandoObject>(res.DynamicBody);
-                    dt_lots = Common.ToDataTable(list_request_paper);
+                string url = "transfer-details/search?query=destPackageNumber==" + PackageID + "&size=20";
+                var param = new { };
+                HttpResponse res = HTTP.Instance.Get(url, param);
 
-                    //delete package
-                    for (int i = dt_lots.Rows.Count - 1; i >= 0; i--)
+                if (res.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    try
                     {
-                        DataRow dr = dt_lots.Rows[i];
-                        if (Convert.ToString(dr["traceNumber"]).Length == 0) dr.Delete();
+                        List<ExpandoObject> list_request_paper = new List<ExpandoObject>(res.DynamicBody);
+                        _dt_lots = Common.ToDataTable(list_request_paper);
+
+                        //delete package
+                        for (int i = _dt_lots.Rows.Count - 1; i >= 0; i--)
+                        {
+                            DataRow dr = _dt_lots.Rows[i];
+                            if (Convert.ToString(dr["traceNumber"]).Length == 0) dr.Delete();
+                        }
+
+                        this.vgListLot.DataSource = _dt_lots;
                     }
-
-                    this.vgListLot.DataSource = dt_lots;
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Không load được dữ liệu !");
+                    };
                 }
-                catch (Exception ex)
+                else
                 {
-                    MessageBox.Show("Không load được dữ liệu !");
-                };
-            }
-            else
-            {
-                //messageShow.ShowHint("không có dữ liệu");
-            }
-            #endregion
-        }
 
-        private void TransferReceiptsDetails_Load(object sender, EventArgs e)
-        {
-            loadData();
+                }
+            }
+            
+            #endregion
         }
 
         private void loadFormData()
         {
-            #region Init data form
             
-            #endregion
-
             #region Load Package Info
-            string url_package = "transfer-details/" + ID.ToString();
-            var param_package = new { };
-            HttpResponse res_package = HTTP.Instance.Get(url_package, param_package);
+            //string url_package = "transfer-details/" + ID.ToString();
+            //var param_package = new { };
+            //HttpResponse res_package = HTTP.Instance.Get(url_package, param_package);
 
-            if (res_package.StatusCode == System.Net.HttpStatusCode.OK)
-            {
-                try
-                {
-                    var serializer = new JavaScriptSerializer();
-                    package_info = serializer.Deserialize(res_package.RawText, typeof(object));
-                    txtSourceNumber.Text = Convert.ToString(package_info["srcPackageNumber"]);
-                    gluSourceLocation.EditValue = package_info["srcLocationId"];
-                    gluDestinationLocation.EditValue = package_info["destLocationId"];
-                    txtNumberPerPackage.Text = Common.ConvertDouble(package_info["doneQuantity"]);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Không load được dữ liệu !");
-                };
-            }
-            else
-            {
-                //messageShow.ShowHint("không có dữ liệu");
-            }
+            //if (res_package.StatusCode == System.Net.HttpStatusCode.OK)
+            //{
+            //    try
+            //    {
+            //        var serializer = new JavaScriptSerializer();
+            //        package_info = serializer.Deserialize(res_package.RawText, typeof(object));
+            //        //txtSourceNumber.Text = Convert.ToString(package_info["srcPackageNumber"]);
+            //        gluSourceLocation.EditValue = package_info["srcLocationId"];
+            //        gluDestinationLocation.EditValue = package_info["destLocationId"];
+            //        txtNumberPerPackage.Text = Convert.ToString(package_info["doneQuantity"]);
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        MessageBox.Show("Không load được dữ liệu !");
+            //    };
+            //}
+            //else
+            //{
+            //    MessageBox.Show("Không load được dữ liệu !");
+            //}
             #endregion
 
             #region Load list Location
-            string url_location = "locations";
+            string url_location = "locations/search?query=&size=20";
             var param_location = new { };
             HttpResponse res_location = HTTP.Instance.Get(url_location, param_location);
 
@@ -142,7 +159,7 @@ namespace LabelPrint.Inventory
             #endregion
 
             #region Load list uom
-            string url_uom = "uoms";
+            string url_uom = "uoms/search?query=&size=15";
             var param_uom = new { };
             HttpResponse res_uom = HTTP.Instance.Get(url_uom, param_uom);
 
@@ -172,12 +189,18 @@ namespace LabelPrint.Inventory
             }
             #endregion
 
+            #region Init data form
+            gluSourceLocation.EditValue = this.SourceLocationId;
+            gluDestinationLocation.EditValue = this.DestLocationId;
+            txtNumberPerPackage.Text = Convert.ToString(DoneQuantityPackage);
+            #endregion
+
         }
 
         private void btnDelete_Click(object sender, EventArgs e)
         {
             DialogResult dr = new DialogResult();
-            dr = MessageBox.Show("Bạn có chắc chắn muốn xóa tem?.", "Xóa tem", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+            dr = MessageBox.Show("Bạn có chắc chắn muốn xóa tem?", "Xóa tem", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
             if (dr == DialogResult.Yes)
             {
                 Dictionary<string, dynamic> transfer_info_delete = transfer_info;
@@ -249,8 +272,6 @@ namespace LabelPrint.Inventory
 
         private void btnGrvEdit_Click(object sender, EventArgs e)
         {
-
-
             Dictionary<string, dynamic> transfer_info_put = new Dictionary<string, dynamic>();
             transfer_info_put = transfer_info;
 
@@ -300,7 +321,7 @@ namespace LabelPrint.Inventory
             bool status_reserve = true;
             List<string> List_allocate_lot = new List<string>();
 
-            if (txtNumberPerLot.Text.Trim().Length == 0 && txtNumberLot.Text.Trim().Length == 0 && Common.ConvertInt(txtNumberLot.Text.Trim()) > 0)
+            if (txtNumberPerLot.Text.Trim().Length > 0 && txtNumberLot.Text.Trim().Length > 0 && Common.ConvertInt(txtNumberLot.Text.Trim()) > 0)
             {
                 //allocate lot
                 string url_lot = "sequences/2/reserve/" + txtNumberLot.Text.Trim();
@@ -334,7 +355,7 @@ namespace LabelPrint.Inventory
                     wh_transfer_details wtd = dbContext.wh_transfer_details.OrderByDescending(u => u.id).FirstOrDefault();
                     if (wtd != null) maxID = wtd.id + 1;
                 }
-                this.dt_lots = checkStructureDatatable(dt_lots);
+                this._dt_lots = checkStructureDatatable(_dt_lots);
 
                 TransferDetailsRepository TransferDetails = new TransferDetailsRepository();
                 List<wh_transfer_details> list_transfer_details = new List<wh_transfer_details>();
@@ -347,24 +368,25 @@ namespace LabelPrint.Inventory
                         wtd.created = DateTime.Now;
                         wtd.src_package_number = txtSourceNumber.Text;
                         wtd.dest_location_id = Common.ConvertInt(gluDestinationLocation.EditValue);
-                        wtd.dest_package_number = "";
+                        wtd.dest_package_number = PackageID;
                         wtd.done_quantity = Common.ConvertDouble(txtNumberPerLot.Text);
                         wtd.id = maxID;
-                        wtd.man_id = Common.ConvertInt(package_info["manId"]);
-                        //wtd.man_pn = Convert.ToString(data["manPn"]);
-                        try { wtd.man_pn = Convert.ToString(package_info["manPn"]); }
+                        wtd.man_id = this.ManId;
+                        try { wtd.man_pn = this.ManPn; }
                         catch (Exception ex) { wtd.man_pn = null; }
-                        wtd.product_id = Common.ConvertInt(package_info["productId"]);
-                        wtd.product_name = Convert.ToString(package_info["productName"]);
+                        wtd.product_id = this.ProductId;
+                        wtd.product_name = ProductName;
                         wtd.src_location_id = Common.ConvertInt(gluSourceLocation.EditValue);
                         wtd.status = 0;
-                        wtd.transfer_id = Common.ConvertInt(package_info["transferId"]);
-                        wtd.transfer_item_id = Common.ConvertInt(package_info["transferItemId"]);
+                        wtd.transfer_id = this.TransferId;
+                        wtd.transfer_item_id = this.TransferItemId;
                         wtd.trace_number = lot;
+                        wtd.internal_reference = InternalReference;
+                        wtd.reference = Reference;
                         list_transfer_details.Add(wtd);
 
                         //add to table list package
-                        addPackageDataRow(wtd.src_package_number, wtd.dest_package_number, wtd.trace_number, Common.ConvertInt(wtd.src_location_id),
+                        addPackageDataRow(InternalReference, Reference, wtd.src_package_number, wtd.dest_package_number, wtd.trace_number, Common.ConvertInt(wtd.src_location_id),
                             Common.ConvertInt(wtd.dest_location_id), Common.ConvertInt(wtd.done_quantity), Common.ConvertInt(wtd.transfer_id),
                             Common.ConvertInt(wtd.transfer_item_id), Common.ConvertInt(wtd.product_id), Common.ConvertInt(wtd.man_id));
 
@@ -376,16 +398,18 @@ namespace LabelPrint.Inventory
                     }
                 }
 
-                vgListLot.DataSource = dt_lots;
+                vgListLot.DataSource = _dt_lots;
                 TransferDetails.Add(list_transfer_details.ToArray());
 
+                //delete package parent
+                CheckAllocate = true;
             }
         }
 
-        private void addPackageDataRow(string _srcPackageNumber, string _destPackageNumber, string _traceNumber, int _srcLocationId, int _destLocationId,
-            double _doneQuantity, int _transferId, int _transferItemId, int _productId, int _manId, int? _lotId = null, int _printed = 1)
+        private void addPackageDataRow(string _internalReference, string _reference, string _srcPackageNumber, string _destPackageNumber, string _traceNumber, int _srcLocationId, int _destLocationId,
+            double _doneQuantity, int _transferId, int _transferItemId, int _productId, int _manId, string _manPn = null, int? _lotId = null, int _printed = 1)
         {
-            DataRow myR = this.dt_lots.NewRow();
+            DataRow myR = this._dt_lots.NewRow();
             try
             {
                 myR["id"] = -1;//this.dt_trans_details.Rows.Count + 1;
@@ -399,10 +423,13 @@ namespace LabelPrint.Inventory
                 myR["transferItemId"] = _transferItemId;
                 myR["productId"] = _productId;
                 myR["manId"] = _manId;
-                myR["lotId"] = _lotId;
+                myR["manPn"] = _manPn;
+                //myR["lotId"] = _lotId;
+                myR["internalReference"] = _internalReference;
+                myR["reference"] = _reference;
                 myR["countPrint"] = _printed;
 
-                this.dt_lots.Rows.Add(myR);
+                this._dt_lots.Rows.Add(myR);
             }
             catch (Exception ex)
             {
@@ -413,6 +440,7 @@ namespace LabelPrint.Inventory
         private DataTable checkStructureDatatable(DataTable dt)
         {
             DataColumnCollection columns = dt.Columns;
+            if (!columns.Contains("id")) dt.Columns.Add("id");
             if (!columns.Contains("srcPackageNumber")) dt.Columns.Add("srcPackageNumber");
             if (!columns.Contains("destPackageNumber")) dt.Columns.Add("destPackageNumber");
             if (!columns.Contains("traceNumber")) dt.Columns.Add("traceNumber");
@@ -423,8 +451,12 @@ namespace LabelPrint.Inventory
             if (!columns.Contains("transferItemId")) dt.Columns.Add("transferItemId");
             if (!columns.Contains("productId")) dt.Columns.Add("productId");
             if (!columns.Contains("manId")) dt.Columns.Add("manId");
+            if (!columns.Contains("manPn")) dt.Columns.Add("manPn");
             if (!columns.Contains("lotId")) dt.Columns.Add("lotId");
             if (!columns.Contains("countPrint")) dt.Columns.Add("countPrint");
+            if (!columns.Contains("internalReference")) dt.Columns.Add("internalReference");
+            if (!columns.Contains("reference")) dt.Columns.Add("reference");
+
             return dt;
         }
     }

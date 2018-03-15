@@ -91,12 +91,14 @@ namespace LabelPrint.Business
                                     values.Remove("removedTransferItems");
                                     values.Remove("removedTransferDetails");
                                     values.Remove("active");
+                                    values.Remove("manOrderTransfer");
 
                                     string para_transfer_detail = " [ ";
                                     foreach (wh_transfer_details td in listTransferDetails)
                                     {
                                         para_transfer_detail += " { \"destLocationId\": " + td.dest_location_id + ", ";
                                         para_transfer_detail += "\"destPackageNumber\": \"" + td.dest_package_number + "\", ";
+                                        para_transfer_detail += "\"productName\": \"" + td.product_name + "\", ";
                                         para_transfer_detail += "\"doneQuantity\": " + td.done_quantity + ", ";
                                         para_transfer_detail += "\"manId\": " + td.man_id + ", ";
                                         if (td.man_pn != null) para_transfer_detail += "\"manPn\": \"" + td.man_pn + "\", ";
@@ -104,6 +106,8 @@ namespace LabelPrint.Business
                                         para_transfer_detail += "\"reserved\": " + td.done_quantity + ", ";
                                         para_transfer_detail += "\"srcLocationId\": " + td.src_location_id + ", ";
                                         para_transfer_detail += "\"traceNumber\": \"" + td.trace_number + "\", ";
+                                        para_transfer_detail += "\"internalReference\": \"" + td.internal_reference + "\", ";
+                                        para_transfer_detail += "\"reference\": \"" + td.reference + "\", ";
                                         para_transfer_detail += "\"transferId\": " + td.transfer_id + ", ";
                                         para_transfer_detail += "\"transferItemId\": " + td.transfer_item_id + " },";
                                     }

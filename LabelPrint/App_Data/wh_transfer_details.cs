@@ -32,5 +32,7 @@ namespace LabelPrint.App_Data
         public Nullable<int> status { get; set; }
         public string trace_number { get; set; }
         public string src_package_number { get; set; }
+        public string internal_reference { get; set; }
+        public string reference { get; set; }
     }
 }

@@ -460,6 +460,7 @@
             this.btnDelete.Size = new System.Drawing.Size(75, 23);
             this.btnDelete.TabIndex = 29;
             this.btnDelete.Text = "Xóa tem";
+            this.btnDelete.Visible = false;
             this.btnDelete.Click += new System.EventHandler(this.btnDelete_Click);
             // 
             // vgListLot
@@ -602,8 +603,6 @@
             this.clmGrvEdit.ColumnEdit = this.btnGrvEdit;
             this.clmGrvEdit.FieldName = "grvEdit";
             this.clmGrvEdit.Name = "clmGrvEdit";
-            this.clmGrvEdit.Visible = true;
-            this.clmGrvEdit.VisibleIndex = 7;
             this.clmGrvEdit.Width = 65;
             // 
             // btnGrvEdit
@@ -623,8 +622,6 @@
             this.clmGrvDelete.ColumnEdit = this.btnGrvDelete;
             this.clmGrvDelete.FieldName = "grvDelete";
             this.clmGrvDelete.Name = "clmGrvDelete";
-            this.clmGrvDelete.Visible = true;
-            this.clmGrvDelete.VisibleIndex = 8;
             this.clmGrvDelete.Width = 37;
             // 
             // btnGrvDelete

@@ -608,6 +608,11 @@
     <Content Include="App_Data\erp_log.ldf">
       <DependentUpon>erp.mdf</DependentUpon>
     </Content>
+    <None Include="Resources\Codabar-example.svg.png" />
+    <None Include="Resources\tasks.png" />
+    <None Include="Resources\Logistics-18-512.png" />
+    <None Include="Resources\Location-Map-icon.png" />
+    <None Include="Resources\barcode.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
