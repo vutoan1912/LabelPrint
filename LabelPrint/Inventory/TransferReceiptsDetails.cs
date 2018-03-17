@@ -391,7 +391,7 @@ namespace LabelPrint.Inventory
                             Common.ConvertInt(wtd.transfer_item_id), Common.ConvertInt(wtd.product_id), Common.ConvertInt(wtd.man_id));
 
                         //Print Lot
-                        LabelPackage labelLot = new LabelPackage(wtd.product_name, lot, "");
+                        LabelPackage labelLot = new LabelPackage(wtd.internal_reference, lot, "");
                         labelLot.Template();
 
                         maxID++;

@@ -1,4 +1,5 @@
-﻿using DevExpress.XtraEditors.Repository;
+﻿using DevExpress.XtraEditors;
+using DevExpress.XtraEditors.Repository;
 using EasyHttp.Http;
 using LabelPrint.App_Data;
 using LabelPrint.Business;
@@ -37,9 +38,6 @@ namespace LabelPrint.Inventory
         private Control FocusedControl;
         private bool IsTransferScan = false;
 
-        //search
-        private StringBuilder key_search_transfer = new StringBuilder();
-
         public TransferReceipts()
         {
             InitializeComponent();
@@ -66,9 +64,9 @@ namespace LabelPrint.Inventory
         {
             if (ThreadScan == null || !ThreadScan.IsAlive)
             {
-                ThreadScan = new Thread(new ThreadStart(PopQueueScan));
-                ThreadScan.Start();
-                Console.WriteLine("Pop Queue Scan!!!");
+                //ThreadScan = new Thread(new ThreadStart(PopQueueScan));
+                //ThreadScan.Start();
+                //Console.WriteLine("Pop Queue Scan!!!");
             }
         }
 
@@ -216,7 +214,7 @@ namespace LabelPrint.Inventory
 
         private void gridLookUpEdit1_EditValueChanged(object sender, EventArgs e)
         {
-            loadDataTransfer();
+            if(gluTransferNumber.EditValue != null) loadDataTransfer();
         }
 
         private void loadDataTransfer()
@@ -365,7 +363,7 @@ namespace LabelPrint.Inventory
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show("Không tải được dữ liệu transfer !");
+                        //MessageBox.Show("Không tải được dữ liệu transfer !");
                     };
                 }
                 else
@@ -517,7 +515,7 @@ namespace LabelPrint.Inventory
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show("Không tải được dữ liệu transfer !");
+                        //MessageBox.Show("Không tải được dữ liệu transfer !");
                     };
                 }
                 else
@@ -761,12 +759,12 @@ namespace LabelPrint.Inventory
                         //Print package
                         if (count_lot_per_package == 0)
                         {
-                            LabelPackage labelPackage = new LabelPackage(wtd.product_name, List_allocate_package[i], "");
+                            LabelPackage labelPackage = new LabelPackage(wtd.internal_reference, List_allocate_package[i], "");
                             labelPackage.Template();
                         }
 
                         //Print
-                        LabelPackage labelLot = new LabelPackage(wtd.product_name, lot, "");
+                        LabelPackage labelLot = new LabelPackage(wtd.internal_reference, lot, "");
                         labelLot.Template();
 
                         maxID++;
@@ -809,7 +807,7 @@ namespace LabelPrint.Inventory
                             Common.ConvertInt(wtd.transfer_item_id), Common.ConvertInt(wtd.product_id), Common.ConvertInt(wtd.man_id));
 
                         //Print package
-                        LabelPackage labelPackage = new LabelPackage(wtd.product_name, pack, "");
+                        LabelPackage labelPackage = new LabelPackage(wtd.internal_reference, pack, "");
                         labelPackage.Template();
 
                         maxID++;
@@ -849,7 +847,7 @@ namespace LabelPrint.Inventory
                             Common.ConvertInt(wtd.transfer_item_id), Common.ConvertInt(wtd.product_id), Common.ConvertInt(wtd.man_id));
 
                         //Print Lot
-                        LabelPackage labelLot = new LabelPackage(wtd.product_name, lot, "");
+                        LabelPackage labelLot = new LabelPackage(wtd.internal_reference, lot, "");
                         labelLot.Template();
 
                         maxID++;
@@ -894,7 +892,7 @@ namespace LabelPrint.Inventory
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                
             }
         }
 
@@ -1001,14 +999,14 @@ namespace LabelPrint.Inventory
             if (dr == DialogResult.Yes)
             {
                 var data = grvListPart.GetDataRow(grvListPart.GetSelectedRows().FirstOrDefault());
-                string _product_name = Convert.ToString(data["internalReference"]);
+                string _internal_reference = Convert.ToString(data["internalReference"]);
                 foreach (var index in grvListPackage.GetSelectedRows())
                 {
                     dynamic row = this.grvListPackage.GetRow(index);
                     string _id_package = Convert.ToString(row["destPackageNumber"]);
                     string _id_lot = Convert.ToString(row["traceNumber"]);
                     string _id = _id_lot.Length > 0 ? _id_lot : _id_package;
-                    LabelPackage labelPackage = new LabelPackage(_product_name, _id, "");
+                    LabelPackage labelPackage = new LabelPackage(_internal_reference, _id, "");
                     labelPackage.Template();
                 }
             }
@@ -1251,14 +1249,33 @@ namespace LabelPrint.Inventory
         }
 
         #region search
+
+        private StringBuilder key_search_transfer = new StringBuilder();
+
         private void gluTransferNumber_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if (e.KeyChar != (Char)Keys.Back && e.KeyChar != (Char)Keys.Delete)
+            code_read.Clear();
+
+            if (e.KeyChar == (Char)Keys.Back || e.KeyChar == (Char)Keys.Delete)
+            {
+                gluTransferNumber.EditValue = null;
+                e.Handled = true;
+                key_search_transfer.Clear();
+                gluTransferNumber.Text = "";
+            }
+            else
             {
                 key_search_transfer.Append(e.KeyChar);
-                //MessageBox.Show(key_search_transfer.ToString());
+            }
 
+            //Console.WriteLine(key_search_transfer.ToString());
+
+            if (e.KeyChar != (Char)Keys.Back && e.KeyChar != (Char)Keys.Delete && key_search_transfer.ToString().Length > 0)
+            {
                 string url = "transfers/search?query=transferNumber==\"*" + key_search_transfer.ToString() + "*\"&size=15";
+
+                //MessageBox.Show(key_search_transfer.ToString());   
+
                 var param = new { };
                 HttpResponse res = HTTP.Instance.Get(url, param);
 
@@ -1275,7 +1292,6 @@ namespace LabelPrint.Inventory
                     }
                     catch (Exception ex)
                     {
-                        //MessageBox.Show("Không load được dữ liệu !");
                     };
                 }
                 else
@@ -1283,25 +1299,122 @@ namespace LabelPrint.Inventory
                     //messageShow.ShowHint("không có dữ liệu");
                 }
             }
-            
-            
         }
         #endregion
 
         private void gluTransferNumber_KeyDown(object sender, KeyEventArgs e)
         {
-            if (gluTransferNumber.SelectionLength == gluTransferNumber.Text.Length && (e.KeyData == Keys.Back || e.KeyData == Keys.Delete))
-            {
-                gluTransferNumber.EditValue = null;
-                e.Handled = true;
-                key_search_transfer = new StringBuilder();
-            }
+            //MessageBox.Show(gluTransferNumber.Text);
+            //if (gluTransferNumber.SelectionLength == gluTransferNumber.Text.Length && (e.KeyData == Keys.Back || e.KeyData == Keys.Delete))
+            //if (gluTransferNumber.SelectionLength == 0 && (e.KeyData == Keys.Back || e.KeyData == Keys.Delete))
+            //if (e.KeyData == Keys.Back || e.KeyData == Keys.Delete)
+            //{
+            //    gluTransferNumber.EditValue = null;
+            //    e.Handled = true;
+            //    key_search_transfer.Clear();
+            //}
         }
 
         private void gluTransferNumber_ProcessNewValue(object sender, DevExpress.XtraEditors.Controls.ProcessNewValueEventArgs e)
         {
 
         }
+
+        private void gluTransferNumber_Properties_CustomDisplayText(object sender, DevExpress.XtraEditors.Controls.CustomDisplayTextEventArgs e)
+        {
+            //GridLookUpEdit edit = sender as GridLookUpEdit;
+            //if (e.DisplayText != null && e.DisplayText.Length > 0 && edit.IsEditorActive && enable_search_transfer)
+            //{
+            //    enable_search_transfer = false;
+
+            //    string url = "transfers/search?query=transferNumber==\"*" + e.DisplayText + "*\"&size=15";
+            //    var param = new { };
+            //    HttpResponse res = HTTP.Instance.Get(url, param);
+
+            //    if (res.StatusCode == System.Net.HttpStatusCode.OK)
+            //    {
+            //        try
+            //        {
+            //            List<ExpandoObject> list_request_paper = new List<ExpandoObject>(res.DynamicBody);
+            //            dt_request_paper = Common.ToDataTable(list_request_paper);
+
+            //            gluTransferNumber.Properties.DataSource = dt_request_paper;
+            //            gluTransferNumber.Properties.DisplayMember = "transferNumber";
+            //            gluTransferNumber.Properties.ValueMember = "id";
+            //        }
+            //        catch (Exception ex)
+            //        {
+            //        };
+            //    }
+            //    else
+            //    {
+            //    }
+            //}
+        }
+
+        private void gluTransferNumber_QueryProcessKey(object sender, DevExpress.XtraEditors.Controls.QueryProcessKeyEventArgs e)
+        {
+            //this.gluTransferNumber.EditValue = null;
+        }
+
+        private void gluTransferNumber_TextChanged(object sender, EventArgs e)
+        {
+            
+        }
+
+        #region KeyPress
+
+        private void txtSourceNumber_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            code_read.Clear();
+        }
+
+        private void gluSourceLocation_EditValueChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void gluSourceLocation_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            code_read.Clear();
+        }
+
+        private void gluDestinationLocation_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            code_read.Clear();
+        }
+
+        private void gluUomPackage_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            code_read.Clear();
+        }
+
+        private void txtNumberPerPackage_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            code_read.Clear();
+        }
+
+        private void txtNumberPackage_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            code_read.Clear();
+        }
+
+        private void gluUomLot_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            code_read.Clear();
+        }
+
+        private void txtNumberPerLot_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            code_read.Clear();
+        }
+
+        private void txtNumberLot_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            code_read.Clear();
+        }
+
+        #endregion
 
     }
 }

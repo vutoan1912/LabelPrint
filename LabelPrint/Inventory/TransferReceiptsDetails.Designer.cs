@@ -701,9 +701,9 @@
             this.lblName.Font = new System.Drawing.Font("Tahoma", 14F);
             this.lblName.Location = new System.Drawing.Point(8, 9);
             this.lblName.Name = "lblName";
-            this.lblName.Size = new System.Drawing.Size(191, 23);
+            this.lblName.Size = new System.Drawing.Size(101, 23);
             this.lblName.TabIndex = 1;
-            this.lblName.Text = "TRANSFER RECEIPTS";
+            this.lblName.Text = "TRANSFER";
             // 
             // imgCbxLanguage
             // 
@@ -733,7 +733,7 @@
             this.Controls.Add(this.panelControl2);
             this.Controls.Add(this.lblPackageID);
             this.Name = "TransferReceiptsDetails";
-            this.Text = "TransferReceiptsDetails";
+            this.Text = "TRANSFER DETAILS";
             this.Load += new System.EventHandler(this.TransferReceiptsDetails_Load);
             ((System.ComponentModel.ISupportInitialize)(this.panelControl2)).EndInit();
             this.panelControl2.ResumeLayout(false);

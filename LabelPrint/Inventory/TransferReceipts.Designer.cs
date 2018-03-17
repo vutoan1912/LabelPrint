@@ -102,6 +102,7 @@
             this.vgListProduct = new DevExpress.XtraGrid.GridControl();
             this.grvListPart = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.clmID = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.clmInternalReference = new DevExpress.XtraGrid.Columns.GridColumn();
             this.clmProductName = new DevExpress.XtraGrid.Columns.GridColumn();
             this.clmProductDescription = new DevExpress.XtraGrid.Columns.GridColumn();
             this.clmManPN = new DevExpress.XtraGrid.Columns.GridColumn();
@@ -131,7 +132,6 @@
             this.lblName = new System.Windows.Forms.Label();
             this.imgCbxLanguage = new DevExpress.XtraEditors.ImageComboBoxEdit();
             this.imgLanguage = new DevExpress.Utils.ImageCollection(this.components);
-            this.clmInternalReference = new DevExpress.XtraGrid.Columns.GridColumn();
             ((System.ComponentModel.ISupportInitialize)(this.xtraTabControl1)).BeginInit();
             this.xtraTabControl1.SuspendLayout();
             this.tabTransfer.SuspendLayout();
@@ -214,16 +214,22 @@
             // 
             this.gluTransferNumber.Location = new System.Drawing.Point(122, 12);
             this.gluTransferNumber.Name = "gluTransferNumber";
+            this.gluTransferNumber.Properties.AllowNullInput = DevExpress.Utils.DefaultBoolean.True;
+            this.gluTransferNumber.Properties.AutoComplete = false;
             this.gluTransferNumber.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.gluTransferNumber.Properties.EditValueChangedDelay = 2000;
             this.gluTransferNumber.Properties.NullText = "";
             this.gluTransferNumber.Properties.PopupFilterMode = DevExpress.XtraEditors.PopupFilterMode.Contains;
             this.gluTransferNumber.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.Standard;
             this.gluTransferNumber.Properties.View = this.gridLookUpEdit1View;
+            this.gluTransferNumber.Properties.CustomDisplayText += new DevExpress.XtraEditors.Controls.CustomDisplayTextEventHandler(this.gluTransferNumber_Properties_CustomDisplayText);
             this.gluTransferNumber.Size = new System.Drawing.Size(225, 20);
             this.gluTransferNumber.TabIndex = 30;
             this.gluTransferNumber.ProcessNewValue += new DevExpress.XtraEditors.Controls.ProcessNewValueEventHandler(this.gluTransferNumber_ProcessNewValue);
             this.gluTransferNumber.EditValueChanged += new System.EventHandler(this.gridLookUpEdit1_EditValueChanged);
+            this.gluTransferNumber.QueryProcessKey += new DevExpress.XtraEditors.Controls.QueryProcessKeyEventHandler(this.gluTransferNumber_QueryProcessKey);
+            this.gluTransferNumber.TextChanged += new System.EventHandler(this.gluTransferNumber_TextChanged);
             this.gluTransferNumber.KeyDown += new System.Windows.Forms.KeyEventHandler(this.gluTransferNumber_KeyDown);
             this.gluTransferNumber.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.gluTransferNumber_KeyPress);
             // 
@@ -232,10 +238,7 @@
             this.gridLookUpEdit1View.Columns.AddRange(new DevExpress.XtraGrid.Columns.GridColumn[] {
             this.columnID,
             this.columnTransferNumber});
-            this.gridLookUpEdit1View.FocusRectStyle = DevExpress.XtraGrid.Views.Grid.DrawFocusRectStyle.RowFocus;
             this.gridLookUpEdit1View.Name = "gridLookUpEdit1View";
-            this.gridLookUpEdit1View.OptionsSelection.EnableAppearanceFocusedCell = false;
-            this.gridLookUpEdit1View.OptionsView.ShowGroupPanel = false;
             // 
             // columnID
             // 
@@ -338,6 +341,7 @@
             this.gluUomLot.Properties.View = this.gridView8;
             this.gluUomLot.Size = new System.Drawing.Size(100, 20);
             this.gluUomLot.TabIndex = 46;
+            this.gluUomLot.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.gluUomLot_KeyPress);
             // 
             // gridView8
             // 
@@ -375,6 +379,7 @@
             this.gluUomPackage.Size = new System.Drawing.Size(100, 20);
             this.gluUomPackage.TabIndex = 45;
             this.gluUomPackage.EditValueChanged += new System.EventHandler(this.gluUomPackage_EditValueChanged);
+            this.gluUomPackage.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.gluUomPackage_KeyPress);
             // 
             // gridView7
             // 
@@ -411,6 +416,7 @@
             this.gluDestinationLocation.Properties.View = this.gridView6;
             this.gluDestinationLocation.Size = new System.Drawing.Size(100, 20);
             this.gluDestinationLocation.TabIndex = 44;
+            this.gluDestinationLocation.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.gluDestinationLocation_KeyPress);
             // 
             // gridView6
             // 
@@ -447,6 +453,8 @@
             this.gluSourceLocation.Properties.View = this.gridView5;
             this.gluSourceLocation.Size = new System.Drawing.Size(100, 20);
             this.gluSourceLocation.TabIndex = 31;
+            this.gluSourceLocation.EditValueChanged += new System.EventHandler(this.gluSourceLocation_EditValueChanged);
+            this.gluSourceLocation.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.gluSourceLocation_KeyPress);
             // 
             // gridView5
             // 
@@ -484,6 +492,7 @@
             this.txtNumberLot.Size = new System.Drawing.Size(100, 20);
             this.txtNumberLot.TabIndex = 43;
             this.txtNumberLot.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtNumberLot_KeyDown);
+            this.txtNumberLot.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtNumberLot_KeyPress);
             // 
             // labelControl7
             // 
@@ -508,6 +517,7 @@
             this.txtNumberPerLot.Size = new System.Drawing.Size(100, 20);
             this.txtNumberPerLot.TabIndex = 41;
             this.txtNumberPerLot.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtNumberPerLot_KeyDown);
+            this.txtNumberPerLot.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtNumberPerLot_KeyPress);
             // 
             // labelControl8
             // 
@@ -542,6 +552,7 @@
             this.txtNumberPackage.Properties.Mask.MaskType = DevExpress.XtraEditors.Mask.MaskType.Numeric;
             this.txtNumberPackage.Size = new System.Drawing.Size(100, 20);
             this.txtNumberPackage.TabIndex = 37;
+            this.txtNumberPackage.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtNumberPackage_KeyPress);
             // 
             // labelControl6
             // 
@@ -566,6 +577,7 @@
             this.txtNumberPerPackage.Size = new System.Drawing.Size(100, 20);
             this.txtNumberPerPackage.TabIndex = 35;
             this.txtNumberPerPackage.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtNumberPerPackage_KeyDown);
+            this.txtNumberPerPackage.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtNumberPerPackage_KeyPress);
             // 
             // labelControl5
             // 
@@ -619,6 +631,7 @@
             this.txtSourceNumber.Properties.Appearance.Options.UseFont = true;
             this.txtSourceNumber.Size = new System.Drawing.Size(100, 20);
             this.txtSourceNumber.TabIndex = 29;
+            this.txtSourceNumber.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtSourceNumber_KeyPress);
             // 
             // lblResourceNumber
             // 
@@ -907,6 +920,14 @@
             this.clmID.Name = "clmID";
             this.clmID.Width = 370;
             // 
+            // clmInternalReference
+            // 
+            this.clmInternalReference.Caption = "Product Name";
+            this.clmInternalReference.FieldName = "internalReference";
+            this.clmInternalReference.Name = "clmInternalReference";
+            this.clmInternalReference.Visible = true;
+            this.clmInternalReference.VisibleIndex = 0;
+            // 
             // clmProductName
             // 
             this.clmProductName.Caption = "Product Name";
@@ -1143,9 +1164,9 @@
             this.lblName.Font = new System.Drawing.Font("Tahoma", 14F);
             this.lblName.Location = new System.Drawing.Point(8, 9);
             this.lblName.Name = "lblName";
-            this.lblName.Size = new System.Drawing.Size(191, 23);
+            this.lblName.Size = new System.Drawing.Size(101, 23);
             this.lblName.TabIndex = 1;
-            this.lblName.Text = "TRANSFER RECEIPTS";
+            this.lblName.Text = "TRANSFER";
             // 
             // imgCbxLanguage
             // 
@@ -1169,14 +1190,6 @@
             this.imgLanguage.Images.SetKeyName(0, "if_Australia_2361509.png");
             this.imgLanguage.Images.SetKeyName(1, "if_Vietnam_flat_92420.png");
             // 
-            // clmInternalReference
-            // 
-            this.clmInternalReference.Caption = "Product Name";
-            this.clmInternalReference.FieldName = "internalReference";
-            this.clmInternalReference.Name = "clmInternalReference";
-            this.clmInternalReference.Visible = true;
-            this.clmInternalReference.VisibleIndex = 0;
-            // 
             // TransferReceipts
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1185,7 +1198,7 @@
             this.Controls.Add(this.panelControl1);
             this.Controls.Add(this.xtraTabControl1);
             this.Name = "TransferReceipts";
-            this.Text = "TransferReceipts";
+            this.Text = "TRANSFER";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.TransferReceipts_FormClosing);
             this.Load += new System.EventHandler(this.TransferReceipts_Load);
             this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TransferReceipts_KeyPress);
