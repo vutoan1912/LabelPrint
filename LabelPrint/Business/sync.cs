@@ -87,11 +87,11 @@ namespace LabelPrint.Business
                                 try
                                 {
                                     var values = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(res_transfer.RawText);
-                                    values.Remove("transferItems");
-                                    values.Remove("removedTransferItems");
-                                    values.Remove("removedTransferDetails");
-                                    values.Remove("active");
-                                    values.Remove("manOrderTransfer");
+                                    try { values.Remove("transferItems"); } catch { };
+                                    try {values.Remove("removedTransferItems");} catch { };
+                                    try {values.Remove("removedTransferDetails");} catch { };
+                                    try {values.Remove("active");} catch { };
+                                    try { values.Remove("manOrderTransfer"); }catch { };
 
                                     string para_transfer_detail = " [ ";
                                     foreach (wh_transfer_details td in listTransferDetails)

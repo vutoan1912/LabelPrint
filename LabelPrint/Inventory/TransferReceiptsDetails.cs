@@ -11,6 +11,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Web.Script.Serialization;
 using System.Windows.Forms;
 
@@ -54,6 +55,16 @@ namespace LabelPrint.Inventory
         {
             loadData();
             loadFormData();
+
+            //set timer gridlookup
+            timer_srcLocation.Elapsed += new ElapsedEventHandler(timer_srcLocation_Tick);
+            timer_srcLocation.Interval = 500;
+            timer_destLocation.Elapsed += new ElapsedEventHandler(timer_destLocation_Tick);
+            timer_destLocation.Interval = 500;
+            timer_UomPackage.Elapsed += new ElapsedEventHandler(timer_UomPackage_Tick);
+            timer_UomPackage.Interval = 500;
+            timer_UomLot.Elapsed += new ElapsedEventHandler(timer_UomLot_Tick);
+            timer_UomLot.Interval = 500;
         }
 
         private void loadData()
@@ -128,7 +139,7 @@ namespace LabelPrint.Inventory
             #endregion
 
             #region Load list Location
-            string url_location = "locations/search?query=&size=20";
+            string url_location = "locations/search?query=&size=15";
             var param_location = new { };
             HttpResponse res_location = HTTP.Instance.Get(url_location, param_location);
 
@@ -140,11 +151,11 @@ namespace LabelPrint.Inventory
                     DataTable dt_location = Common.ToDataTable(list_location);
 
                     this.gluSourceLocation.Properties.DataSource = dt_location;
-                    this.gluSourceLocation.Properties.DisplayMember = "name";
+                    this.gluSourceLocation.Properties.DisplayMember = "completeName";
                     this.gluSourceLocation.Properties.ValueMember = "id";
 
                     this.gluDestinationLocation.Properties.DataSource = dt_location;
-                    this.gluDestinationLocation.Properties.DisplayMember = "name";
+                    this.gluDestinationLocation.Properties.DisplayMember = "completeName";
                     this.gluDestinationLocation.Properties.ValueMember = "id";
                 }
                 catch (Exception ex)
@@ -459,5 +470,195 @@ namespace LabelPrint.Inventory
 
             return dt;
         }
+
+        #region GridLookUpEdit
+
+        #region SourceLocation
+        System.Timers.Timer timer_srcLocation = new System.Timers.Timer();
+        void timer_srcLocation_Tick(object sender, EventArgs e)
+        {
+            timer_srcLocation.Stop();
+
+            if (this.gluSourceLocation.Text.Length > 0)
+            {
+                string url = "locations/search?query=completeName==\"*" + this.gluSourceLocation.Text + "*\"&size=15";
+
+                var param = new { };
+                HttpResponse res = HTTP.Instance.Get(url, param);
+
+                if (res.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    try
+                    {
+                        List<ExpandoObject> list = new List<ExpandoObject>(res.DynamicBody);
+                        DataTable dt = Common.ToDataTable(list);
+
+                        this.gluSourceLocation.Invoke(new MethodInvoker(delegate
+                        {
+                            this.gluSourceLocation.Properties.DataSource = dt;
+                            this.gluSourceLocation.Properties.DisplayMember = "completeName";
+                            this.gluSourceLocation.Properties.ValueMember = "id";
+
+                            if (dt.Rows.Count == 1)
+                            {
+                                gluSourceLocation.EditValue = dt.Rows[0]["id"];
+                            }
+                        }));
+
+                        //MessageBox.Show(this.gluSourceLocation.Text);
+                    }
+                    catch (Exception ex)
+                    {
+                    };
+                }
+            }
+        }
+
+        private void gluSourceLocation_TextChanged(object sender, EventArgs e)
+        {
+            timer_srcLocation.Start();
+        }
+        #endregion
+
+        #region DestinationLocation
+        System.Timers.Timer timer_destLocation = new System.Timers.Timer();
+        void timer_destLocation_Tick(object sender, EventArgs e)
+        {
+            timer_destLocation.Stop();
+
+            if (this.gluDestinationLocation.Text.Length > 0)
+            {
+                string url = "locations/search?query=completeName==\"*" + this.gluDestinationLocation.Text + "*\"&size=15";
+
+                var param = new { };
+                HttpResponse res = HTTP.Instance.Get(url, param);
+
+                if (res.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    try
+                    {
+                        List<ExpandoObject> list = new List<ExpandoObject>(res.DynamicBody);
+                        DataTable dt = Common.ToDataTable(list);
+
+                        this.gluDestinationLocation.Invoke(new MethodInvoker(delegate
+                        {
+                            this.gluDestinationLocation.Properties.DataSource = dt;
+                            this.gluDestinationLocation.Properties.DisplayMember = "completeName";
+                            this.gluDestinationLocation.Properties.ValueMember = "id";
+
+                            if (dt.Rows.Count == 1)
+                            {
+                                gluDestinationLocation.EditValue = dt.Rows[0]["id"];
+                            }
+                        }));
+
+                        //MessageBox.Show(this.gluDestinationLocation.Text);
+                    }
+                    catch (Exception ex)
+                    {
+                    };
+                }
+            }
+        }
+        private void gluDestinationLocation_TextChanged(object sender, EventArgs e)
+        {
+            timer_destLocation.Start();
+        }
+        #endregion
+
+        #region UomPackage
+        System.Timers.Timer timer_UomPackage = new System.Timers.Timer();
+        void timer_UomPackage_Tick(object sender, EventArgs e)
+        {
+            timer_UomPackage.Stop();
+
+            if (this.gluUomPackage.Text.Length > 0)
+            {
+                string url = "uoms/search?query=name==\"*" + this.gluUomPackage.Text + "*\"&size=10";
+
+                var param = new { };
+                HttpResponse res = HTTP.Instance.Get(url, param);
+
+                if (res.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    try
+                    {
+                        List<ExpandoObject> list = new List<ExpandoObject>(res.DynamicBody);
+                        DataTable dt = Common.ToDataTable(list);
+
+                        this.gluUomPackage.Invoke(new MethodInvoker(delegate
+                        {
+                            this.gluUomPackage.Properties.DataSource = dt;
+                            this.gluUomPackage.Properties.DisplayMember = "name";
+                            this.gluUomPackage.Properties.ValueMember = "id";
+
+                            if (dt.Rows.Count == 1)
+                            {
+                                gluUomPackage.EditValue = dt.Rows[0]["id"];
+                            }
+                        }));
+
+                        //MessageBox.Show(this.gluUomPackage.Text);
+                    }
+                    catch (Exception ex)
+                    {
+                    };
+                }
+            }
+        }
+
+        private void gluUomPackage_TextChanged(object sender, EventArgs e)
+        {
+            timer_UomPackage.Start();
+        }
+        #endregion
+
+        #region UomLot
+        System.Timers.Timer timer_UomLot = new System.Timers.Timer();
+        void timer_UomLot_Tick(object sender, EventArgs e)
+        {
+            timer_UomLot.Stop();
+
+            if (this.gluUomLot.Text.Length > 0)
+            {
+                string url = "uoms/search?query=name==\"*" + this.gluUomLot.Text + "*\"&size=10";
+
+                var param = new { };
+                HttpResponse res = HTTP.Instance.Get(url, param);
+
+                if (res.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    try
+                    {
+                        List<ExpandoObject> list = new List<ExpandoObject>(res.DynamicBody);
+                        DataTable dt = Common.ToDataTable(list);
+
+                        this.gluUomLot.Invoke(new MethodInvoker(delegate
+                        {
+                            this.gluUomLot.Properties.DataSource = dt;
+                            this.gluUomLot.Properties.DisplayMember = "name";
+                            this.gluUomLot.Properties.ValueMember = "id";
+
+                            if (dt.Rows.Count == 1)
+                            {
+                                gluUomLot.EditValue = dt.Rows[0]["id"];
+                            }
+                        }));
+
+                        //MessageBox.Show(this.gluUomLot.Text);
+                    }
+                    catch (Exception ex)
+                    {
+                    };
+                }
+            }
+        }
+        private void gluUomLot_TextChanged(object sender, EventArgs e)
+        {
+            timer_UomLot.Start();
+        }
+        #endregion
+
+        #endregion
     }
 }

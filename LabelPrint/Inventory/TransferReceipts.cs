@@ -35,9 +35,9 @@ namespace LabelPrint.Inventory
         //private string code_data = null;
         private Thread ThreadScan;
         private Queue<string> QueueScan = new Queue<string>();
-        private Control FocusedControl;
+        //private Control FocusedControl;
         private bool IsTransferScan = false;
-
+        
         public TransferReceipts()
         {
             InitializeComponent();
@@ -45,6 +45,11 @@ namespace LabelPrint.Inventory
 
             this.Focus();
             this.KeyPreview = true;
+
+            //t.Tick += t_Tick;
+            //timer.Elapsed += new ElapsedEventHandler(timer_Tick);
+            //timer.Interval = 11;
+            //timer.Enabled = true;
         }
 
         private void TransferReceipts_Load(object sender, EventArgs e)
@@ -54,19 +59,26 @@ namespace LabelPrint.Inventory
             
             loadFormData();
 
-            System.Timers.Timer aTimer = new System.Timers.Timer();
-            aTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
-            aTimer.Interval = 500;
-            aTimer.Enabled = true;
+            //set timer gridlookup
+            timer_transfer.Elapsed += new ElapsedEventHandler(timer_transfer_Tick);
+            timer_transfer.Interval = 700;
+            timer_srcLocation.Elapsed += new ElapsedEventHandler(timer_srcLocation_Tick);
+            timer_srcLocation.Interval = 500;
+            timer_destLocation.Elapsed += new ElapsedEventHandler(timer_destLocation_Tick);
+            timer_destLocation.Interval = 500;
+            timer_UomPackage.Elapsed += new ElapsedEventHandler(timer_UomPackage_Tick);
+            timer_UomPackage.Interval = 500;
+            timer_UomLot.Elapsed += new ElapsedEventHandler(timer_UomLot_Tick);
+            timer_UomLot.Interval = 500;
         }
 
         private void OnTimedEvent(object source, ElapsedEventArgs e)
         {
             if (ThreadScan == null || !ThreadScan.IsAlive)
             {
-                //ThreadScan = new Thread(new ThreadStart(PopQueueScan));
-                //ThreadScan.Start();
-                //Console.WriteLine("Pop Queue Scan!!!");
+                ThreadScan = new Thread(new ThreadStart(PopQueueScan));
+                ThreadScan.Start();
+                Console.WriteLine("Pop Queue Scan!!!");
             }
         }
 
@@ -103,7 +115,7 @@ namespace LabelPrint.Inventory
             #endregion
 
             #region Load list transfer
-            string url = "transfers/search?query=&size=15";
+            string url = "transfers/search?query=&size=10";
             var param = new {};
             HttpResponse res = HTTP.Instance.Get(url, param);
 
@@ -130,7 +142,7 @@ namespace LabelPrint.Inventory
             #endregion
 
             #region Load list Location
-            string url_location = "locations/search?query=&size=15";
+            string url_location = "locations/search?query=&size=10";
             var param_location = new { };
             HttpResponse res_location = HTTP.Instance.Get(url_location, param_location);
 
@@ -142,11 +154,12 @@ namespace LabelPrint.Inventory
                     DataTable dt_location = Common.ToDataTable(list_location);
 
                     this.gluSourceLocation.Properties.DataSource = dt_location;
-                    this.gluSourceLocation.Properties.DisplayMember = "name";
+                    this.gluSourceLocation.Properties.DisplayMember = "completeName";
+                    //this.gluSourceLocation.Properties.pop = "completeName";
                     this.gluSourceLocation.Properties.ValueMember = "id";
 
                     this.gluDestinationLocation.Properties.DataSource = dt_location;
-                    this.gluDestinationLocation.Properties.DisplayMember = "name";
+                    this.gluDestinationLocation.Properties.DisplayMember = "completeName";
                     this.gluDestinationLocation.Properties.ValueMember = "id";
                 }
                 catch (Exception ex)
@@ -161,7 +174,7 @@ namespace LabelPrint.Inventory
             #endregion
 
             #region Load list uom
-            string url_uom = "uoms/search?query=&size=15";
+            string url_uom = "uoms/search?query=&size=10";
             var param_uom = new { };
             HttpResponse res_uom = HTTP.Instance.Get(url_uom, param_uom);
 
@@ -200,11 +213,6 @@ namespace LabelPrint.Inventory
         private void cbxRequestPaper_SelectedIndexChanged(object sender, EventArgs e)
         {
             
-        }
-
-        private void tabTransfer_Paint(object sender, PaintEventArgs e)
-        {
-
         }
 
         private void cbxRequestPaper_KeyPress(object sender, KeyPressEventArgs e)
@@ -899,6 +907,7 @@ namespace LabelPrint.Inventory
         private DataTable checkStructureDatatable(DataTable dt)
         {
             DataColumnCollection columns = dt.Columns;
+            if (!columns.Contains("id")) dt.Columns.Add("id");
             if (!columns.Contains("srcPackageNumber")) dt.Columns.Add("srcPackageNumber");
             if (!columns.Contains("destPackageNumber")) dt.Columns.Add("destPackageNumber");
             if (!columns.Contains("traceNumber")) dt.Columns.Add("traceNumber");
@@ -1248,143 +1257,9 @@ namespace LabelPrint.Inventory
             if (ThreadScan != null && ThreadScan.IsAlive) ThreadScan.Abort();
         }
 
-        #region search
-
-        private StringBuilder key_search_transfer = new StringBuilder();
-
-        private void gluTransferNumber_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            code_read.Clear();
-
-            if (e.KeyChar == (Char)Keys.Back || e.KeyChar == (Char)Keys.Delete)
-            {
-                gluTransferNumber.EditValue = null;
-                e.Handled = true;
-                key_search_transfer.Clear();
-                gluTransferNumber.Text = "";
-            }
-            else
-            {
-                key_search_transfer.Append(e.KeyChar);
-            }
-
-            //Console.WriteLine(key_search_transfer.ToString());
-
-            if (e.KeyChar != (Char)Keys.Back && e.KeyChar != (Char)Keys.Delete && key_search_transfer.ToString().Length > 0)
-            {
-                string url = "transfers/search?query=transferNumber==\"*" + key_search_transfer.ToString() + "*\"&size=15";
-
-                //MessageBox.Show(key_search_transfer.ToString());   
-
-                var param = new { };
-                HttpResponse res = HTTP.Instance.Get(url, param);
-
-                if (res.StatusCode == System.Net.HttpStatusCode.OK)
-                {
-                    try
-                    {
-                        List<ExpandoObject> list_request_paper = new List<ExpandoObject>(res.DynamicBody);
-                        dt_request_paper = Common.ToDataTable(list_request_paper);
-
-                        gluTransferNumber.Properties.DataSource = dt_request_paper;
-                        gluTransferNumber.Properties.DisplayMember = "transferNumber";
-                        gluTransferNumber.Properties.ValueMember = "id";
-                    }
-                    catch (Exception ex)
-                    {
-                    };
-                }
-                else
-                {
-                    //messageShow.ShowHint("không có dữ liệu");
-                }
-            }
-        }
-        #endregion
-
-        private void gluTransferNumber_KeyDown(object sender, KeyEventArgs e)
-        {
-            //MessageBox.Show(gluTransferNumber.Text);
-            //if (gluTransferNumber.SelectionLength == gluTransferNumber.Text.Length && (e.KeyData == Keys.Back || e.KeyData == Keys.Delete))
-            //if (gluTransferNumber.SelectionLength == 0 && (e.KeyData == Keys.Back || e.KeyData == Keys.Delete))
-            //if (e.KeyData == Keys.Back || e.KeyData == Keys.Delete)
-            //{
-            //    gluTransferNumber.EditValue = null;
-            //    e.Handled = true;
-            //    key_search_transfer.Clear();
-            //}
-        }
-
-        private void gluTransferNumber_ProcessNewValue(object sender, DevExpress.XtraEditors.Controls.ProcessNewValueEventArgs e)
-        {
-
-        }
-
-        private void gluTransferNumber_Properties_CustomDisplayText(object sender, DevExpress.XtraEditors.Controls.CustomDisplayTextEventArgs e)
-        {
-            //GridLookUpEdit edit = sender as GridLookUpEdit;
-            //if (e.DisplayText != null && e.DisplayText.Length > 0 && edit.IsEditorActive && enable_search_transfer)
-            //{
-            //    enable_search_transfer = false;
-
-            //    string url = "transfers/search?query=transferNumber==\"*" + e.DisplayText + "*\"&size=15";
-            //    var param = new { };
-            //    HttpResponse res = HTTP.Instance.Get(url, param);
-
-            //    if (res.StatusCode == System.Net.HttpStatusCode.OK)
-            //    {
-            //        try
-            //        {
-            //            List<ExpandoObject> list_request_paper = new List<ExpandoObject>(res.DynamicBody);
-            //            dt_request_paper = Common.ToDataTable(list_request_paper);
-
-            //            gluTransferNumber.Properties.DataSource = dt_request_paper;
-            //            gluTransferNumber.Properties.DisplayMember = "transferNumber";
-            //            gluTransferNumber.Properties.ValueMember = "id";
-            //        }
-            //        catch (Exception ex)
-            //        {
-            //        };
-            //    }
-            //    else
-            //    {
-            //    }
-            //}
-        }
-
-        private void gluTransferNumber_QueryProcessKey(object sender, DevExpress.XtraEditors.Controls.QueryProcessKeyEventArgs e)
-        {
-            //this.gluTransferNumber.EditValue = null;
-        }
-
-        private void gluTransferNumber_TextChanged(object sender, EventArgs e)
-        {
-            
-        }
-
-        #region KeyPress
+        #region TextBox KeyPress
 
         private void txtSourceNumber_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            code_read.Clear();
-        }
-
-        private void gluSourceLocation_EditValueChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void gluSourceLocation_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            code_read.Clear();
-        }
-
-        private void gluDestinationLocation_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            code_read.Clear();
-        }
-
-        private void gluUomPackage_KeyPress(object sender, KeyPressEventArgs e)
         {
             code_read.Clear();
         }
@@ -1395,11 +1270,6 @@ namespace LabelPrint.Inventory
         }
 
         private void txtNumberPackage_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            code_read.Clear();
-        }
-
-        private void gluUomLot_KeyPress(object sender, KeyPressEventArgs e)
         {
             code_read.Clear();
         }
@@ -1416,5 +1286,267 @@ namespace LabelPrint.Inventory
 
         #endregion
 
+        #region GridLookUpEdit
+
+        #region TransferNumber
+        
+        System.Timers.Timer timer_transfer = new System.Timers.Timer();
+        void timer_transfer_Tick(object sender, EventArgs e)
+        {
+            timer_transfer.Stop();
+
+            if (this.gluTransferNumber.Text.Length > 0)
+            {
+                string key_search = this.gluTransferNumber.Text;
+                string url = "transfers/search?query=transferNumber==\"*" + key_search + "*\"&size=15";
+
+                var param = new { };
+                HttpResponse res = HTTP.Instance.Get(url, param);
+
+                if (res.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    try
+                    {
+                        List<ExpandoObject> list_request_paper = new List<ExpandoObject>(res.DynamicBody);
+                        dt_request_paper = Common.ToDataTable(list_request_paper);
+
+                        this.gluTransferNumber.Invoke(new MethodInvoker(delegate { 
+                            gluTransferNumber.Properties.DataSource = dt_request_paper;
+                            //gluTransferNumber.Properties.DisplayMember = "transferNumber";
+                            //gluTransferNumber.Properties.ValueMember = "id";
+
+                            if (dt_request_paper.Rows.Count == 1)
+                            {
+                                gluTransferNumber.EditValue = dt_request_paper.Rows[0]["id"];
+                            }
+                        }));
+
+                        //MessageBox.Show(this.gluTransferNumber.Text);
+                    }
+                    catch (Exception ex)
+                    {
+                    };
+                }
+            }
+        }
+
+        private void gluTransferNumber_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            //if (e.KeyChar != (Char)Keys.Back && e.KeyChar != (Char)Keys.Delete)
+            //{
+            //    key_search_transfer.Append(e.KeyChar);
+            //    clear_key_transfer_number = false;
+            //}
+            //else
+            //{
+            //    clear_key_transfer_number = true;
+            //}
+        }
+
+        private void gluTransferNumber_TextChanged(object sender, EventArgs e)
+        {
+            code_read.Clear();
+            timer_transfer.Start();
+        }
+
+        #endregion
+
+        #region SourceLocation
+        System.Timers.Timer timer_srcLocation = new System.Timers.Timer();
+        void timer_srcLocation_Tick(object sender, EventArgs e)
+        {
+            timer_srcLocation.Stop();
+
+            if (this.gluSourceLocation.Text.Length > 0)
+            {
+                string url = "locations/search?query=completeName==\"*" + this.gluSourceLocation.Text + "*\"&size=15";
+
+                var param = new { };
+                HttpResponse res = HTTP.Instance.Get(url, param);
+
+                if (res.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    try
+                    {
+                        List<ExpandoObject> list = new List<ExpandoObject>(res.DynamicBody);
+                        DataTable dt = Common.ToDataTable(list);
+
+                        this.gluSourceLocation.Invoke(new MethodInvoker(delegate
+                        {
+                            this.gluSourceLocation.Properties.DataSource = dt;
+                            this.gluSourceLocation.Properties.DisplayMember = "completeName";
+                            this.gluSourceLocation.Properties.ValueMember = "id";
+
+                            if (dt.Rows.Count == 1)
+                            {
+                                gluSourceLocation.EditValue = dt.Rows[0]["id"];
+                            }
+                        }));
+
+                        //MessageBox.Show(this.gluSourceLocation.Text);
+                    }
+                    catch (Exception ex)
+                    {
+                    };
+                }
+            }
+        }
+
+        private void gluSourceLocation_EditValueChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void gluSourceLocation_TextChanged(object sender, EventArgs e)
+        {
+            code_read.Clear();
+            timer_srcLocation.Start();
+        }
+        #endregion
+
+        #region DestinationLocation
+        System.Timers.Timer timer_destLocation = new System.Timers.Timer();
+        void timer_destLocation_Tick(object sender, EventArgs e)
+        {
+            timer_destLocation.Stop();
+
+            if (this.gluDestinationLocation.Text.Length > 0)
+            {
+                string url = "locations/search?query=completeName==\"*" + this.gluDestinationLocation.Text + "*\"&size=15";
+
+                var param = new { };
+                HttpResponse res = HTTP.Instance.Get(url, param);
+
+                if (res.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    try
+                    {
+                        List<ExpandoObject> list = new List<ExpandoObject>(res.DynamicBody);
+                        DataTable dt = Common.ToDataTable(list);
+
+                        this.gluDestinationLocation.Invoke(new MethodInvoker(delegate
+                        {
+                            this.gluDestinationLocation.Properties.DataSource = dt;
+                            this.gluDestinationLocation.Properties.DisplayMember = "completeName";
+                            this.gluDestinationLocation.Properties.ValueMember = "id";
+
+                            if (dt.Rows.Count == 1)
+                            {
+                                gluDestinationLocation.EditValue = dt.Rows[0]["id"];
+                            }
+                        }));
+
+                        //MessageBox.Show(this.gluDestinationLocation.Text);
+                    }
+                    catch (Exception ex)
+                    {
+                    };
+                }
+            }
+        }
+        private void gluDestinationLocation_TextChanged(object sender, EventArgs e)
+        {
+            code_read.Clear();
+            timer_destLocation.Start();
+        }
+        #endregion
+
+        #region UomPackage
+        System.Timers.Timer timer_UomPackage = new System.Timers.Timer();
+        void timer_UomPackage_Tick(object sender, EventArgs e)
+        {
+            timer_UomPackage.Stop();
+
+            if (this.gluUomPackage.Text.Length > 0)
+            {
+                string url = "uoms/search?query=name==\"*" + this.gluUomPackage.Text + "*\"&size=10";
+
+                var param = new { };
+                HttpResponse res = HTTP.Instance.Get(url, param);
+
+                if (res.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    try
+                    {
+                        List<ExpandoObject> list = new List<ExpandoObject>(res.DynamicBody);
+                        DataTable dt = Common.ToDataTable(list);
+
+                        this.gluUomPackage.Invoke(new MethodInvoker(delegate
+                        {
+                            this.gluUomPackage.Properties.DataSource = dt;
+                            this.gluUomPackage.Properties.DisplayMember = "name";
+                            this.gluUomPackage.Properties.ValueMember = "id";
+
+                            if (dt.Rows.Count == 1)
+                            {
+                                gluUomPackage.EditValue = dt.Rows[0]["id"];
+                            }
+                        }));
+
+                        //MessageBox.Show(this.gluUomPackage.Text);
+                    }
+                    catch (Exception ex)
+                    {
+                    };
+                }
+            }
+        }
+
+        private void gluUomPackage_TextChanged(object sender, EventArgs e)
+        {
+            code_read.Clear();
+            timer_UomPackage.Start();
+        }
+        #endregion
+
+        #region UomLot
+        System.Timers.Timer timer_UomLot = new System.Timers.Timer();
+        void timer_UomLot_Tick(object sender, EventArgs e)
+        {
+            timer_UomLot.Stop();
+
+            if (this.gluUomLot.Text.Length > 0)
+            {
+                string url = "uoms/search?query=name==\"*" + this.gluUomLot.Text + "*\"&size=10";
+
+                var param = new { };
+                HttpResponse res = HTTP.Instance.Get(url, param);
+
+                if (res.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    try
+                    {
+                        List<ExpandoObject> list = new List<ExpandoObject>(res.DynamicBody);
+                        DataTable dt = Common.ToDataTable(list);
+
+                        this.gluUomLot.Invoke(new MethodInvoker(delegate
+                        {
+                            this.gluUomLot.Properties.DataSource = dt;
+                            this.gluUomLot.Properties.DisplayMember = "name";
+                            this.gluUomLot.Properties.ValueMember = "id";
+
+                            if (dt.Rows.Count == 1)
+                            {
+                                gluUomLot.EditValue = dt.Rows[0]["id"];
+                            }
+                        }));
+
+                        //MessageBox.Show(this.gluUomLot.Text);
+                    }
+                    catch (Exception ex)
+                    {
+                    };
+                }
+            }
+        }
+        private void gluUomLot_TextChanged(object sender, EventArgs e)
+        {
+            code_read.Clear();
+            timer_UomLot.Start();
+        }
+        #endregion
+
+        #endregion
+        
     }
 }

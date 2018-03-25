@@ -82,7 +82,9 @@
             this.clmDetailsSrcPackageNumber = new DevExpress.XtraGrid.Columns.GridColumn();
             this.clmDestPackageNumber = new DevExpress.XtraGrid.Columns.GridColumn();
             this.clmDetailsTraceNumber = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.clmSrcLocationName = new DevExpress.XtraGrid.Columns.GridColumn();
             this.clmDetailsSrcLocationId = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.clmDestLocationName = new DevExpress.XtraGrid.Columns.GridColumn();
             this.clmDetailsDestLocationId = new DevExpress.XtraGrid.Columns.GridColumn();
             this.clmDetailsDoneQuantity = new DevExpress.XtraGrid.Columns.GridColumn();
             this.clmCountPrint = new DevExpress.XtraGrid.Columns.GridColumn();
@@ -208,7 +210,6 @@
             this.tabTransfer.Name = "tabTransfer";
             this.tabTransfer.Size = new System.Drawing.Size(1016, 651);
             this.tabTransfer.Text = "Theo Transfer";
-            this.tabTransfer.Paint += new System.Windows.Forms.PaintEventHandler(this.tabTransfer_Paint);
             // 
             // gluTransferNumber
             // 
@@ -221,16 +222,14 @@
             this.gluTransferNumber.Properties.EditValueChangedDelay = 2000;
             this.gluTransferNumber.Properties.NullText = "";
             this.gluTransferNumber.Properties.PopupFilterMode = DevExpress.XtraEditors.PopupFilterMode.Contains;
+            this.gluTransferNumber.Properties.PopupFormSize = new System.Drawing.Size(225, 210);
+            this.gluTransferNumber.Properties.ShowDropDown = DevExpress.XtraEditors.Controls.ShowDropDown.Never;
             this.gluTransferNumber.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.Standard;
             this.gluTransferNumber.Properties.View = this.gridLookUpEdit1View;
-            this.gluTransferNumber.Properties.CustomDisplayText += new DevExpress.XtraEditors.Controls.CustomDisplayTextEventHandler(this.gluTransferNumber_Properties_CustomDisplayText);
             this.gluTransferNumber.Size = new System.Drawing.Size(225, 20);
             this.gluTransferNumber.TabIndex = 30;
-            this.gluTransferNumber.ProcessNewValue += new DevExpress.XtraEditors.Controls.ProcessNewValueEventHandler(this.gluTransferNumber_ProcessNewValue);
             this.gluTransferNumber.EditValueChanged += new System.EventHandler(this.gridLookUpEdit1_EditValueChanged);
-            this.gluTransferNumber.QueryProcessKey += new DevExpress.XtraEditors.Controls.QueryProcessKeyEventHandler(this.gluTransferNumber_QueryProcessKey);
             this.gluTransferNumber.TextChanged += new System.EventHandler(this.gluTransferNumber_TextChanged);
-            this.gluTransferNumber.KeyDown += new System.Windows.Forms.KeyEventHandler(this.gluTransferNumber_KeyDown);
             this.gluTransferNumber.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.gluTransferNumber_KeyPress);
             // 
             // gridLookUpEdit1View
@@ -238,7 +237,10 @@
             this.gridLookUpEdit1View.Columns.AddRange(new DevExpress.XtraGrid.Columns.GridColumn[] {
             this.columnID,
             this.columnTransferNumber});
+            this.gridLookUpEdit1View.FocusRectStyle = DevExpress.XtraGrid.Views.Grid.DrawFocusRectStyle.RowFocus;
             this.gridLookUpEdit1View.Name = "gridLookUpEdit1View";
+            this.gridLookUpEdit1View.OptionsSelection.EnableAppearanceFocusedCell = false;
+            this.gridLookUpEdit1View.OptionsView.ShowGroupPanel = false;
             // 
             // columnID
             // 
@@ -334,14 +336,17 @@
             // 
             this.gluUomLot.Location = new System.Drawing.Point(83, 242);
             this.gluUomLot.Name = "gluUomLot";
+            this.gluUomLot.Properties.AutoComplete = false;
             this.gluUomLot.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.gluUomLot.Properties.NullText = "";
             this.gluUomLot.Properties.PopupFilterMode = DevExpress.XtraEditors.PopupFilterMode.Contains;
+            this.gluUomLot.Properties.PopupFormSize = new System.Drawing.Size(70, 210);
+            this.gluUomLot.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.Standard;
             this.gluUomLot.Properties.View = this.gridView8;
             this.gluUomLot.Size = new System.Drawing.Size(100, 20);
             this.gluUomLot.TabIndex = 46;
-            this.gluUomLot.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.gluUomLot_KeyPress);
+            this.gluUomLot.TextChanged += new System.EventHandler(this.gluUomLot_TextChanged);
             // 
             // gridView8
             // 
@@ -371,15 +376,18 @@
             // 
             this.gluUomPackage.Location = new System.Drawing.Point(82, 140);
             this.gluUomPackage.Name = "gluUomPackage";
+            this.gluUomPackage.Properties.AutoComplete = false;
             this.gluUomPackage.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.gluUomPackage.Properties.NullText = "";
             this.gluUomPackage.Properties.PopupFilterMode = DevExpress.XtraEditors.PopupFilterMode.Contains;
+            this.gluUomPackage.Properties.PopupFormSize = new System.Drawing.Size(70, 210);
+            this.gluUomPackage.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.Standard;
             this.gluUomPackage.Properties.View = this.gridView7;
             this.gluUomPackage.Size = new System.Drawing.Size(100, 20);
             this.gluUomPackage.TabIndex = 45;
             this.gluUomPackage.EditValueChanged += new System.EventHandler(this.gluUomPackage_EditValueChanged);
-            this.gluUomPackage.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.gluUomPackage_KeyPress);
+            this.gluUomPackage.TextChanged += new System.EventHandler(this.gluUomPackage_TextChanged);
             // 
             // gridView7
             // 
@@ -409,14 +417,17 @@
             // 
             this.gluDestinationLocation.Location = new System.Drawing.Point(82, 98);
             this.gluDestinationLocation.Name = "gluDestinationLocation";
+            this.gluDestinationLocation.Properties.AutoComplete = false;
             this.gluDestinationLocation.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.gluDestinationLocation.Properties.NullText = "";
             this.gluDestinationLocation.Properties.PopupFilterMode = DevExpress.XtraEditors.PopupFilterMode.Contains;
+            this.gluDestinationLocation.Properties.PopupFormSize = new System.Drawing.Size(250, 210);
+            this.gluDestinationLocation.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.Standard;
             this.gluDestinationLocation.Properties.View = this.gridView6;
             this.gluDestinationLocation.Size = new System.Drawing.Size(100, 20);
             this.gluDestinationLocation.TabIndex = 44;
-            this.gluDestinationLocation.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.gluDestinationLocation_KeyPress);
+            this.gluDestinationLocation.TextChanged += new System.EventHandler(this.gluDestinationLocation_TextChanged);
             // 
             // gridView6
             // 
@@ -446,15 +457,18 @@
             // 
             this.gluSourceLocation.Location = new System.Drawing.Point(83, 69);
             this.gluSourceLocation.Name = "gluSourceLocation";
+            this.gluSourceLocation.Properties.AutoComplete = false;
             this.gluSourceLocation.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.gluSourceLocation.Properties.NullText = "";
             this.gluSourceLocation.Properties.PopupFilterMode = DevExpress.XtraEditors.PopupFilterMode.Contains;
+            this.gluSourceLocation.Properties.PopupFormSize = new System.Drawing.Size(250, 210);
+            this.gluSourceLocation.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.Standard;
             this.gluSourceLocation.Properties.View = this.gridView5;
             this.gluSourceLocation.Size = new System.Drawing.Size(100, 20);
             this.gluSourceLocation.TabIndex = 31;
             this.gluSourceLocation.EditValueChanged += new System.EventHandler(this.gluSourceLocation_EditValueChanged);
-            this.gluSourceLocation.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.gluSourceLocation_KeyPress);
+            this.gluSourceLocation.TextChanged += new System.EventHandler(this.gluSourceLocation_TextChanged);
             // 
             // gridView5
             // 
@@ -685,7 +699,9 @@
             this.clmDetailsSrcPackageNumber,
             this.clmDestPackageNumber,
             this.clmDetailsTraceNumber,
+            this.clmSrcLocationName,
             this.clmDetailsSrcLocationId,
+            this.clmDestLocationName,
             this.clmDetailsDestLocationId,
             this.clmDetailsDoneQuantity,
             this.clmCountPrint,
@@ -738,22 +754,34 @@
             this.clmDetailsTraceNumber.VisibleIndex = 3;
             this.clmDetailsTraceNumber.Width = 123;
             // 
+            // clmSrcLocationName
+            // 
+            this.clmSrcLocationName.Caption = "Đi từ";
+            this.clmSrcLocationName.FieldName = "srcLocationName";
+            this.clmSrcLocationName.Name = "clmSrcLocationName";
+            this.clmSrcLocationName.Visible = true;
+            this.clmSrcLocationName.VisibleIndex = 4;
+            // 
             // clmDetailsSrcLocationId
             // 
             this.clmDetailsSrcLocationId.Caption = "Đi từ";
             this.clmDetailsSrcLocationId.FieldName = "srcLocationId";
             this.clmDetailsSrcLocationId.Name = "clmDetailsSrcLocationId";
-            this.clmDetailsSrcLocationId.Visible = true;
-            this.clmDetailsSrcLocationId.VisibleIndex = 4;
             this.clmDetailsSrcLocationId.Width = 99;
+            // 
+            // clmDestLocationName
+            // 
+            this.clmDestLocationName.Caption = "Tới";
+            this.clmDestLocationName.FieldName = "destLocationName";
+            this.clmDestLocationName.Name = "clmDestLocationName";
+            this.clmDestLocationName.Visible = true;
+            this.clmDestLocationName.VisibleIndex = 5;
             // 
             // clmDetailsDestLocationId
             // 
             this.clmDetailsDestLocationId.Caption = "Tới";
             this.clmDetailsDestLocationId.FieldName = "destLocationId";
             this.clmDetailsDestLocationId.Name = "clmDetailsDestLocationId";
-            this.clmDetailsDestLocationId.Visible = true;
-            this.clmDetailsDestLocationId.VisibleIndex = 5;
             this.clmDetailsDestLocationId.Width = 112;
             // 
             // clmDetailsDoneQuantity
@@ -1346,6 +1374,8 @@
         private DevExpress.XtraGrid.Columns.GridColumn clmDelete;
         private DevExpress.XtraEditors.Repository.RepositoryItemButtonEdit btnDeletePack;
         private DevExpress.XtraGrid.Columns.GridColumn clmInternalReference;
+        private DevExpress.XtraGrid.Columns.GridColumn clmSrcLocationName;
+        private DevExpress.XtraGrid.Columns.GridColumn clmDestLocationName;
 
     }
 }
