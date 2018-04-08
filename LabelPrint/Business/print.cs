@@ -674,6 +674,29 @@ namespace LabelPrint.Business
             data += encode.set_Quantity() + encode.End;
             Print(data);
         }
+
+        public void Print_LabelPackage(string barcode_data, string productNo, string packageID, string productNoOld, string TransferNo, string Supplier, string Project)
+        {
+            Encode encode = new Encode();
+            string data = encode.Start;
+
+            //qrdata = "[)>@06@PHY5ND35N000001@3SPKG_00072@@";
+
+            data += encode.set_Vertical("90") + encode.set_Horizontal("40") + encode.gen_data_matrix_barcode(barcode_data);
+
+            data += encode.set_Vertical("20") + encode.set_Horizontal("270") + encode.set_Pitch("1") + encode.gen_text_X23("Product No.");
+            data += encode.set_Vertical("50") + encode.set_Horizontal("270") + encode.set_Pitch("1") + encode.gen_text_XL(productNo);
+            data += encode.set_Vertical("90") + encode.set_Horizontal("270") + encode.set_Pitch("1") + encode.gen_text_X23("Package-ID");
+            data += encode.set_Vertical("120") + encode.set_Horizontal("270") + encode.set_Pitch("1") + encode.gen_text_XL(packageID);
+            data += encode.set_Vertical("160") + encode.set_Horizontal("270") + encode.set_Pitch("1") + encode.gen_text_X23("Supplier");
+            data += encode.set_Vertical("190") + encode.set_Horizontal("270") + encode.set_Pitch("1") + encode.gen_text_XL(Supplier);
+            data += encode.set_Vertical("230") + encode.set_Horizontal("270") + encode.set_Pitch("1") + encode.gen_text_X23("Project");
+            data += encode.set_Vertical("260") + encode.set_Horizontal("270") + encode.set_Pitch("1") + encode.gen_text_XL(Project);
+            data += encode.set_Vertical("300") + encode.set_Horizontal("270") + encode.set_Pitch("1") + encode.gen_text_X23("Transfer No.");
+            data += encode.set_Vertical("330") + encode.set_Horizontal("270") + encode.set_Pitch("1") + encode.gen_text_XL(TransferNo);
+            data += encode.set_Quantity() + encode.End;
+            Print(data);
+        }
     }
 
     class CL4NX609 : SATO
@@ -843,18 +866,25 @@ namespace LabelPrint.Business
             Print(data);
         }
 
-        public void Print_LabelPackage(string barcode_data, string productNo, string packageID, string productNoOld)
+        public void Print_LabelPackage(string barcode_data, string productNo, string packageID, string productNoOld, string TransferNo, string Supplier, string Project)
         {
             Encode encode = new Encode();
             string data = encode.Start;
 
             //qrdata = "[)>@06@PHY5ND35N000001@3SPKG_00072@@";
 
-            data += encode.set_Vertical("170") + encode.set_Horizontal("100") + encode.gen_data_matrix_barcode(barcode_data);
-            data += encode.set_Vertical("190") + encode.set_Horizontal("600") + encode.set_Pitch("1") + encode.gen_text_X23("Product No.");
-            data += encode.set_Vertical("290") + encode.set_Horizontal("600") + encode.set_Pitch("1") + encode.gen_text_XL(productNo);
-            data += encode.set_Vertical("390") + encode.set_Horizontal("600") + encode.set_Pitch("1") + encode.gen_text_X23("Package-ID");
-            data += encode.set_Vertical("490") + encode.set_Horizontal("600") + encode.set_Pitch("1") + encode.gen_text_XL(packageID);            
+            data += encode.set_Vertical("170") + encode.set_Horizontal("20") + encode.gen_data_matrix_barcode(barcode_data);
+
+            data += encode.set_Vertical("20") + encode.set_Horizontal("460") + encode.set_Pitch("1") + encode.gen_text_X23("Product No.");
+            data += encode.set_Vertical("80") + encode.set_Horizontal("460") + encode.set_Pitch("1") + encode.gen_text_XL(productNo);
+            data += encode.set_Vertical("170") + encode.set_Horizontal("460") + encode.set_Pitch("1") + encode.gen_text_X23("Package-ID");
+            data += encode.set_Vertical("230") + encode.set_Horizontal("460") + encode.set_Pitch("1") + encode.gen_text_XL(packageID);
+            data += encode.set_Vertical("310") + encode.set_Horizontal("460") + encode.set_Pitch("1") + encode.gen_text_X23("Supplier");
+            data += encode.set_Vertical("370") + encode.set_Horizontal("460") + encode.set_Pitch("1") + encode.gen_text_XL(Supplier);
+            data += encode.set_Vertical("450") + encode.set_Horizontal("460") + encode.set_Pitch("1") + encode.gen_text_X23("Project");
+            data += encode.set_Vertical("510") + encode.set_Horizontal("460") + encode.set_Pitch("1") + encode.gen_text_XL(Project);
+            data += encode.set_Vertical("590") + encode.set_Horizontal("460") + encode.set_Pitch("1") + encode.gen_text_X23("Transfer No.");
+            data += encode.set_Vertical("650") + encode.set_Horizontal("460") + encode.set_Pitch("1") + encode.gen_text_XL(TransferNo);   
             data += encode.set_Quantity() + encode.End;
             Print(data);
         }

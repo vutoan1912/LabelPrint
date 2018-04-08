@@ -37,6 +37,9 @@ namespace LabelPrint.Inventory
         private Queue<string> QueueScan = new Queue<string>();
         //private Control FocusedControl;
         private bool IsTransferScan = false;
+
+        private string _project = "";
+        private string _supplier = "";
         
         public TransferReceipts()
         {
@@ -61,15 +64,15 @@ namespace LabelPrint.Inventory
 
             //set timer gridlookup
             timer_transfer.Elapsed += new ElapsedEventHandler(timer_transfer_Tick);
-            timer_transfer.Interval = 700;
+            timer_transfer.Interval = 500;
             timer_srcLocation.Elapsed += new ElapsedEventHandler(timer_srcLocation_Tick);
-            timer_srcLocation.Interval = 500;
+            timer_srcLocation.Interval = 400;
             timer_destLocation.Elapsed += new ElapsedEventHandler(timer_destLocation_Tick);
-            timer_destLocation.Interval = 500;
+            timer_destLocation.Interval = 400;
             timer_UomPackage.Elapsed += new ElapsedEventHandler(timer_UomPackage_Tick);
-            timer_UomPackage.Interval = 500;
+            timer_UomPackage.Interval = 400;
             timer_UomLot.Elapsed += new ElapsedEventHandler(timer_UomLot_Tick);
-            timer_UomLot.Interval = 500;
+            timer_UomLot.Interval = 400;
         }
 
         private void OnTimedEvent(object source, ElapsedEventArgs e)
@@ -89,7 +92,6 @@ namespace LabelPrint.Inventory
             ResourceManager rm = new ResourceManager("LabelPrint.Lang.Language", typeof(TransferReceipts).Assembly);
 
             lblRequest.Text = rm.GetString("request", culture);
-            lblName.Text = rm.GetString("transfer_receipt", culture);
             tabID.Text = rm.GetString("tab_id", culture);
             tabTransfer.Text = rm.GetString("tab_transfer", culture);
         }
@@ -155,7 +157,6 @@ namespace LabelPrint.Inventory
 
                     this.gluSourceLocation.Properties.DataSource = dt_location;
                     this.gluSourceLocation.Properties.DisplayMember = "completeName";
-                    //this.gluSourceLocation.Properties.pop = "completeName";
                     this.gluSourceLocation.Properties.ValueMember = "id";
 
                     this.gluDestinationLocation.Properties.DataSource = dt_location;
@@ -260,20 +261,30 @@ namespace LabelPrint.Inventory
 
                                     if (data_op["type"] != "manufacturing")
                                     {
-                                        #region Get source location information
+                                        #region Get source location
                                         try
                                         {
-                                            string url_srcLocation = "locations/" + Convert.ToString(data["srcLocationId"]);
+                                            string url_srcLocation = "locations/search?query=id==" + Convert.ToString(data["srcLocationId"]);
                                             var param_srcLocation = new { };
-                                            HttpResponse res_srcLocation = HTTP.Instance.Get(url_srcLocation, param);
+                                            HttpResponse res_srcLocation = HTTP.Instance.Get(url_srcLocation, param_srcLocation);
 
                                             if (res_srcLocation.StatusCode == System.Net.HttpStatusCode.OK)
                                             {
                                                 try
                                                 {
-                                                    var serializer_srcLocation = new JavaScriptSerializer();
-                                                    dynamic data_srcLocation = serializer_srcLocation.Deserialize(res_srcLocation.RawText, typeof(object));
-                                                    lblSourceLocationValue.Text = data_srcLocation["completeName"];
+                                                    List<ExpandoObject> list_srcLocation = new List<ExpandoObject>(res_srcLocation.DynamicBody);
+                                                    DataTable dt_srcLocation = Common.ToDataTable(list_srcLocation);
+
+                                                    if (dt_srcLocation.Rows.Count > 0)
+                                                    {
+                                                        lblSourceLocationValue.Text = Convert.ToString(dt_srcLocation.Rows[0]["completeName"]);
+
+                                                        this.gluSourceLocation.Properties.DataSource = dt_srcLocation;
+                                                        this.gluSourceLocation.Properties.DisplayMember = "completeName";
+                                                        this.gluSourceLocation.Properties.ValueMember = "id";
+                                                        gluSourceLocation.EditValue = dt_srcLocation.Rows[0]["id"];
+                                                    }
+                                                    
                                                 }
                                                 catch (Exception ex)
                                                 {
@@ -284,8 +295,37 @@ namespace LabelPrint.Inventory
                                         catch { lblSourceLocationValue.Text = ""; };
                                         #endregion
 
-                                        this.gluSourceLocation.EditValue = data["srcLocationId"];
-                                        this.gluDestinationLocation.EditValue = data["destLocationId"];
+                                        #region Get destination location
+                                        try
+                                        {
+                                            string url_destLocation = "locations/search?query=id==" + Convert.ToString(data["destLocationId"]);
+                                            var param_destLocation = new { };
+                                            HttpResponse res_destLocation = HTTP.Instance.Get(url_destLocation, param_destLocation);
+
+                                            if (res_destLocation.StatusCode == System.Net.HttpStatusCode.OK)
+                                            {
+                                                try
+                                                {
+                                                    List<ExpandoObject> list_destLocation = new List<ExpandoObject>(res_destLocation.DynamicBody);
+                                                    DataTable dt_destLocation = Common.ToDataTable(list_destLocation);
+
+                                                    if (dt_destLocation.Rows.Count > 0)
+                                                    {
+                                                        this.gluDestinationLocation.Properties.DataSource = dt_destLocation;
+                                                        this.gluDestinationLocation.Properties.DisplayMember = "completeName";
+                                                        this.gluDestinationLocation.Properties.ValueMember = "id";
+                                                        gluDestinationLocation.EditValue = dt_destLocation.Rows[0]["id"];
+                                                    }
+
+                                                }
+                                                catch (Exception ex)
+                                                {
+                                                    //MessageBox.Show("Không tồn tại dữ liệu !");
+                                                };
+                                            }
+                                        }
+                                        catch { };
+                                        #endregion
 
                                         panelControl2.Enabled = true;
                                     }
@@ -317,6 +357,7 @@ namespace LabelPrint.Inventory
                                 {
                                     var serializer_partner = new JavaScriptSerializer();
                                     dynamic data_partner = serializer_partner.Deserialize(res_partner.RawText, typeof(object));
+                                    this._supplier = Convert.ToString(data_partner["name"]);
                                     lblPartnerValue.Text = data_partner["name"];
                                 }
                                 catch (Exception ex)
@@ -326,7 +367,32 @@ namespace LabelPrint.Inventory
                             }
 
                         }
-                        catch { lblPartnerValue.Text = ""; };
+                        catch { lblPartnerValue.Text = ""; this._supplier = ""; };
+                        #endregion
+
+                        #region Get project information
+                        try
+                        {
+                            string url_project = "product-version/" + Convert.ToString(data["productVersionId"]);
+                            var param_project = new { };
+                            HttpResponse res_project = HTTP.Instance.Get(url_project, param_project);
+
+                            if (res_project.StatusCode == System.Net.HttpStatusCode.OK)
+                            {
+                                try
+                                {
+                                    var serializer_project = new JavaScriptSerializer();
+                                    dynamic data_project = serializer_project.Deserialize(res_project.RawText, typeof(object));
+                                    this._project = data_project["name"];
+                                }
+                                catch (Exception ex)
+                                {
+                                    //MessageBox.Show("Không tồn tại dữ liệu !");
+                                };
+                            }
+
+                        }
+                        catch { this._project = ""; };
                         #endregion
 
                         try { lblCreatedValue.Text = Convert.ToString(data["created"]); } catch { lblCreatedValue.Text = ""; };
@@ -419,21 +485,33 @@ namespace LabelPrint.Inventory
 
                                     if (data_op["type"] != "manufacturing")
                                     {
-                                        #region Get source location information
+                                        #region Get source location
                                         try
                                         {
-                                            string url_srcLocation = "locations/" + Convert.ToString(data["srcLocationId"]);
+                                            string url_srcLocation = "locations/search?query=id==" + Convert.ToString(data["srcLocationId"]);
                                             var param_srcLocation = new { };
-                                            HttpResponse res_srcLocation = HTTP.Instance.Get(url_srcLocation, param);
+                                            HttpResponse res_srcLocation = HTTP.Instance.Get(url_srcLocation, param_srcLocation);
 
                                             if (res_srcLocation.StatusCode == System.Net.HttpStatusCode.OK)
                                             {
                                                 try
                                                 {
-                                                    var serializer_srcLocation = new JavaScriptSerializer();
-                                                    dynamic data_srcLocation = serializer_srcLocation.Deserialize(res_srcLocation.RawText, typeof(object));
+                                                    List<ExpandoObject> list_srcLocation = new List<ExpandoObject>(res_srcLocation.DynamicBody);
+                                                    DataTable dt_srcLocation = Common.ToDataTable(list_srcLocation);
 
-                                                    this.lblSourceLocationValue.Invoke(new MethodInvoker(delegate { lblSourceLocationValue.Text = data_srcLocation["completeName"]; }));
+                                                    if (dt_srcLocation.Rows.Count > 0)
+                                                    {
+                                                        this.lblSourceLocationValue.Invoke(new MethodInvoker(delegate { lblSourceLocationValue.Text = Convert.ToString(dt_srcLocation.Rows[0]["completeName"]); }));
+
+                                                        this.gluSourceLocation.Invoke(new MethodInvoker(delegate
+                                                        {
+                                                            this.gluSourceLocation.Properties.DataSource = dt_srcLocation;
+                                                            this.gluSourceLocation.Properties.DisplayMember = "completeName";
+                                                            this.gluSourceLocation.Properties.ValueMember = "id";
+                                                            gluSourceLocation.EditValue = dt_srcLocation.Rows[0]["id"];
+                                                        }));
+                                                    }
+
                                                 }
                                                 catch (Exception ex)
                                                 {
@@ -444,8 +522,40 @@ namespace LabelPrint.Inventory
                                         catch { lblSourceLocationValue.Text = ""; };
                                         #endregion
 
-                                        this.gluSourceLocation.Invoke(new MethodInvoker(delegate { this.gluSourceLocation.EditValue = data["srcLocationId"]; }));
-                                        this.gluDestinationLocation.Invoke(new MethodInvoker(delegate { this.gluDestinationLocation.EditValue = data["destLocationId"]; }));
+                                        #region Get destination location
+                                        try
+                                        {
+                                            string url_destLocation = "locations/search?query=id==" + Convert.ToString(data["destLocationId"]);
+                                            var param_destLocation = new { };
+                                            HttpResponse res_destLocation = HTTP.Instance.Get(url_destLocation, param_destLocation);
+
+                                            if (res_destLocation.StatusCode == System.Net.HttpStatusCode.OK)
+                                            {
+                                                try
+                                                {
+                                                    List<ExpandoObject> list_destLocation = new List<ExpandoObject>(res_destLocation.DynamicBody);
+                                                    DataTable dt_destLocation = Common.ToDataTable(list_destLocation);
+
+                                                    if (dt_destLocation.Rows.Count > 0)
+                                                    {
+                                                        this.gluDestinationLocation.Invoke(new MethodInvoker(delegate
+                                                        {
+                                                            this.gluDestinationLocation.Properties.DataSource = dt_destLocation;
+                                                            this.gluDestinationLocation.Properties.DisplayMember = "completeName";
+                                                            this.gluDestinationLocation.Properties.ValueMember = "id";
+                                                            gluDestinationLocation.EditValue = dt_destLocation.Rows[0]["id"];
+                                                        }));
+                                                    }
+
+                                                }
+                                                catch (Exception ex)
+                                                {
+                                                    //MessageBox.Show("Không tồn tại dữ liệu !");
+                                                };
+                                            }
+                                        }
+                                        catch { };
+                                        #endregion
 
                                         panelControl2.Enabled = true;
                                     }
@@ -477,7 +587,7 @@ namespace LabelPrint.Inventory
                                 {
                                     var serializer_partner = new JavaScriptSerializer();
                                     dynamic data_partner = serializer_partner.Deserialize(res_partner.RawText, typeof(object));
-
+                                    this._supplier = Convert.ToString(data_partner["name"]);
                                     this.lblPartnerValue.Invoke(new MethodInvoker(delegate { lblPartnerValue.Text = data_partner["name"]; }));
                                 }
                                 catch (Exception ex)
@@ -487,7 +597,32 @@ namespace LabelPrint.Inventory
                             }
 
                         }
-                        catch { lblPartnerValue.Text = ""; };
+                        catch { lblPartnerValue.Text = ""; this._supplier = ""; };
+                        #endregion
+
+                        #region Get project information
+                        try
+                        {
+                            string url_project = "product-version/" + Convert.ToString(data["productVersionId"]);
+                            var param_project = new { };
+                            HttpResponse res_project = HTTP.Instance.Get(url_project, param_project);
+
+                            if (res_project.StatusCode == System.Net.HttpStatusCode.OK)
+                            {
+                                try
+                                {
+                                    var serializer_project = new JavaScriptSerializer();
+                                    dynamic data_project = serializer_project.Deserialize(res_project.RawText, typeof(object));
+                                    this._project = data_project["name"];
+                                }
+                                catch (Exception ex)
+                                {
+
+                                };
+                            }
+
+                        }
+                        catch { this._project = ""; };
                         #endregion
 
                         this.lblCreatedValue.Invoke(new MethodInvoker(delegate { lblCreatedValue.Text = Convert.ToString(data["created"]); }));
@@ -551,6 +686,9 @@ namespace LabelPrint.Inventory
 
         private void loadDataListPackage()
         {
+            this.vgListPackage.DataSource = null;
+            this.dt_trans_details.Clear();
+
             if (grvListPart.DataRowCount > 0)
             {
                 var data = grvListPart.GetDataRow(grvListPart.GetSelectedRows().FirstOrDefault());
@@ -624,7 +762,7 @@ namespace LabelPrint.Inventory
             if (txtNumberPerPackage.Text.Trim().Length > 0 && txtNumberPackage.Text.Trim().Length > 0 && Common.ConvertInt(txtNumberPackage.Text.Trim()) > 0)
             {
                 //allocate package
-                string url_package = "sequences/4/reserve/" + txtNumberPackage.Text;
+                string url_package = "sequences/" + Config.PackReserveId + "/reserve/" + txtNumberPackage.Text;
                 HttpResponse res_package = HTTP.Instance.Post(url_package, null);
 
                 if (res_package.StatusCode == System.Net.HttpStatusCode.OK)
@@ -659,8 +797,8 @@ namespace LabelPrint.Inventory
                 {
                     number_allocate_lot = Common.ConvertInt(txtNumberLot.Text);
                 }
-                
-                string url_lot = "sequences/2/reserve/" + Convert.ToString(number_allocate_lot);
+
+                string url_lot = "sequences/" + Config.LotReserveId + "/reserve/" + Convert.ToString(number_allocate_lot);
                 HttpResponse res_lot = HTTP.Instance.Post(url_lot, null);
 
                 if (res_lot.StatusCode == System.Net.HttpStatusCode.OK)
@@ -767,12 +905,12 @@ namespace LabelPrint.Inventory
                         //Print package
                         if (count_lot_per_package == 0)
                         {
-                            LabelPackage labelPackage = new LabelPackage(wtd.internal_reference, List_allocate_package[i], "");
+                            LabelPackage labelPackage = new LabelPackage(wtd.internal_reference, List_allocate_package[i], "", this.transfer_info["transferNumber"], this._supplier, this._project);
                             labelPackage.Template();
                         }
 
                         //Print
-                        LabelPackage labelLot = new LabelPackage(wtd.internal_reference, lot, "");
+                        LabelPackage labelLot = new LabelPackage(wtd.internal_reference, lot, "", this.transfer_info["transferNumber"],this._supplier,this._project);
                         labelLot.Template();
 
                         maxID++;
@@ -803,7 +941,7 @@ namespace LabelPrint.Inventory
                         wtd.status = 0;
                         wtd.transfer_id = Common.ConvertInt(gluTransferNumber.EditValue);
                         wtd.transfer_item_id = Common.ConvertInt(data["id"]);
-                        wtd.trace_number = "";
+                        wtd.trace_number = null;
                         wtd.src_package_number = txtSourceNumber.Text;
                         wtd.internal_reference = Convert.ToString(data["internalReference"]);
                         wtd.reference = Convert.ToString(this.transfer_info["transferNumber"]);
@@ -815,7 +953,7 @@ namespace LabelPrint.Inventory
                             Common.ConvertInt(wtd.transfer_item_id), Common.ConvertInt(wtd.product_id), Common.ConvertInt(wtd.man_id));
 
                         //Print package
-                        LabelPackage labelPackage = new LabelPackage(wtd.internal_reference, pack, "");
+                        LabelPackage labelPackage = new LabelPackage(wtd.internal_reference, pack,"", this.transfer_info["transferNumber"],this._supplier,this._project);
                         labelPackage.Template();
 
                         maxID++;
@@ -831,7 +969,7 @@ namespace LabelPrint.Inventory
                         wtd.created = DateTime.Now;
                         wtd.src_package_number = txtSourceNumber.Text;
                         wtd.dest_location_id = Common.ConvertInt(gluDestinationLocation.EditValue);
-                        wtd.dest_package_number = "";
+                        wtd.dest_package_number = null;
                         wtd.done_quantity = Common.ConvertDouble(txtNumberPerLot.Text);
                         wtd.id = maxID;
                         wtd.man_id = Common.ConvertInt(data["manId"]);
@@ -855,7 +993,7 @@ namespace LabelPrint.Inventory
                             Common.ConvertInt(wtd.transfer_item_id), Common.ConvertInt(wtd.product_id), Common.ConvertInt(wtd.man_id));
 
                         //Print Lot
-                        LabelPackage labelLot = new LabelPackage(wtd.internal_reference, lot, "");
+                        LabelPackage labelLot = new LabelPackage(wtd.internal_reference, lot, "", this.transfer_info["transferNumber"],this._supplier,this._project);
                         labelLot.Template();
 
                         maxID++;
@@ -1015,7 +1153,7 @@ namespace LabelPrint.Inventory
                     string _id_package = Convert.ToString(row["destPackageNumber"]);
                     string _id_lot = Convert.ToString(row["traceNumber"]);
                     string _id = _id_lot.Length > 0 ? _id_lot : _id_package;
-                    LabelPackage labelPackage = new LabelPackage(_internal_reference, _id, "");
+                    LabelPackage labelPackage = new LabelPackage(_internal_reference, _id, "", this.transfer_info["transferNumber"], this._supplier, this._project);
                     labelPackage.Template();
                 }
             }
@@ -1064,7 +1202,7 @@ namespace LabelPrint.Inventory
             frmTransferReceiptsDetails.SourceLocationId = Common.ConvertInt(row["srcLocationId"]);
             frmTransferReceiptsDetails.DestLocationId = Common.ConvertInt(row["destLocationId"]);
             frmTransferReceiptsDetails.DoneQuantityPackage = Common.ConvertInt(row["doneQuantity"]);
-            frmTransferReceiptsDetails.InternalReference = Common.ConvertInt(row["internalReference"]);
+            frmTransferReceiptsDetails.InternalReference = Convert.ToString(row["internalReference"]);
             frmTransferReceiptsDetails.Reference = Convert.ToString(this.transfer_info["transferNumber"]);
 
             frmTransferReceiptsDetails.ShowDialog();
@@ -1309,19 +1447,18 @@ namespace LabelPrint.Inventory
                     {
                         List<ExpandoObject> list_request_paper = new List<ExpandoObject>(res.DynamicBody);
                         dt_request_paper = Common.ToDataTable(list_request_paper);
-
                         this.gluTransferNumber.Invoke(new MethodInvoker(delegate { 
                             gluTransferNumber.Properties.DataSource = dt_request_paper;
-                            //gluTransferNumber.Properties.DisplayMember = "transferNumber";
-                            //gluTransferNumber.Properties.ValueMember = "id";
 
                             if (dt_request_paper.Rows.Count == 1)
                             {
                                 gluTransferNumber.EditValue = dt_request_paper.Rows[0]["id"];
                             }
+                            else
+                            {
+                                gluTransferNumber.ShowPopup();
+                            }
                         }));
-
-                        //MessageBox.Show(this.gluTransferNumber.Text);
                     }
                     catch (Exception ex)
                     {
@@ -1381,6 +1518,10 @@ namespace LabelPrint.Inventory
                             {
                                 gluSourceLocation.EditValue = dt.Rows[0]["id"];
                             }
+                            else
+                            {
+                                gluSourceLocation.ShowPopup();
+                            }
                         }));
 
                         //MessageBox.Show(this.gluSourceLocation.Text);
@@ -1434,6 +1575,10 @@ namespace LabelPrint.Inventory
                             {
                                 gluDestinationLocation.EditValue = dt.Rows[0]["id"];
                             }
+                            else
+                            {
+                                gluDestinationLocation.ShowPopup();
+                            }
                         }));
 
                         //MessageBox.Show(this.gluDestinationLocation.Text);
@@ -1480,6 +1625,10 @@ namespace LabelPrint.Inventory
                             if (dt.Rows.Count == 1)
                             {
                                 gluUomPackage.EditValue = dt.Rows[0]["id"];
+                            }
+                            else
+                            {
+                                gluUomPackage.ShowPopup();
                             }
                         }));
 
@@ -1528,6 +1677,10 @@ namespace LabelPrint.Inventory
                             if (dt.Rows.Count == 1)
                             {
                                 gluUomLot.EditValue = dt.Rows[0]["id"];
+                            }
+                            else
+                            {
+                                gluUomLot.ShowPopup();
                             }
                         }));
 

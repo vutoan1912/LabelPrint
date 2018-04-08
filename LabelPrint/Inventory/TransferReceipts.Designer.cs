@@ -30,10 +30,10 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TransferReceipts));
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject1 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject2 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject3 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject4 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject21 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject22 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject23 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject24 = new DevExpress.Utils.SerializableAppearanceObject();
             this.xtraTabControl1 = new DevExpress.XtraTab.XtraTabControl();
             this.tabTransfer = new DevExpress.XtraTab.XtraTabPage();
             this.gluTransferNumber = new DevExpress.XtraEditors.GridLookUpEdit();
@@ -131,7 +131,6 @@
             this.lblRequest = new DevExpress.XtraEditors.LabelControl();
             this.tabID = new DevExpress.XtraTab.XtraTabPage();
             this.panelControl1 = new DevExpress.XtraEditors.PanelControl();
-            this.lblName = new System.Windows.Forms.Label();
             this.imgCbxLanguage = new DevExpress.XtraEditors.ImageComboBoxEdit();
             this.imgLanguage = new DevExpress.Utils.ImageCollection(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.xtraTabControl1)).BeginInit();
@@ -175,12 +174,15 @@
             // 
             // xtraTabControl1
             // 
-            this.xtraTabControl1.Location = new System.Drawing.Point(0, 41);
+            this.xtraTabControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.xtraTabControl1.Location = new System.Drawing.Point(0, 28);
             this.xtraTabControl1.LookAndFeel.SkinName = "Blue";
             this.xtraTabControl1.LookAndFeel.UseDefaultLookAndFeel = false;
             this.xtraTabControl1.Name = "xtraTabControl1";
             this.xtraTabControl1.SelectedTabPage = this.tabTransfer;
-            this.xtraTabControl1.Size = new System.Drawing.Size(1021, 680);
+            this.xtraTabControl1.Size = new System.Drawing.Size(1021, 693);
             this.xtraTabControl1.TabIndex = 0;
             this.xtraTabControl1.TabPages.AddRange(new DevExpress.XtraTab.XtraTabPage[] {
             this.tabTransfer,
@@ -208,7 +210,7 @@
             this.tabTransfer.Controls.Add(this.lblRequestName);
             this.tabTransfer.Controls.Add(this.lblRequest);
             this.tabTransfer.Name = "tabTransfer";
-            this.tabTransfer.Size = new System.Drawing.Size(1016, 651);
+            this.tabTransfer.Size = new System.Drawing.Size(1016, 664);
             this.tabTransfer.Text = "Theo Transfer";
             // 
             // gluTransferNumber
@@ -223,7 +225,6 @@
             this.gluTransferNumber.Properties.NullText = "";
             this.gluTransferNumber.Properties.PopupFilterMode = DevExpress.XtraEditors.PopupFilterMode.Contains;
             this.gluTransferNumber.Properties.PopupFormSize = new System.Drawing.Size(225, 210);
-            this.gluTransferNumber.Properties.ShowDropDown = DevExpress.XtraEditors.Controls.ShowDropDown.Never;
             this.gluTransferNumber.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.Standard;
             this.gluTransferNumber.Properties.View = this.gridLookUpEdit1View;
             this.gluTransferNumber.Size = new System.Drawing.Size(225, 20);
@@ -258,15 +259,15 @@
             // 
             // cbxViewPackage
             // 
-            this.cbxViewPackage.Location = new System.Drawing.Point(917, 253);
+            this.cbxViewPackage.Location = new System.Drawing.Point(353, 252);
             this.cbxViewPackage.Name = "cbxViewPackage";
-            this.cbxViewPackage.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 9F);
+            this.cbxViewPackage.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 10F);
             this.cbxViewPackage.Properties.Appearance.ForeColor = System.Drawing.SystemColors.HotTrack;
             this.cbxViewPackage.Properties.Appearance.Options.UseFont = true;
             this.cbxViewPackage.Properties.Appearance.Options.UseForeColor = true;
             this.cbxViewPackage.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.cbxViewPackage.Size = new System.Drawing.Size(96, 20);
+            this.cbxViewPackage.Size = new System.Drawing.Size(96, 22);
             this.cbxViewPackage.TabIndex = 27;
             this.cbxViewPackage.SelectedIndexChanged += new System.EventHandler(this.cbxViewPackage_SelectedIndexChanged);
             // 
@@ -686,7 +687,7 @@
             this.repositoryItemCheckEdit2,
             this.btnEdit,
             this.btnDeletePack});
-            this.vgListPackage.Size = new System.Drawing.Size(825, 370);
+            this.vgListPackage.Size = new System.Drawing.Size(825, 383);
             this.vgListPackage.TabIndex = 23;
             this.vgListPackage.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.grvListPackage,
@@ -811,7 +812,7 @@
             // 
             this.repositoryItemButtonEdit1.AutoHeight = false;
             this.repositoryItemButtonEdit1.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
-            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Glyph, "In lại", -1, true, true, false, DevExpress.XtraEditors.ImageLocation.MiddleCenter, ((System.Drawing.Image)(resources.GetObject("repositoryItemButtonEdit1.Buttons"))), new DevExpress.Utils.KeyShortcut(System.Windows.Forms.Keys.None), serializableAppearanceObject1, "In lại", null, null, true)});
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Glyph, "In lại", -1, true, true, false, DevExpress.XtraEditors.ImageLocation.MiddleCenter, ((System.Drawing.Image)(resources.GetObject("repositoryItemButtonEdit1.Buttons"))), new DevExpress.Utils.KeyShortcut(System.Windows.Forms.Keys.None), serializableAppearanceObject21, "In lại", null, null, true)});
             this.repositoryItemButtonEdit1.ButtonsStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
             this.repositoryItemButtonEdit1.LookAndFeel.SkinName = "Blue";
             this.repositoryItemButtonEdit1.LookAndFeel.UseDefaultLookAndFeel = false;
@@ -831,7 +832,7 @@
             // 
             this.btnEdit.AutoHeight = false;
             this.btnEdit.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
-            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Glyph, "Chỉnh sửa", -1, true, true, false, DevExpress.XtraEditors.ImageLocation.MiddleCenter, ((System.Drawing.Image)(resources.GetObject("btnEdit.Buttons"))), new DevExpress.Utils.KeyShortcut(System.Windows.Forms.Keys.None), serializableAppearanceObject2, "Chỉnh sửa", null, null, true)});
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Glyph, "Chỉnh sửa", -1, true, true, false, DevExpress.XtraEditors.ImageLocation.MiddleCenter, ((System.Drawing.Image)(resources.GetObject("btnEdit.Buttons"))), new DevExpress.Utils.KeyShortcut(System.Windows.Forms.Keys.None), serializableAppearanceObject22, "Chỉnh sửa", null, null, true)});
             this.btnEdit.LookAndFeel.SkinName = "Blue";
             this.btnEdit.LookAndFeel.UseDefaultLookAndFeel = false;
             this.btnEdit.Name = "btnEdit";
@@ -851,7 +852,7 @@
             // 
             this.btnDeletePack.AutoHeight = false;
             this.btnDeletePack.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
-            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Glyph, "Xóa", -1, true, true, false, DevExpress.XtraEditors.ImageLocation.MiddleCenter, ((System.Drawing.Image)(resources.GetObject("btnDeletePack.Buttons"))), new DevExpress.Utils.KeyShortcut(System.Windows.Forms.Keys.None), serializableAppearanceObject3, "Xóa", null, null, true)});
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Glyph, "Xóa", -1, true, true, false, DevExpress.XtraEditors.ImageLocation.MiddleCenter, ((System.Drawing.Image)(resources.GetObject("btnDeletePack.Buttons"))), new DevExpress.Utils.KeyShortcut(System.Windows.Forms.Keys.None), serializableAppearanceObject23, "Xóa", null, null, true)});
             this.btnDeletePack.LookAndFeel.SkinName = "Blue";
             this.btnDeletePack.LookAndFeel.UseDefaultLookAndFeel = false;
             this.btnDeletePack.Name = "btnDeletePack";
@@ -900,8 +901,7 @@
             // 
             // vgListProduct
             // 
-            this.vgListProduct.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.vgListProduct.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.vgListProduct.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(2);
             this.vgListProduct.Location = new System.Drawing.Point(0, 84);
@@ -1044,7 +1044,7 @@
             // 
             this.repositoryItemButtonEdit2.AutoHeight = false;
             this.repositoryItemButtonEdit2.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
-            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Glyph, "In lại", -1, true, true, false, DevExpress.XtraEditors.ImageLocation.MiddleCenter, ((System.Drawing.Image)(resources.GetObject("repositoryItemButtonEdit2.Buttons"))), new DevExpress.Utils.KeyShortcut(System.Windows.Forms.Keys.None), serializableAppearanceObject4, "In lại", null, null, true)});
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Glyph, "In lại", -1, true, true, false, DevExpress.XtraEditors.ImageLocation.MiddleCenter, ((System.Drawing.Image)(resources.GetObject("repositoryItemButtonEdit2.Buttons"))), new DevExpress.Utils.KeyShortcut(System.Windows.Forms.Keys.None), serializableAppearanceObject24, "In lại", null, null, true)});
             this.repositoryItemButtonEdit2.ButtonsStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
             this.repositoryItemButtonEdit2.Name = "repositoryItemButtonEdit2";
             this.repositoryItemButtonEdit2.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.HideTextEditor;
@@ -1151,7 +1151,7 @@
             // 
             this.lblRequestName.Appearance.Font = new System.Drawing.Font("Tahoma", 12F);
             this.lblRequestName.Appearance.ForeColor = System.Drawing.SystemColors.HotTrack;
-            this.lblRequestName.Location = new System.Drawing.Point(409, 13);
+            this.lblRequestName.Location = new System.Drawing.Point(558, 13);
             this.lblRequestName.LookAndFeel.SkinName = "Blue";
             this.lblRequestName.Name = "lblRequestName";
             this.lblRequestName.Size = new System.Drawing.Size(62, 19);
@@ -1177,28 +1177,20 @@
             // 
             // panelControl1
             // 
-            this.panelControl1.Controls.Add(this.lblName);
+            this.panelControl1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.panelControl1.Controls.Add(this.imgCbxLanguage);
             this.panelControl1.Location = new System.Drawing.Point(0, 0);
             this.panelControl1.LookAndFeel.SkinName = "Blueprint";
             this.panelControl1.LookAndFeel.UseDefaultLookAndFeel = false;
             this.panelControl1.Name = "panelControl1";
-            this.panelControl1.Size = new System.Drawing.Size(1021, 40);
+            this.panelControl1.Size = new System.Drawing.Size(1021, 25);
             this.panelControl1.TabIndex = 2;
-            // 
-            // lblName
-            // 
-            this.lblName.AutoSize = true;
-            this.lblName.Font = new System.Drawing.Font("Tahoma", 14F);
-            this.lblName.Location = new System.Drawing.Point(8, 9);
-            this.lblName.Name = "lblName";
-            this.lblName.Size = new System.Drawing.Size(101, 23);
-            this.lblName.TabIndex = 1;
-            this.lblName.Text = "TRANSFER";
             // 
             // imgCbxLanguage
             // 
-            this.imgCbxLanguage.Location = new System.Drawing.Point(918, 9);
+            this.imgCbxLanguage.Dock = System.Windows.Forms.DockStyle.Right;
+            this.imgCbxLanguage.Location = new System.Drawing.Point(930, 2);
             this.imgCbxLanguage.Name = "imgCbxLanguage";
             this.imgCbxLanguage.Properties.Appearance.ForeColor = System.Drawing.SystemColors.HotTrack;
             this.imgCbxLanguage.Properties.Appearance.Options.UseForeColor = true;
@@ -1267,7 +1259,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.gridView4)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl1)).EndInit();
             this.panelControl1.ResumeLayout(false);
-            this.panelControl1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.imgCbxLanguage.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.imgLanguage)).EndInit();
             this.ResumeLayout(false);
@@ -1280,7 +1271,6 @@
         private DevExpress.XtraTab.XtraTabPage tabTransfer;
         private DevExpress.XtraTab.XtraTabPage tabID;
         private DevExpress.XtraEditors.PanelControl panelControl1;
-        private System.Windows.Forms.Label lblName;
         private DevExpress.XtraEditors.ImageComboBoxEdit imgCbxLanguage;
         private DevExpress.Utils.ImageCollection imgLanguage;
         private DevExpress.XtraEditors.LabelControl lblRequest;

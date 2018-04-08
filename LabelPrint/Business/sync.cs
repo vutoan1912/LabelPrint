@@ -88,16 +88,17 @@ namespace LabelPrint.Business
                                 {
                                     var values = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(res_transfer.RawText);
                                     try { values.Remove("transferItems"); } catch { };
-                                    try {values.Remove("removedTransferItems");} catch { };
-                                    try {values.Remove("removedTransferDetails");} catch { };
-                                    try {values.Remove("active");} catch { };
+                                    try { values.Remove("removedTransferItems"); } catch { };
+                                    try { values.Remove("removedTransferDetails"); } catch { };
+                                    try { values.Remove("active"); } catch { };
                                     try { values.Remove("manOrderTransfer"); }catch { };
+                                    try { values.Remove("returnedTransfer"); }catch { };
 
                                     string para_transfer_detail = " [ ";
                                     foreach (wh_transfer_details td in listTransferDetails)
                                     {
                                         para_transfer_detail += " { \"destLocationId\": " + td.dest_location_id + ", ";
-                                        para_transfer_detail += "\"destPackageNumber\": \"" + td.dest_package_number + "\", ";
+                                        if (td.dest_package_number != null) para_transfer_detail += "\"destPackageNumber\": \"" + td.dest_package_number + "\", ";
                                         para_transfer_detail += "\"productName\": \"" + td.product_name + "\", ";
                                         para_transfer_detail += "\"doneQuantity\": " + td.done_quantity + ", ";
                                         para_transfer_detail += "\"manId\": " + td.man_id + ", ";
@@ -105,7 +106,7 @@ namespace LabelPrint.Business
                                         para_transfer_detail += "\"productId\": " + td.product_id + ", ";
                                         para_transfer_detail += "\"reserved\": " + td.done_quantity + ", ";
                                         para_transfer_detail += "\"srcLocationId\": " + td.src_location_id + ", ";
-                                        para_transfer_detail += "\"traceNumber\": \"" + td.trace_number + "\", ";
+                                        if(td.trace_number != null) para_transfer_detail += "\"traceNumber\": \"" + td.trace_number + "\", ";
                                         para_transfer_detail += "\"internalReference\": \"" + td.internal_reference + "\", ";
                                         para_transfer_detail += "\"reference\": \"" + td.reference + "\", ";
                                         para_transfer_detail += "\"transferId\": " + td.transfer_id + ", ";

@@ -36,7 +36,9 @@ namespace LabelPrint.Inventory
         public int TransferItemId;
         public string InternalReference;
         public string Reference;
-        //init param
+
+        private string _project = "";
+        private string _supplier = "";
         
         public Dictionary<string, dynamic> transfer_info;
         public dynamic package_info;
@@ -58,13 +60,13 @@ namespace LabelPrint.Inventory
 
             //set timer gridlookup
             timer_srcLocation.Elapsed += new ElapsedEventHandler(timer_srcLocation_Tick);
-            timer_srcLocation.Interval = 500;
+            timer_srcLocation.Interval = 400;
             timer_destLocation.Elapsed += new ElapsedEventHandler(timer_destLocation_Tick);
-            timer_destLocation.Interval = 500;
+            timer_destLocation.Interval = 400;
             timer_UomPackage.Elapsed += new ElapsedEventHandler(timer_UomPackage_Tick);
-            timer_UomPackage.Interval = 500;
+            timer_UomPackage.Interval = 400;
             timer_UomLot.Elapsed += new ElapsedEventHandler(timer_UomLot_Tick);
-            timer_UomLot.Interval = 500;
+            timer_UomLot.Interval = 400;
         }
 
         private void loadData()
@@ -74,7 +76,7 @@ namespace LabelPrint.Inventory
             #region Load list Lots
             if (ID > 0)
             {
-                string url = "transfer-details/search?query=destPackageNumber==" + PackageID + "&size=20";
+                string url = "transfer-details/search?query=destPackageNumber==" + PackageID + "&size=50";
                 var param = new { };
                 HttpResponse res = HTTP.Instance.Get(url, param);
 
@@ -84,6 +86,7 @@ namespace LabelPrint.Inventory
                     {
                         List<ExpandoObject> list_request_paper = new List<ExpandoObject>(res.DynamicBody);
                         _dt_lots = Common.ToDataTable(list_request_paper);
+                        this._dt_lots = checkStructureDatatable(_dt_lots);
 
                         //delete package
                         for (int i = _dt_lots.Rows.Count - 1; i >= 0; i--)
@@ -198,6 +201,56 @@ namespace LabelPrint.Inventory
             {
                 //messageShow.ShowHint("không có dữ liệu");
             }
+            #endregion
+
+            #region Get partner information
+            try
+            {
+                string url_partner = "companies/" + Convert.ToString(transfer_info["partnerId"]);
+                var param_partner = new { };
+                HttpResponse res_partner = HTTP.Instance.Get(url_partner, param_partner);
+
+                if (res_partner.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    try
+                    {
+                        var serializer_partner = new JavaScriptSerializer();
+                        dynamic data_partner = serializer_partner.Deserialize(res_partner.RawText, typeof(object));
+                        this._supplier = Convert.ToString(data_partner["name"]);
+                    }
+                    catch (Exception ex)
+                    {
+                        //MessageBox.Show("Không tồn tại dữ liệu !");
+                    };
+                }
+
+            }
+            catch { this._supplier = ""; };
+            #endregion
+
+            #region Get project information
+            try
+            {
+                string url_project = "product-version/" + Convert.ToString(transfer_info["productVersionId"]);
+                var param_project = new { };
+                HttpResponse res_project = HTTP.Instance.Get(url_project, param_project);
+
+                if (res_project.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    try
+                    {
+                        var serializer_project = new JavaScriptSerializer();
+                        dynamic data_project = serializer_project.Deserialize(res_project.RawText, typeof(object));
+                        this._project = data_project["name"];
+                    }
+                    catch (Exception ex)
+                    {
+                        //MessageBox.Show("Không tồn tại dữ liệu !");
+                    };
+                }
+
+            }
+            catch { this._project = ""; };
             #endregion
 
             #region Init data form
@@ -335,7 +388,7 @@ namespace LabelPrint.Inventory
             if (txtNumberPerLot.Text.Trim().Length > 0 && txtNumberLot.Text.Trim().Length > 0 && Common.ConvertInt(txtNumberLot.Text.Trim()) > 0)
             {
                 //allocate lot
-                string url_lot = "sequences/2/reserve/" + txtNumberLot.Text.Trim();
+                string url_lot = "sequences/" + Config.LotReserveId + "/reserve/" + txtNumberLot.Text.Trim();
                 HttpResponse res_lot = HTTP.Instance.Post(url_lot, null);
 
                 if (res_lot.StatusCode == System.Net.HttpStatusCode.OK)
@@ -402,7 +455,7 @@ namespace LabelPrint.Inventory
                             Common.ConvertInt(wtd.transfer_item_id), Common.ConvertInt(wtd.product_id), Common.ConvertInt(wtd.man_id));
 
                         //Print Lot
-                        LabelPackage labelLot = new LabelPackage(wtd.internal_reference, lot, "");
+                        LabelPackage labelLot = new LabelPackage(wtd.internal_reference, lot, "", this.transfer_info["transferNumber"], this._supplier, this._project);
                         labelLot.Template();
 
                         maxID++;
@@ -503,6 +556,10 @@ namespace LabelPrint.Inventory
                             {
                                 gluSourceLocation.EditValue = dt.Rows[0]["id"];
                             }
+                            else
+                            {
+                                gluSourceLocation.ShowPopup();
+                            }
                         }));
 
                         //MessageBox.Show(this.gluSourceLocation.Text);
@@ -550,6 +607,10 @@ namespace LabelPrint.Inventory
                             {
                                 gluDestinationLocation.EditValue = dt.Rows[0]["id"];
                             }
+                            else
+                            {
+                                gluDestinationLocation.ShowPopup();
+                            }
                         }));
 
                         //MessageBox.Show(this.gluDestinationLocation.Text);
@@ -595,6 +656,10 @@ namespace LabelPrint.Inventory
                             if (dt.Rows.Count == 1)
                             {
                                 gluUomPackage.EditValue = dt.Rows[0]["id"];
+                            }
+                            else
+                            {
+                                gluUomPackage.ShowPopup();
                             }
                         }));
 
@@ -642,6 +707,10 @@ namespace LabelPrint.Inventory
                             if (dt.Rows.Count == 1)
                             {
                                 gluUomLot.EditValue = dt.Rows[0]["id"];
+                            }
+                            else
+                            {
+                                gluUomLot.ShowPopup();
                             }
                         }));
 

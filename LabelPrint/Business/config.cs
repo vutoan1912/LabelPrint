@@ -90,6 +90,18 @@ namespace LabelPrint.Business
             set { SaveConfig("AllowDbSync", value.ToString()); }
         }
 
+        public static string PackReserveId
+        {
+            get { return GetConfig("PackReserveId"); }
+            set { SaveConfig("PackReserveId", value); }
+        }
+
+        public static string LotReserveId
+        {
+            get { return GetConfig("LotReserveId"); }
+            set { SaveConfig("LotReserveId", value); }
+        }
+
         public class IntemCuon
         {
 

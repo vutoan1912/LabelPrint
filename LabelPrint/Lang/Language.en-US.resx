@@ -127,6 +127,6 @@
     <value>Transfer</value>
   </data>
   <data name="transfer_receipt" xml:space="preserve">
-    <value>Transfer Receipt</value>
+    <value>TRANSFER</value>
   </data>
 </root>

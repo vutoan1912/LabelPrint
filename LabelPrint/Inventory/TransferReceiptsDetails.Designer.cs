@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TransferReceiptsDetails));
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject1 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject2 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject3 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject4 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject5 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject6 = new DevExpress.Utils.SerializableAppearanceObject();
             this.panelControl2 = new DevExpress.XtraEditors.PanelControl();
             this.txtNumberPerPackage = new DevExpress.XtraEditors.TextEdit();
             this.labelControl5 = new DevExpress.XtraEditors.LabelControl();
@@ -72,6 +72,8 @@
             this.clmDestPackageNumber = new DevExpress.XtraGrid.Columns.GridColumn();
             this.clmDetailsTraceNumber = new DevExpress.XtraGrid.Columns.GridColumn();
             this.clmDetailsSrcLocationId = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.clmSrcLocationName = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.clmDestLocationName = new DevExpress.XtraGrid.Columns.GridColumn();
             this.clmDetailsDestLocationId = new DevExpress.XtraGrid.Columns.GridColumn();
             this.clmDetailsDoneQuantity = new DevExpress.XtraGrid.Columns.GridColumn();
             this.clmCountPrint = new DevExpress.XtraGrid.Columns.GridColumn();
@@ -90,10 +92,7 @@
             this.gridView2 = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.txtPackageID = new DevExpress.XtraEditors.TextEdit();
             this.panelControl1 = new DevExpress.XtraEditors.PanelControl();
-            this.lblName = new System.Windows.Forms.Label();
             this.imgCbxLanguage = new DevExpress.XtraEditors.ImageComboBoxEdit();
-            this.clmDestLocationName = new DevExpress.XtraGrid.Columns.GridColumn();
-            this.clmSrcLocationName = new DevExpress.XtraGrid.Columns.GridColumn();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl2)).BeginInit();
             this.panelControl2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtNumberPerPackage.Properties)).BeginInit();
@@ -140,11 +139,11 @@
             this.panelControl2.Controls.Add(this.labelControl2);
             this.panelControl2.Controls.Add(this.txtSourceNumber);
             this.panelControl2.Controls.Add(this.lblResourceNumber);
-            this.panelControl2.Location = new System.Drawing.Point(0, 82);
+            this.panelControl2.Location = new System.Drawing.Point(0, 72);
             this.panelControl2.LookAndFeel.SkinName = "Blue";
             this.panelControl2.LookAndFeel.UseDefaultLookAndFeel = false;
             this.panelControl2.Name = "panelControl2";
-            this.panelControl2.Size = new System.Drawing.Size(188, 370);
+            this.panelControl2.Size = new System.Drawing.Size(188, 380);
             this.panelControl2.TabIndex = 25;
             // 
             // txtNumberPerPackage
@@ -451,7 +450,7 @@
             // 
             this.lblPackageID.Appearance.Font = new System.Drawing.Font("Tahoma", 12F);
             this.lblPackageID.Appearance.ForeColor = System.Drawing.SystemColors.HotTrack;
-            this.lblPackageID.Location = new System.Drawing.Point(10, 48);
+            this.lblPackageID.Location = new System.Drawing.Point(10, 36);
             this.lblPackageID.LookAndFeel.SkinName = "Blue";
             this.lblPackageID.Name = "lblPackageID";
             this.lblPackageID.Size = new System.Drawing.Size(53, 19);
@@ -460,7 +459,7 @@
             // 
             // btnPrint
             // 
-            this.btnPrint.Location = new System.Drawing.Point(984, 54);
+            this.btnPrint.Location = new System.Drawing.Point(194, 79);
             this.btnPrint.LookAndFeel.SkinName = "Blue";
             this.btnPrint.LookAndFeel.UseDefaultLookAndFeel = false;
             this.btnPrint.Name = "btnPrint";
@@ -471,7 +470,7 @@
             // 
             // btnDelete
             // 
-            this.btnDelete.Location = new System.Drawing.Point(1065, 54);
+            this.btnDelete.Location = new System.Drawing.Point(273, 79);
             this.btnDelete.LookAndFeel.SkinName = "Blue";
             this.btnDelete.LookAndFeel.UseDefaultLookAndFeel = false;
             this.btnDelete.Name = "btnDelete";
@@ -487,7 +486,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.vgListLot.EmbeddedNavigator.Margin = new System.Windows.Forms.Padding(2);
-            this.vgListLot.Location = new System.Drawing.Point(188, 82);
+            this.vgListLot.Location = new System.Drawing.Point(188, 72);
             this.vgListLot.LookAndFeel.SkinName = "Blue";
             this.vgListLot.LookAndFeel.UseDefaultLookAndFeel = false;
             this.vgListLot.MainView = this.grvListLot;
@@ -498,7 +497,7 @@
             this.repositoryItemCheckEdit2,
             this.btnGrvEdit,
             this.btnGrvDelete});
-            this.vgListLot.Size = new System.Drawing.Size(955, 370);
+            this.vgListLot.Size = new System.Drawing.Size(955, 380);
             this.vgListLot.TabIndex = 28;
             this.vgListLot.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.grvListLot,
@@ -572,6 +571,22 @@
             this.clmDetailsSrcLocationId.Name = "clmDetailsSrcLocationId";
             this.clmDetailsSrcLocationId.Width = 83;
             // 
+            // clmSrcLocationName
+            // 
+            this.clmSrcLocationName.Caption = "Đi từ";
+            this.clmSrcLocationName.FieldName = "srcLocationName";
+            this.clmSrcLocationName.Name = "clmSrcLocationName";
+            this.clmSrcLocationName.Visible = true;
+            this.clmSrcLocationName.VisibleIndex = 5;
+            // 
+            // clmDestLocationName
+            // 
+            this.clmDestLocationName.Caption = "Tới";
+            this.clmDestLocationName.FieldName = "destLocationName";
+            this.clmDestLocationName.Name = "clmDestLocationName";
+            this.clmDestLocationName.Visible = true;
+            this.clmDestLocationName.VisibleIndex = 6;
+            // 
             // clmDetailsDestLocationId
             // 
             this.clmDetailsDestLocationId.Caption = "Tới";
@@ -606,7 +621,7 @@
             // 
             this.btnGrvPrint.AutoHeight = false;
             this.btnGrvPrint.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
-            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Glyph, "In lại", -1, true, true, false, DevExpress.XtraEditors.ImageLocation.MiddleCenter, ((System.Drawing.Image)(resources.GetObject("btnGrvPrint.Buttons"))), new DevExpress.Utils.KeyShortcut(System.Windows.Forms.Keys.None), serializableAppearanceObject1, "In lại", null, null, true)});
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Glyph, "In lại", -1, true, true, false, DevExpress.XtraEditors.ImageLocation.MiddleCenter, ((System.Drawing.Image)(resources.GetObject("btnGrvPrint.Buttons"))), new DevExpress.Utils.KeyShortcut(System.Windows.Forms.Keys.None), serializableAppearanceObject4, "In lại", null, null, true)});
             this.btnGrvPrint.ButtonsStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
             this.btnGrvPrint.LookAndFeel.SkinName = "Blue";
             this.btnGrvPrint.LookAndFeel.UseDefaultLookAndFeel = false;
@@ -625,7 +640,7 @@
             // 
             this.btnGrvEdit.AutoHeight = false;
             this.btnGrvEdit.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
-            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Glyph, "Sửa", -1, true, true, false, DevExpress.XtraEditors.ImageLocation.MiddleCenter, ((System.Drawing.Image)(resources.GetObject("btnGrvEdit.Buttons"))), new DevExpress.Utils.KeyShortcut(System.Windows.Forms.Keys.None), serializableAppearanceObject2, "Chính sửa", null, null, true)});
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Glyph, "Sửa", -1, true, true, false, DevExpress.XtraEditors.ImageLocation.MiddleCenter, ((System.Drawing.Image)(resources.GetObject("btnGrvEdit.Buttons"))), new DevExpress.Utils.KeyShortcut(System.Windows.Forms.Keys.None), serializableAppearanceObject5, "Chính sửa", null, null, true)});
             this.btnGrvEdit.LookAndFeel.SkinName = "Blue";
             this.btnGrvEdit.LookAndFeel.UseDefaultLookAndFeel = false;
             this.btnGrvEdit.Name = "btnGrvEdit";
@@ -644,7 +659,7 @@
             // 
             this.btnGrvDelete.AutoHeight = false;
             this.btnGrvDelete.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
-            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Glyph, "Xóa", -1, true, true, false, DevExpress.XtraEditors.ImageLocation.MiddleCenter, ((System.Drawing.Image)(resources.GetObject("btnGrvDelete.Buttons"))), new DevExpress.Utils.KeyShortcut(System.Windows.Forms.Keys.None), serializableAppearanceObject3, "Xóa", null, null, true)});
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Glyph, "Xóa", -1, true, true, false, DevExpress.XtraEditors.ImageLocation.MiddleCenter, ((System.Drawing.Image)(resources.GetObject("btnGrvDelete.Buttons"))), new DevExpress.Utils.KeyShortcut(System.Windows.Forms.Keys.None), serializableAppearanceObject6, "Xóa", null, null, true)});
             this.btnGrvDelete.LookAndFeel.SkinName = "Blue";
             this.btnGrvDelete.LookAndFeel.UseDefaultLookAndFeel = false;
             this.btnGrvDelete.Name = "btnGrvDelete";
@@ -693,7 +708,7 @@
             // 
             // txtPackageID
             // 
-            this.txtPackageID.Location = new System.Drawing.Point(82, 45);
+            this.txtPackageID.Location = new System.Drawing.Point(82, 33);
             this.txtPackageID.Name = "txtPackageID";
             this.txtPackageID.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 12F);
             this.txtPackageID.Properties.Appearance.Options.UseFont = true;
@@ -702,28 +717,20 @@
             // 
             // panelControl1
             // 
-            this.panelControl1.Controls.Add(this.lblName);
+            this.panelControl1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.panelControl1.Controls.Add(this.imgCbxLanguage);
             this.panelControl1.Location = new System.Drawing.Point(0, 0);
             this.panelControl1.LookAndFeel.SkinName = "Blueprint";
             this.panelControl1.LookAndFeel.UseDefaultLookAndFeel = false;
             this.panelControl1.Name = "panelControl1";
-            this.panelControl1.Size = new System.Drawing.Size(1146, 40);
+            this.panelControl1.Size = new System.Drawing.Size(1146, 24);
             this.panelControl1.TabIndex = 48;
-            // 
-            // lblName
-            // 
-            this.lblName.AutoSize = true;
-            this.lblName.Font = new System.Drawing.Font("Tahoma", 14F);
-            this.lblName.Location = new System.Drawing.Point(8, 9);
-            this.lblName.Name = "lblName";
-            this.lblName.Size = new System.Drawing.Size(101, 23);
-            this.lblName.TabIndex = 1;
-            this.lblName.Text = "TRANSFER";
             // 
             // imgCbxLanguage
             // 
-            this.imgCbxLanguage.Location = new System.Drawing.Point(1050, 9);
+            this.imgCbxLanguage.Dock = System.Windows.Forms.DockStyle.Right;
+            this.imgCbxLanguage.Location = new System.Drawing.Point(1055, 2);
             this.imgCbxLanguage.Name = "imgCbxLanguage";
             this.imgCbxLanguage.Properties.Appearance.ForeColor = System.Drawing.SystemColors.HotTrack;
             this.imgCbxLanguage.Properties.Appearance.Options.UseForeColor = true;
@@ -735,22 +742,6 @@
             this.imgCbxLanguage.Size = new System.Drawing.Size(89, 20);
             this.imgCbxLanguage.TabIndex = 0;
             this.imgCbxLanguage.Visible = false;
-            // 
-            // clmDestLocationName
-            // 
-            this.clmDestLocationName.Caption = "Tới";
-            this.clmDestLocationName.FieldName = "destLocationName";
-            this.clmDestLocationName.Name = "clmDestLocationName";
-            this.clmDestLocationName.Visible = true;
-            this.clmDestLocationName.VisibleIndex = 6;
-            // 
-            // clmSrcLocationName
-            // 
-            this.clmSrcLocationName.Caption = "Đi từ";
-            this.clmSrcLocationName.FieldName = "srcLocationName";
-            this.clmSrcLocationName.Name = "clmSrcLocationName";
-            this.clmSrcLocationName.Visible = true;
-            this.clmSrcLocationName.VisibleIndex = 5;
             // 
             // TransferReceiptsDetails
             // 
@@ -792,7 +783,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.txtPackageID.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl1)).EndInit();
             this.panelControl1.ResumeLayout(false);
-            this.panelControl1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.imgCbxLanguage.Properties)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -854,7 +844,6 @@
         private DevExpress.XtraGrid.Views.Grid.GridView gridView2;
         private DevExpress.XtraEditors.TextEdit txtPackageID;
         private DevExpress.XtraEditors.PanelControl panelControl1;
-        private System.Windows.Forms.Label lblName;
         private DevExpress.XtraEditors.ImageComboBoxEdit imgCbxLanguage;
         private DevExpress.XtraGrid.Columns.GridColumn clmGrvDelete;
         private DevExpress.XtraEditors.Repository.RepositoryItemButtonEdit btnGrvEdit;

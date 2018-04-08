@@ -33,6 +33,9 @@ namespace LabelPrint.Business
         private string _product_no;
         private string _package_id;
         private string _product_no_old;
+        private string _transfer_no;
+        private string _supplier;
+        private string _project;
 
         public string ProductNo
         {
@@ -52,6 +55,24 @@ namespace LabelPrint.Business
             set { _product_no_old = value; }
         }
 
+        public string TransferNo
+        {
+            get { return _transfer_no; }
+            set { _transfer_no = value; }
+        }
+
+        public string Supplier
+        {
+            get { return _supplier; }
+            set { _supplier = value; }
+        }
+
+        public string Project
+        {
+            get { return _project; }
+            set { _project = value; }
+        }
+
         #endregion
 
         public LabelPackage(string labelContent)
@@ -65,16 +86,22 @@ namespace LabelPrint.Business
             labelPackage.ProductNo = this.ProductNo;
             labelPackage.PackageID = this.PackageID;
             labelPackage.ProductNoOld = this.ProductNoOld;
+            labelPackage.TransferNo = this.TransferNo;
+            labelPackage.Supplier = this.Supplier;
+            labelPackage.Project = this.Project;
             return labelPackage;
         }
 
         public LabelPackage() { }
 
-        public LabelPackage(string productNo, string packageID, string productNoOld)
+        public LabelPackage(string productNo, string packageID, string productNoOld, string TransferNo, string Supplier, string Project)
         {
             _product_no = productNo;
             _package_id = packageID;
             _product_no_old = productNoOld;
+            _transfer_no = TransferNo;
+            _supplier = Supplier;
+            _project = Project;
         }
 
         public bool ParseString(string labelContent)
@@ -112,8 +139,12 @@ namespace LabelPrint.Business
         {
             var lstData = new List<KeyValuePair<string, string>>()
                 {
-                    new KeyValuePair<string, string>(ObjectDefine.productNo, _product_no),
-                    new KeyValuePair<string, string>(ObjectDefine.packageID, _package_id)
+                    new KeyValuePair<string, string>("ProductNo", _product_no),
+                    new KeyValuePair<string, string>("PackageID", _package_id),
+                    new KeyValuePair<string, string>("ProductNoOld", _product_no_old),
+                    new KeyValuePair<string, string>("TransferNo", _transfer_no),
+                    new KeyValuePair<string, string>("Supplier", _supplier),
+                    new KeyValuePair<string, string>("Project", _project)
                 };
 
             return lstData;
@@ -125,7 +156,7 @@ namespace LabelPrint.Business
             {
 
                 //Format
-                object[] _param = new object[] { LabelToString(), ProductNo, PackageID, ProductNoOld };
+                object[] _param = new object[] { LabelToString(), ProductNo, PackageID, ProductNoOld, TransferNo, Supplier, Project };
                 Common.caller(ClassPrint + Printer, "Print_LabelPackage", _param);
             }
         }
