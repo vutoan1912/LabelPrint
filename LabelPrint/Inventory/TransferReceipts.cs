@@ -37,6 +37,7 @@ namespace LabelPrint.Inventory
         private Queue<string> QueueScan = new Queue<string>();
         //private Control FocusedControl;
         private bool IsTransferScan = false;
+        private string _state;
 
         private string _project = "";
         private string _supplier = "";
@@ -48,11 +49,6 @@ namespace LabelPrint.Inventory
 
             this.Focus();
             this.KeyPreview = true;
-
-            //t.Tick += t_Tick;
-            //timer.Elapsed += new ElapsedEventHandler(timer_Tick);
-            //timer.Interval = 11;
-            //timer.Enabled = true;
         }
 
         private void TransferReceipts_Load(object sender, EventArgs e)
@@ -73,16 +69,12 @@ namespace LabelPrint.Inventory
             timer_UomPackage.Interval = 400;
             timer_UomLot.Elapsed += new ElapsedEventHandler(timer_UomLot_Tick);
             timer_UomLot.Interval = 400;
-        }
 
-        private void OnTimedEvent(object source, ElapsedEventArgs e)
-        {
-            if (ThreadScan == null || !ThreadScan.IsAlive)
-            {
-                ThreadScan = new Thread(new ThreadStart(PopQueueScan));
-                ThreadScan.Start();
-                Console.WriteLine("Pop Queue Scan!!!");
-            }
+            //Form scan 
+            System.Timers.Timer aTimer = new System.Timers.Timer();
+            aTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
+            aTimer.Interval = 500;
+            aTimer.Enabled = true;
         }
 
         #region Language
@@ -105,6 +97,8 @@ namespace LabelPrint.Inventory
                 SetLanguage("vi-VN");
         }
         #endregion
+
+        // ---------------------------------------------------------- TAB TRANSFER ------------------------------------------------------------------ //
 
         private void loadFormData()
         {
@@ -244,6 +238,8 @@ namespace LabelPrint.Inventory
                         transfer_info = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(res.RawText);
 
                         lblRequestName.Text = data["transferNumber"];
+                        this._state = Convert.ToString(data["state"]);
+                        this._state = this._state.ToLower();
 
                         #region Get operations type
                         try
@@ -409,11 +405,13 @@ namespace LabelPrint.Inventory
                             {
                                 try
                                 {
-                                    //var serializer_list_part = new JavaScriptSerializer();
-                                    //dynamic data_list_part = serializer_list_part.Deserialize(res_list_part.RawText, typeof(object));
+                                    List<TransferItem> RootObject = JsonConvert.DeserializeObject<List<TransferItem>>(res_list_part.RawText, new JsonSerializerSettings
+                                    {
+                                        NullValueHandling = NullValueHandling.Ignore
+                                    });
 
-                                    List<ExpandoObject> list_parts = new List<ExpandoObject>(res_list_part.DynamicBody);
-                                    dt_products = Common.ToDataTable(list_parts);
+                                    List<TransferItem> list_parts = RootObject as List<TransferItem>;
+                                    dt_products = Common.ToDataTableClass<TransferItem>(list_parts);
 
                                     try
                                     {
@@ -447,229 +445,6 @@ namespace LabelPrint.Inventory
                     this.vgListPackage.DataSource = null;
                 }
             }
-
-        }
-
-        private void loadDataTransferScan()
-        {
-            if (this.gluTransferNumber.EditValue != null && IsTransferScan == true)
-            {
-                string url = "transfers/" + this.gluTransferNumber.EditValue.ToString();
-                var param = new { };
-                HttpResponse res = HTTP.Instance.Get(url, param);
-
-                if (res.StatusCode == System.Net.HttpStatusCode.OK)
-                {
-                    try
-                    {
-                        var serializer = new JavaScriptSerializer();
-                        dynamic data = serializer.Deserialize(res.RawText, typeof(object));
-
-                        transfer_info = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(res.RawText);
-
-                        this.lblRequestName.Invoke(new MethodInvoker(delegate { lblRequestName.Text = data["transferNumber"]; }));
-
-                        #region Get operations type
-                        try
-                        {
-                            string url_op = "operation-types/" + Convert.ToString(data["operationTypeId"]);
-                            var param_op = new { };
-                            HttpResponse res_op = HTTP.Instance.Get(url_op, param_op);
-
-                            if (res_op.StatusCode == System.Net.HttpStatusCode.OK)
-                            {
-                                try
-                                {
-                                    var serializer_op = new JavaScriptSerializer();
-                                    dynamic data_op = serializer_op.Deserialize(res_op.RawText, typeof(object));
-
-                                    if (data_op["type"] != "manufacturing")
-                                    {
-                                        #region Get source location
-                                        try
-                                        {
-                                            string url_srcLocation = "locations/search?query=id==" + Convert.ToString(data["srcLocationId"]);
-                                            var param_srcLocation = new { };
-                                            HttpResponse res_srcLocation = HTTP.Instance.Get(url_srcLocation, param_srcLocation);
-
-                                            if (res_srcLocation.StatusCode == System.Net.HttpStatusCode.OK)
-                                            {
-                                                try
-                                                {
-                                                    List<ExpandoObject> list_srcLocation = new List<ExpandoObject>(res_srcLocation.DynamicBody);
-                                                    DataTable dt_srcLocation = Common.ToDataTable(list_srcLocation);
-
-                                                    if (dt_srcLocation.Rows.Count > 0)
-                                                    {
-                                                        this.lblSourceLocationValue.Invoke(new MethodInvoker(delegate { lblSourceLocationValue.Text = Convert.ToString(dt_srcLocation.Rows[0]["completeName"]); }));
-
-                                                        this.gluSourceLocation.Invoke(new MethodInvoker(delegate
-                                                        {
-                                                            this.gluSourceLocation.Properties.DataSource = dt_srcLocation;
-                                                            this.gluSourceLocation.Properties.DisplayMember = "completeName";
-                                                            this.gluSourceLocation.Properties.ValueMember = "id";
-                                                            gluSourceLocation.EditValue = dt_srcLocation.Rows[0]["id"];
-                                                        }));
-                                                    }
-
-                                                }
-                                                catch (Exception ex)
-                                                {
-                                                    //MessageBox.Show("Không tồn tại dữ liệu !");
-                                                };
-                                            }
-                                        }
-                                        catch { lblSourceLocationValue.Text = ""; };
-                                        #endregion
-
-                                        #region Get destination location
-                                        try
-                                        {
-                                            string url_destLocation = "locations/search?query=id==" + Convert.ToString(data["destLocationId"]);
-                                            var param_destLocation = new { };
-                                            HttpResponse res_destLocation = HTTP.Instance.Get(url_destLocation, param_destLocation);
-
-                                            if (res_destLocation.StatusCode == System.Net.HttpStatusCode.OK)
-                                            {
-                                                try
-                                                {
-                                                    List<ExpandoObject> list_destLocation = new List<ExpandoObject>(res_destLocation.DynamicBody);
-                                                    DataTable dt_destLocation = Common.ToDataTable(list_destLocation);
-
-                                                    if (dt_destLocation.Rows.Count > 0)
-                                                    {
-                                                        this.gluDestinationLocation.Invoke(new MethodInvoker(delegate
-                                                        {
-                                                            this.gluDestinationLocation.Properties.DataSource = dt_destLocation;
-                                                            this.gluDestinationLocation.Properties.DisplayMember = "completeName";
-                                                            this.gluDestinationLocation.Properties.ValueMember = "id";
-                                                            gluDestinationLocation.EditValue = dt_destLocation.Rows[0]["id"];
-                                                        }));
-                                                    }
-
-                                                }
-                                                catch (Exception ex)
-                                                {
-                                                    //MessageBox.Show("Không tồn tại dữ liệu !");
-                                                };
-                                            }
-                                        }
-                                        catch { };
-                                        #endregion
-
-                                        panelControl2.Enabled = true;
-                                    }
-                                    else
-                                    {
-                                        panelControl2.Enabled = false;
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    //MessageBox.Show("Không tồn tại dữ liệu !");
-                                };
-                            }
-
-                        }
-                        catch { };
-                        #endregion
-
-                        #region Get partner information
-                        try
-                        {
-                            string url_partner = "companies/" + Convert.ToString(data["partnerId"]);
-                            var param_partner = new { };
-                            HttpResponse res_partner = HTTP.Instance.Get(url_partner, param_partner);
-
-                            if (res_partner.StatusCode == System.Net.HttpStatusCode.OK)
-                            {
-                                try
-                                {
-                                    var serializer_partner = new JavaScriptSerializer();
-                                    dynamic data_partner = serializer_partner.Deserialize(res_partner.RawText, typeof(object));
-                                    this._supplier = Convert.ToString(data_partner["name"]);
-                                    this.lblPartnerValue.Invoke(new MethodInvoker(delegate { lblPartnerValue.Text = data_partner["name"]; }));
-                                }
-                                catch (Exception ex)
-                                {
-                                    //MessageBox.Show("Không tồn tại dữ liệu !");
-                                };
-                            }
-
-                        }
-                        catch { lblPartnerValue.Text = ""; this._supplier = ""; };
-                        #endregion
-
-                        #region Get project information
-                        try
-                        {
-                            string url_project = "product-version/" + Convert.ToString(data["productVersionId"]);
-                            var param_project = new { };
-                            HttpResponse res_project = HTTP.Instance.Get(url_project, param_project);
-
-                            if (res_project.StatusCode == System.Net.HttpStatusCode.OK)
-                            {
-                                try
-                                {
-                                    var serializer_project = new JavaScriptSerializer();
-                                    dynamic data_project = serializer_project.Deserialize(res_project.RawText, typeof(object));
-                                    this._project = data_project["name"];
-                                }
-                                catch (Exception ex)
-                                {
-
-                                };
-                            }
-
-                        }
-                        catch { this._project = ""; };
-                        #endregion
-
-                        this.lblCreatedValue.Invoke(new MethodInvoker(delegate { lblCreatedValue.Text = Convert.ToString(data["created"]); }));
-                        this.lblDocumentValue.Invoke(new MethodInvoker(delegate { lblDocumentValue.Text = (string)data["sourceDocument"]; }));
-
-                        #region Get list part in request paper
-                        try
-                        {
-                            string url_list_part = "transfer-items/search?query=transferId==" + this.gluTransferNumber.EditValue.ToString() + "&size=2000";
-                            var param_list_part = new { };
-                            HttpResponse res_list_part = HTTP.Instance.Get(url_list_part, param_list_part);
-
-                            if (res_list_part.StatusCode == System.Net.HttpStatusCode.OK)
-                            {
-                                try
-                                {
-                                    //var serializer_list_part = new JavaScriptSerializer();
-                                    //dynamic data_list_part = serializer_list_part.Deserialize(res_list_part.RawText, typeof(object));
-
-                                    List<ExpandoObject> list_parts = new List<ExpandoObject>(res_list_part.DynamicBody);
-                                    dt_products = Common.ToDataTable(list_parts);
-
-                                    this.vgListProduct.Invoke(new MethodInvoker(delegate { vgListProduct.DataSource = dt_products; }));
-                                }
-                                catch (Exception ex)
-                                {
-                                    this.vgListProduct.DataSource = null;
-                                };
-                            }
-                        }
-                        catch { this.vgListProduct.DataSource = null; };
-                        #endregion
-                    }
-                    catch (Exception ex)
-                    {
-                        //MessageBox.Show("Không tải được dữ liệu transfer !");
-                    };
-                }
-                else
-                {
-                    MessageBox.Show("Lỗi tải dữ liệu transfer !");
-                    this.vgListProduct.DataSource = null;
-                    this.vgListPackage.DataSource = null;
-                }
-                IsTransferScan = false;
-            }
-            
         }
 
         private void grvListPart_FocusedRowChanged(object sender, DevExpress.XtraGrid.Views.Base.FocusedRowChangedEventArgs e)
@@ -706,9 +481,13 @@ namespace LabelPrint.Inventory
                     {
                         try
                         {
-                            List<ExpandoObject> list_trans_details = new List<ExpandoObject>(res_trans_details.DynamicBody);
-                            int index = list_trans_details.Count > 1 ? list_trans_details.Count - 1 : 0;
-                            dt_trans_details = Common.ToDataTable(list_trans_details, _length: index);
+                            List<TransferDetail> RootObject = JsonConvert.DeserializeObject<List<TransferDetail>>(res_trans_details.RawText, new JsonSerializerSettings
+                            {
+                                NullValueHandling = NullValueHandling.Ignore
+                            });
+
+                            List<TransferDetail> list_trans_details = RootObject as List<TransferDetail>;
+                            dt_trans_details = Common.ToDataTableClass<TransferDetail>(list_trans_details);
                             vgListPackage.DataSource = dt_trans_details;
                         }
                         catch (Exception ex)
@@ -742,6 +521,12 @@ namespace LabelPrint.Inventory
 
         private void btnAllocate_Click(object sender, EventArgs e)
         {
+            if (this._state == "done")
+            {
+                MessageBox.Show("The selected transaction has completed, actions are not allowed !");
+                return;
+            }
+
             if (txtNumberPerPackage.Text.Trim().Length == 0 && txtNumberPackage.Text.Trim().Length == 0
                 && txtNumberPerLot.Text.Trim().Length == 0 && txtNumberLot.Text.Trim().Length == 0)
             {
@@ -772,7 +557,7 @@ namespace LabelPrint.Inventory
                         var serializer_package = new JavaScriptSerializer();
                         dynamic data_package = serializer_package.Deserialize(res_package.RawText, typeof(object));
 
-                        List_allocate_package = Common.CreateSequential(Common.ConvertInt(data_package["nextNumber"]), Common.ConvertInt(data_package["step"]), Common.ConvertInt(data_package["length"]), Common.ConvertInt(txtNumberPackage.Text), data_package["prefix"]);
+                        List_allocate_package = Common.CreateSequential(Convert.ToInt32(data_package["nextNumber"]), Convert.ToInt32(data_package["step"]), Convert.ToInt32(data_package["length"]), Convert.ToInt32(txtNumberPackage.Text), data_package["prefix"]);
                     }
                     catch (Exception ex)
                     {
@@ -791,11 +576,11 @@ namespace LabelPrint.Inventory
                 int number_allocate_lot = 0;
                 if (Common.ConvertInt(txtNumberPackage.Text) > 0)
                 {
-                    number_allocate_lot = Common.ConvertInt(txtNumberLot.Text) * Common.ConvertInt(txtNumberPackage.Text);
+                    number_allocate_lot = Convert.ToInt32(txtNumberLot.Text) * Convert.ToInt32(txtNumberPackage.Text);
                 }
                 else
                 {
-                    number_allocate_lot = Common.ConvertInt(txtNumberLot.Text);
+                    number_allocate_lot = Convert.ToInt32(txtNumberLot.Text);
                 }
 
                 string url_lot = "sequences/" + Config.LotReserveId + "/reserve/" + Convert.ToString(number_allocate_lot);
@@ -899,7 +684,7 @@ namespace LabelPrint.Inventory
 
                         //add to table list package
                         addPackageDataRow(wtd.internal_reference, wtd.reference, wtd.src_package_number, wtd.dest_package_number, wtd.trace_number, Common.ConvertInt(wtd.src_location_id),
-                            Common.ConvertInt(wtd.dest_location_id), Common.ConvertInt(wtd.done_quantity), Common.ConvertInt(wtd.transfer_id),
+                            Common.ConvertInt(wtd.dest_location_id), Common.ConvertDouble(wtd.done_quantity), Common.ConvertInt(wtd.transfer_id),
                             Common.ConvertInt(wtd.transfer_item_id), Common.ConvertInt(wtd.product_id), Common.ConvertInt(wtd.man_id));
 
                         //Print package
@@ -949,7 +734,7 @@ namespace LabelPrint.Inventory
 
                         //add to table list package
                         addPackageDataRow(wtd.internal_reference, wtd.reference, wtd.src_package_number, wtd.dest_package_number, wtd.trace_number, Common.ConvertInt(wtd.src_location_id),
-                            Common.ConvertInt(wtd.dest_location_id), Common.ConvertInt(wtd.done_quantity), Common.ConvertInt(wtd.transfer_id),
+                            Common.ConvertInt(wtd.dest_location_id), Common.ConvertDouble(wtd.done_quantity), Common.ConvertInt(wtd.transfer_id),
                             Common.ConvertInt(wtd.transfer_item_id), Common.ConvertInt(wtd.product_id), Common.ConvertInt(wtd.man_id));
 
                         //Print package
@@ -989,7 +774,7 @@ namespace LabelPrint.Inventory
 
                         //add to table list package
                         addPackageDataRow(wtd.internal_reference, wtd.reference, wtd.src_package_number, wtd.dest_package_number, wtd.trace_number, Common.ConvertInt(wtd.src_location_id),
-                            Common.ConvertInt(wtd.dest_location_id), Common.ConvertInt(wtd.done_quantity), Common.ConvertInt(wtd.transfer_id),
+                            Common.ConvertInt(wtd.dest_location_id), Common.ConvertDouble(wtd.done_quantity), Common.ConvertInt(wtd.transfer_id),
                             Common.ConvertInt(wtd.transfer_item_id), Common.ConvertInt(wtd.product_id), Common.ConvertInt(wtd.man_id));
 
                         //Print Lot
@@ -1011,8 +796,8 @@ namespace LabelPrint.Inventory
             }
         }
 
-        private void addPackageDataRow(string _internalReference, string _reference, string _srcPackageNumber, string _destPackageNumber, string _traceNumber, int _srcLocationId, int _destLocationId,
-            double _doneQuantity, int _transferId, int _transferItemId, int _productId, int _manId, string _manPn = null, int? _lotId = null, int _printed = 1)
+        private void addPackageDataRow(string _internalReference, string _reference, string _srcPackageNumber, string _destPackageNumber, string _traceNumber, int? _srcLocationId, int? _destLocationId,
+            double _doneQuantity, int? _transferId, int? _transferItemId, int? _productId, int? _manId, string _manPn = null, int? _lotId = null, int _printed = 1)
         {
             DataRow myR = this.dt_trans_details.NewRow();
             try
@@ -1192,7 +977,7 @@ namespace LabelPrint.Inventory
             frmTransferReceiptsDetails.ID = Common.ConvertInt(row["id"]);
             frmTransferReceiptsDetails.transfer_info = this.transfer_info;
             frmTransferReceiptsDetails.PackageID = Convert.ToString(row["destPackageNumber"]);
-            frmTransferReceiptsDetails.ProductName = Convert.ToString(data["productName"]);
+            //frmTransferReceiptsDetails.ProductName = Convert.ToString(data["productName"]);
             frmTransferReceiptsDetails.ManId = Common.ConvertInt(data["manId"]);
             try { frmTransferReceiptsDetails.ManPn = Convert.ToString(data["manPn"]); }
             catch { frmTransferReceiptsDetails.ManPn = null; }
@@ -1204,6 +989,7 @@ namespace LabelPrint.Inventory
             frmTransferReceiptsDetails.DoneQuantityPackage = Common.ConvertInt(row["doneQuantity"]);
             frmTransferReceiptsDetails.InternalReference = Convert.ToString(row["internalReference"]);
             frmTransferReceiptsDetails.Reference = Convert.ToString(this.transfer_info["transferNumber"]);
+            frmTransferReceiptsDetails.State = this._state;
 
             frmTransferReceiptsDetails.ShowDialog();
 
@@ -1230,6 +1016,12 @@ namespace LabelPrint.Inventory
 
         private void btnDeletePack_Click(object sender, EventArgs e)
         {
+            if (this._state == "done")
+            {
+                MessageBox.Show("The selected transaction has completed, not allowed to delete !");
+                return;
+            }
+
             DialogResult dr = new DialogResult();
             dr = MessageBox.Show("Bạn có chắc chắn muốn xóa tem?.", "Xóa tem", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
             if (dr == DialogResult.Yes)
@@ -1240,6 +1032,8 @@ namespace LabelPrint.Inventory
                 transfer_info_delete.Remove("removedTransferItems");
                 transfer_info_delete.Remove("transferDetails");
                 transfer_info_delete.Remove("active");
+                try { transfer_info_delete.Remove("manOrderTransfer"); }catch { };
+                try { transfer_info_delete.Remove("returnedTransfer"); }catch { };
                 DataRow row = grvListPackage.GetDataRow(grvListPackage.FocusedRowHandle);
                 string _id_delete = "[" + Convert.ToString(row["id"]) + "]";
                 transfer_info_delete["removedTransferDetails"] = _id_delete;
@@ -1263,6 +1057,12 @@ namespace LabelPrint.Inventory
 
         private void btnDelete_Click(object sender, EventArgs e)
         {
+            if (this._state == "done")
+            {
+                MessageBox.Show("The selected transaction has completed, not allowed to delete !");
+                return;
+            }
+
             DialogResult dr = new DialogResult();
             dr = MessageBox.Show("Bạn có chắc chắn muốn xóa tem?.", "Xóa tem", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
             if (dr == DialogResult.Yes)
@@ -1273,6 +1073,8 @@ namespace LabelPrint.Inventory
                 transfer_info_delete.Remove("removedTransferItems");
                 transfer_info_delete.Remove("transferDetails");
                 transfer_info_delete.Remove("active");
+                try { transfer_info_delete.Remove("manOrderTransfer"); }catch { };
+                try { transfer_info_delete.Remove("returnedTransfer"); }catch { };
                 string _id_delete = "[";
                 foreach (var index in grvListPackage.GetSelectedRows())
                 {
@@ -1345,54 +1147,9 @@ namespace LabelPrint.Inventory
             }
         }
 
-        private void TransferReceipts_KeyPress(object sender, KeyPressEventArgs e)
+        private void btnRefresh_Click(object sender, EventArgs e)
         {
-            code_read.Append(e.KeyChar);
-            //timeScan.Enabled = true;
-            //timeScan.Interval = 2500;
-
-            if (e.KeyChar == (char)13)
-            {
-                //Push Queue
-                QueueScan.Enqueue(code_read.ToString().Trim());
-                code_read.Clear();
-            }
-        }
-
-        private void PopQueueScan()
-        {
-            if (QueueScan.Count > 0)
-            {
-
-                string ScanText = QueueScan.Dequeue();
-
-                //Pop Queue -> process data
-                double n;
-                bool isNumeric = double.TryParse(ScanText, out n);
-
-                //var a = this.FocusedControl;
-
-                if (!isNumeric)
-                {
-                    //process input transfer
-                    try
-                    {
-                        string[] split = ScanText.Split('-');
-
-                        //var element = gluTransferNumber.Properties.GetRowByKeyValue(split[1]);
-                        IsTransferScan = true;
-                        this.gluTransferNumber.Invoke(new MethodInvoker(delegate { try { gluTransferNumber.EditValue = split[1]; } catch { } }));
-
-                        loadDataTransferScan();
-                    }
-                    catch (Exception ex) { }
-                }
-            }
-        }
-
-        private void TransferReceipts_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            if (ThreadScan != null && ThreadScan.IsAlive) ThreadScan.Abort();
+            loadDataListPackage();
         }
 
         #region TextBox KeyPress
@@ -1700,6 +1457,372 @@ namespace LabelPrint.Inventory
         #endregion
 
         #endregion
-        
+
+        // ---------------------------------------------------------- TAB ID ------------------------------------------------------------------ //
+
+        private int packageID;
+
+        private void OnTimedEvent(object source, ElapsedEventArgs e)
+        {
+            if (ThreadScan == null || !ThreadScan.IsAlive)
+            {
+                ThreadScan = new Thread(new ThreadStart(PopQueueScan));
+                ThreadScan.Start();
+                //Console.WriteLine("Pop Queue Scan!!!");
+            }
+        }
+
+        private void TransferReceipts_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            code_read.Append(e.KeyChar);
+            if (e.KeyChar == (char)13)
+            {
+                //Push Queue
+                QueueScan.Enqueue(code_read.ToString().Trim());
+                code_read.Clear();
+            }
+        }
+
+        private void TransferReceipts_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (ThreadScan != null && ThreadScan.IsAlive) ThreadScan.Abort();
+        }
+
+        private void PopQueueScan()
+        {
+            if (QueueScan.Count > 0)
+            {
+                string ScanString = QueueScan.Dequeue();
+                //Console.WriteLine("Pop Queue : " + ScanString);
+
+                if (ScanString.Length > 3)
+                {
+                    if (ScanString.StartsWith("["))
+                    {
+                        LabelPackage label = new LabelPackage(ScanString);
+                        this.txtSearchID.Invoke(new MethodInvoker(delegate { txtSearchID.Text = label.PackageID; }));
+                        LoadDataSearch();
+                        return;
+                    }
+
+                    TemThungCuon temthung = new TemThungCuon(ScanString);
+                    if (temthung.IdThung != null && temthung.IdThung.Length > 0 && temthung.Type != null && temthung.Type == "1")
+                    {
+                        this.txtSearchID.Invoke(new MethodInvoker(delegate { txtSearchID.Text = temthung.IdThung; }));
+                        LoadDataSearch();
+                        return;
+                    }
+
+                    TemCuon temcuon = new TemCuon(ScanString);
+                    if (temcuon.IdCuon != null && temcuon.IdCuon.Length > 0 && temcuon.Type != null && temcuon.Type == "0")
+                    {
+                        this.txtSearchID.Invoke(new MethodInvoker(delegate { txtSearchID.Text = temcuon.IdCuon; }));
+                        LoadDataSearch();
+                        return;
+                    }
+                    
+                    ttError.ShowHint("Định dạng ID sai"); 
+                    return;
+
+                    //double n;
+                    //bool isNumeric = double.TryParse(ScanString, out n);
+
+                    //if (!isNumeric)
+                    //{
+                    //    try
+                    //    {
+                    //        string[] split = ScanString.Split('-');
+                    //        this.gluTransferNumber.Invoke(new MethodInvoker(delegate { try { gluTransferNumber.EditValue = split[1]; } catch { } }));
+                    //    }
+                    //    catch (Exception ex) { }
+                    //}
+                }
+            }
+        }
+
+        private DataTable buildTableSearchID()
+        {
+            DataTable dt = new DataTable();
+            dt.Columns.Add("productId", typeof(int));
+            dt.Columns.Add("productName", typeof(string));
+            dt.Columns.Add("srcPackageNumber", typeof(string));
+            dt.Columns.Add("destPackageNumber", typeof(string));
+            dt.Columns.Add("transferId", typeof(int));
+            dt.Columns.Add("transferNumber", typeof(string));
+            dt.Columns.Add("locationId", typeof(string));
+            dt.Columns.Add("locationName", typeof(string));
+            dt.Columns.Add("quantity", typeof(double));
+            dt.Columns.Add("supplier", typeof(string));
+            dt.Columns.Add("project", typeof(string));
+            dt.Columns.Add("manId", typeof(int));
+            dt.Columns.Add("companyCode", typeof(int));
+            dt.Columns.Add("internalReference", typeof(string));
+            return dt;
+        }
+
+        private void txtSearchID_EditValueChanged(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void LoadDataSearch()
+        {
+            DataTable dt = buildTableSearchID();
+            DataRow dr = dt.NewRow();
+            string packNumber = this.txtSearchID.Text.Trim();
+            try
+            {
+                string url = "";
+                if (packNumber.StartsWith(Config.PackPrefix))
+                    url = "packages/search?query=packageNumber==\"" + packNumber + "\"";
+                else if (packNumber.StartsWith(Config.LotPrefix))
+                    url = "lots/search?query=lotNumber==\"" + packNumber + "\"";
+                else return;
+                var param = new { };
+                HttpResponse res = HTTP.Instance.Get(url, param);
+
+                if (res.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    try
+                    {
+                        var serializer = new JavaScriptSerializer();
+                        dynamic data = serializer.Deserialize(res.RawText, typeof(object));
+                        if (packNumber.StartsWith(Config.PackPrefix))
+                            dr["srcPackageNumber"] = data[0]["packageNumber"];
+                        else if (packNumber.StartsWith(Config.LotPrefix))
+                            dr["srcPackageNumber"] = data[0]["lotNumber"];
+
+                        this.packageID = data[0]["id"];
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Error during load information package/lot !");
+                        return;
+                    };
+                }
+            }
+            catch
+            {
+                dr["packageNumber"] = "";
+                MessageBox.Show("Error during load information package/lot !");
+                return;
+            }
+
+            #region Find Stock
+            try
+            {
+                string url = "quants/search?query=packageId==" + this.packageID.ToString() + ";onHand>0";
+                var param = new { };
+                HttpResponse res = HTTP.Instance.Get(url, param);
+
+                if (res.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    try
+                    {
+                        List<StockQuantity> ListStockQuant = JsonConvert.DeserializeObject<List<StockQuantity>>(res.RawText, new JsonSerializerSettings
+                        {
+                            NullValueHandling = NullValueHandling.Ignore
+                        });
+                        if (ListStockQuant.Count == 0)
+                        {
+                            MessageBox.Show("Package/Lot does not exist in stock!");
+                            return;
+                        }
+                        else if (ListStockQuant.Count > 1)
+                        {
+                            MessageBox.Show("You can not split packages including roll!");
+                            return;
+                        }
+                        else
+                        {
+                            dr["productId"] = ListStockQuant[0].productId;
+                            dr["quantity"] = ListStockQuant[0].onHand;
+                            dr["locationId"] = ListStockQuant[0].locationId;
+                            dr["manId"] = ListStockQuant[0].manId;
+                        }
+                    }
+                    catch (Exception ex)
+                    { };
+                }
+            }
+            catch
+            {
+                dr["packageNumber"] = "";
+                MessageBox.Show("Error during load information package/lot !");
+                return;
+            };
+            #endregion
+
+            #region Find location
+            //try
+            //{
+            //    string url = "transfer-details/find-last-done-by-package?Id=" + Id;
+            //    var param = new { };
+            //    HttpResponse res = HTTP.Instance.Get(url, param);
+
+            //    if (res.StatusCode == System.Net.HttpStatusCode.OK)
+            //    {
+            //        try
+            //        {
+            //            var serializer = new JavaScriptSerializer();
+            //            dynamic data = serializer.Deserialize(res.RawText, typeof(object));
+            //            dr["destLocationName"] = data["destLocationName"];
+            //        }
+            //        catch (Exception ex)
+            //        { };
+            //    }
+            //}
+            //catch { dr["destLocationName"] = null; };
+            #endregion
+
+            #region Find location stock
+            try
+            {
+                string url = "locations/" + Common.ConvertInt(dr["locationId"]);
+                var param = new { };
+                HttpResponse res = HTTP.Instance.Get(url, param);
+
+                if (res.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    try
+                    {
+                        var serializer = new JavaScriptSerializer();
+                        dynamic data = serializer.Deserialize(res.RawText, typeof(object));
+                        dr["locationName"] = data["completeName"];
+                    }
+                    catch (Exception ex)
+                    { };
+                }
+            }
+            catch { dr["locationName"] = null; };
+            #endregion
+
+            #region Find product name
+            try
+            {
+                string url = "products/" + Common.ConvertInt(dr["productId"]);
+                var param = new { };
+                HttpResponse res = HTTP.Instance.Get(url, param);
+
+                if (res.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    try
+                    {
+                        var serializer = new JavaScriptSerializer();
+                        dynamic data = serializer.Deserialize(res.RawText, typeof(object));
+                        dr["productName"] = data["name"];
+                    }
+                    catch (Exception ex)
+                    { };
+                }
+            }
+            catch { dr["productName"] = null; };
+            try
+            {
+                string url = "companies/" + Common.ConvertInt(dr["manId"]);
+                var param = new { };
+                HttpResponse res = HTTP.Instance.Get(url, param);
+
+                if (res.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    try
+                    {
+                        var serializer = new JavaScriptSerializer();
+                        dynamic data = serializer.Deserialize(res.RawText, typeof(object));
+                        dr["companyCode"] = data["name"];
+                    }
+                    catch (Exception ex)
+                    { };
+                }
+            }
+            catch { dr["companyCode"] = null; };
+            if (dr["productName"] != null && dr["companyCode"] != null)
+                dr["internalReference"] = Convert.ToString(dr["productName"]) + Convert.ToString(dr["companyCode"]);
+            else
+                dr["internalReference"] = null;
+            #endregion
+
+            #region Find transfer number
+            try
+            {
+                string url = "transfers/get-first-by-package?Id=" + packNumber;
+                var param = new { };
+                HttpResponse res = HTTP.Instance.Get(url, param);
+
+                if (res.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    try
+                    {
+                        var serializer = new JavaScriptSerializer();
+                        dynamic data = serializer.Deserialize(res.RawText, typeof(object));
+                        dr["transferNumber"] = data["transferNumber"];
+
+                        #region Get partner information
+                        try
+                        {
+                            string url_partner = "companies/" + Convert.ToString(data["partnerId"]);
+                            var param_partner = new { };
+                            HttpResponse res_partner = HTTP.Instance.Get(url_partner, param_partner);
+
+                            if (res_partner.StatusCode == System.Net.HttpStatusCode.OK)
+                            {
+                                var serializer_partner = new JavaScriptSerializer();
+                                dynamic data_partner = serializer_partner.Deserialize(res_partner.RawText, typeof(object));
+                                dr["supplier"] = data_partner["name"];
+                            }
+
+                        }
+                        catch { dr["supplier"] = null; };
+                        #endregion
+
+                        #region Get project information
+                        try
+                        {
+                            string url_project = "product-version/" + Convert.ToString(data["productVersionId"]);
+                            var param_project = new { };
+                            HttpResponse res_project = HTTP.Instance.Get(url_project, param_project);
+
+                            if (res_project.StatusCode == System.Net.HttpStatusCode.OK)
+                            {
+                                var serializer_project = new JavaScriptSerializer();
+                                dynamic data_project = serializer_project.Deserialize(res_project.RawText, typeof(object));
+                                dr["project"] = data_project["name"];
+                            }
+
+                        }
+                        catch { dr["project"] = null; };
+                        #endregion
+                    }
+                    catch (Exception ex)
+                    { };
+                }
+            }
+            catch { dr["transferNumber"] = null; };
+            #endregion
+
+            dt.Rows.Add(dr);
+            this.vgSearchID.DataSource = dt;
+        }
+
+        private void btnPrintAgain_Click(object sender, EventArgs e)
+        {
+            //LabelPackage labelPackage = new LabelPackage(wtd.internal_reference, List_allocate_package[i], "", this.transfer_info["transferNumber"], this._supplier, this._project);
+            //labelPackage.Template();
+        }
+
+        private void btnRepackage_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void txtSearchID_KeyDown(object sender, KeyEventArgs e)
+        {
+            code_read.Clear();
+            if (e.KeyCode == Keys.Enter)
+            {
+                LoadDataSearch();
+            }
+        }
+
     }
 }

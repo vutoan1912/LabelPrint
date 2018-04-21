@@ -102,6 +102,18 @@ namespace LabelPrint.Business
             set { SaveConfig("LotReserveId", value); }
         }
 
+        public static string PackPrefix
+        {
+            get { return GetConfig("PackPrefix"); }
+            set { SaveConfig("PackPrefix", value); }
+        }
+
+        public static string LotPrefix
+        {
+            get { return GetConfig("LotPrefix"); }
+            set { SaveConfig("LotPrefix", value); }
+        }
+
         public class IntemCuon
         {
 

@@ -466,6 +466,8 @@
     <Compile Include="Business\http.cs" />
     <Compile Include="Business\label.cs" />
     <Compile Include="Business\Language.cs" />
+    <Compile Include="Business\Object\StockQuant.cs" />
+    <Compile Include="Business\Object\Transfer.cs" />
     <Compile Include="Business\print.cs" />
     <Compile Include="Business\sync.cs" />
     <Compile Include="Business\Zebra\FileIO.cs" />

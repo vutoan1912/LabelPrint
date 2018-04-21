@@ -36,11 +36,36 @@ namespace LabelPrint.Business
             return cal.GetWeekOfYear(DateTime.Now, dfi.CalendarWeekRule, dfi.FirstDayOfWeek);
         }
 
+        public static DataTable ToDataTableClass<T>(List<T> items)
+        {
+            DataTable dataTable = new DataTable(typeof(T).Name);
+
+            //Get all the properties
+            PropertyInfo[] Props = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            foreach (PropertyInfo prop in Props)
+            {
+                //Setting column names as Property names
+                dataTable.Columns.Add(prop.Name);
+            }
+            foreach (T item in items)
+            {
+                var values = new object[Props.Length];
+                for (int i = 0; i < Props.Length; i++)
+                {
+                    //inserting property values to datatable rows
+                    values[i] = Props[i].GetValue(item, null);
+                }
+                dataTable.Rows.Add(values);
+            }
+            //put a breakpoint here and check datatable
+            return dataTable;
+        }
+
         public static DataTable ToDataTable(List<ExpandoObject> list, string tableName = "myTable", int? _length = null)
         {
             if (list == null || list.Count == 0) return null;
             //build columns
-            var props = _length != null ? (IDictionary<string, object>)list[Common.ConvertInt(_length)] : (IDictionary<string, object>)list[0];
+            var props = _length != null ? (IDictionary<string, object>)list[Convert.ToInt32(_length)] : (IDictionary<string, object>)list[0];
             var t = new DataTable(tableName);
             Type type;
             foreach (var prop in props)
@@ -186,34 +211,34 @@ namespace LabelPrint.Business
             return c;
         }
 
-        public static int ConvertInt(dynamic value)
+        public static int? ConvertInt(dynamic value)
         {
             try
             {
-                if (value == null) return 0;
+                if (value == null) return null;
                 return Convert.ToInt32(value);
             }
-            catch { return 0; }
+            catch { return null; }
         }
 
-        public static int ConvertLong(dynamic value)
+        public static int? ConvertLong(dynamic value)
         {
             try
             {
-                if (value == null) return 0;
+                if (value == null) return null;
                 return Convert.ToInt64(value);
             }
-            catch { return 0; }
+            catch { return null; }
         }
 
-        public static byte ConvertByte(dynamic value)
+        public static byte? ConvertByte(dynamic value)
         {
             try
             {
-                if (value == null) return 0;
+                if (value == null) return null;
                 return Convert.ToByte(value);
             }
-            catch { return 0; }
+            catch { return null; }
         }
 
         public static dynamic ConvertDouble(dynamic value)

@@ -22,16 +22,16 @@ namespace LabelPrint.Inventory
         //param form
         public int ID;
         public string PackageID;
-        public string ProductName;
+        //public string ProductName;
         public string SourcePackageNumber;
         public int SourceLocationId;
         public int DestLocationId;
         public int UomPackageId;
         public int UomLotId;
         public int DoneQuantityPackage;
-        public int ManId;
+        public int? ManId;
         public string ManPn;
-        public int ProductId;
+        public int? ProductId;
         public int TransferId;
         public int TransferItemId;
         public string InternalReference;
@@ -39,6 +39,13 @@ namespace LabelPrint.Inventory
 
         private string _project = "";
         private string _supplier = "";
+        private string _state = "";
+        public string State
+        {
+            set { this._state = value; }
+            get { return this._state; }
+        }
+
         
         public Dictionary<string, dynamic> transfer_info;
         public dynamic package_info;
@@ -263,6 +270,12 @@ namespace LabelPrint.Inventory
 
         private void btnDelete_Click(object sender, EventArgs e)
         {
+            if (this._state == "done")
+            {
+                MessageBox.Show("The selected transaction has completed, not allowed to delete !");
+                return;
+            }
+
             DialogResult dr = new DialogResult();
             dr = MessageBox.Show("Bạn có chắc chắn muốn xóa tem?", "Xóa tem", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
             if (dr == DialogResult.Yes)
@@ -273,6 +286,8 @@ namespace LabelPrint.Inventory
                 transfer_info_delete.Remove("removedTransferItems");
                 transfer_info_delete.Remove("transferDetails");
                 transfer_info_delete.Remove("active");
+                try { transfer_info_delete.Remove("manOrderTransfer"); }catch { };
+                try { transfer_info_delete.Remove("returnedTransfer"); }catch { };
                 string _id_delete = "[";
                 foreach (var index in grvListLot.GetSelectedRows())
                 {
@@ -303,6 +318,12 @@ namespace LabelPrint.Inventory
 
         private void btnGrvDelete_Click(object sender, EventArgs e)
         {
+            if (this._state == "done")
+            {
+                MessageBox.Show("The selected transaction has completed, not allowed to delete !");
+                return;
+            }
+
             DialogResult dr = new DialogResult();
             dr = MessageBox.Show("Bạn có chắc chắn muốn xóa tem?.", "Xóa tem", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
             if (dr == DialogResult.Yes)
@@ -313,6 +334,8 @@ namespace LabelPrint.Inventory
                 transfer_info_delete.Remove("removedTransferItems");
                 transfer_info_delete.Remove("transferDetails");
                 transfer_info_delete.Remove("active");
+                try { transfer_info_delete.Remove("manOrderTransfer"); }catch { };
+                try { transfer_info_delete.Remove("returnedTransfer"); }catch { };
                 DataRow row = grvListLot.GetDataRow(grvListLot.FocusedRowHandle);
                 string _id_delete = "[" + Convert.ToString(row["id"]) + "]";
                 transfer_info_delete["removedTransferDetails"] = _id_delete;
@@ -382,6 +405,12 @@ namespace LabelPrint.Inventory
 
         private void btnAllocate_Click(object sender, EventArgs e)
         {
+            if (this._state == "done")
+            {
+                MessageBox.Show("The selected transaction has completed, action not implemented !");
+                return;
+            }
+
             bool status_reserve = true;
             List<string> List_allocate_lot = new List<string>();
 
@@ -398,7 +427,7 @@ namespace LabelPrint.Inventory
                         var serializer_lot = new JavaScriptSerializer();
                         dynamic data_lot = serializer_lot.Deserialize(res_lot.RawText, typeof(object));
 
-                        List_allocate_lot = Common.CreateSequential(Common.ConvertInt(data_lot["nextNumber"]), Common.ConvertInt(data_lot["step"]), Common.ConvertInt(data_lot["length"]), Common.ConvertInt(txtNumberLot.Text.Trim()), data_lot["prefix"]);
+                        List_allocate_lot = Common.CreateSequential(Convert.ToInt32(data_lot["nextNumber"]), Common.ConvertInt(data_lot["step"]), Convert.ToInt32(data_lot["length"]), Convert.ToInt32(txtNumberLot.Text.Trim()), data_lot["prefix"]);
                     }
                     catch (Exception ex)
                     {
@@ -451,7 +480,7 @@ namespace LabelPrint.Inventory
 
                         //add to table list package
                         addPackageDataRow(InternalReference, Reference, wtd.src_package_number, wtd.dest_package_number, wtd.trace_number, Common.ConvertInt(wtd.src_location_id),
-                            Common.ConvertInt(wtd.dest_location_id), Common.ConvertInt(wtd.done_quantity), Common.ConvertInt(wtd.transfer_id),
+                            Common.ConvertInt(wtd.dest_location_id), Common.ConvertDouble(wtd.done_quantity), Common.ConvertInt(wtd.transfer_id),
                             Common.ConvertInt(wtd.transfer_item_id), Common.ConvertInt(wtd.product_id), Common.ConvertInt(wtd.man_id));
 
                         //Print Lot
@@ -470,8 +499,8 @@ namespace LabelPrint.Inventory
             }
         }
 
-        private void addPackageDataRow(string _internalReference, string _reference, string _srcPackageNumber, string _destPackageNumber, string _traceNumber, int _srcLocationId, int _destLocationId,
-            double _doneQuantity, int _transferId, int _transferItemId, int _productId, int _manId, string _manPn = null, int? _lotId = null, int _printed = 1)
+        private void addPackageDataRow(string _internalReference, string _reference, string _srcPackageNumber, string _destPackageNumber, string _traceNumber, int? _srcLocationId, int? _destLocationId,
+            double _doneQuantity, int? _transferId, int? _transferItemId, int? _productId, int? _manId, string _manPn = null, int? _lotId = null, int _printed = 1)
         {
             DataRow myR = this._dt_lots.NewRow();
             try

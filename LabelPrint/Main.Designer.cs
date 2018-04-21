@@ -70,6 +70,7 @@
             this.txtUser.Name = "txtUser";
             this.txtUser.Size = new System.Drawing.Size(220, 20);
             this.txtUser.TabIndex = 2;
+            this.txtUser.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtUser_KeyDown);
             // 
             // lblPass
             // 
@@ -89,6 +90,7 @@
             this.txtPass.Properties.PasswordChar = '*';
             this.txtPass.Size = new System.Drawing.Size(220, 20);
             this.txtPass.TabIndex = 4;
+            this.txtPass.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtPass_KeyDown);
             // 
             // checkRemember
             // 

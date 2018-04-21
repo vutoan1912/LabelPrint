@@ -28,6 +28,27 @@ namespace LabelPrint
 
         private void simpleButton1_Click(object sender, EventArgs e)
         {
+            login();
+        }
+
+        private void txtPass_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                login();
+            }
+        }
+
+        private void txtUser_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                login();
+            }
+        }
+
+        private void login()
+        {
             lblError.Visible = false;
 
             ApiResponse api_res = new ApiResponse();
@@ -55,7 +76,7 @@ namespace LabelPrint
             else
             {
                 Config.API_KEY = "Bearer " + (string)data["id_token"];
-                
+
                 var param_current_user = new { };
                 HttpResponse res_current_user = HTTP.Instance.Get("users/current", param_current_user);
 
@@ -97,5 +118,7 @@ namespace LabelPrint
                 }
             }
         }
+
+        
     }
 }

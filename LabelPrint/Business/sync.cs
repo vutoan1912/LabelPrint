@@ -47,7 +47,7 @@ namespace LabelPrint.Business
         public void Todo()
         {
             //@TODO thực hiện sync toàn bộ DB ở đây
-            Console.WriteLine("Start sync Local to ERP ...");
+            //Console.WriteLine("Start sync Local to ERP ...");
             DoSyncTransferDetails();
 
             Config.LatestDbSyncTime = DateTime.Now.ToString();
@@ -72,10 +72,19 @@ namespace LabelPrint.Business
             {
                 using (var dbContext = new erpEntities())
                 {
-                    wh_transfer_details wtd = dbContext.wh_transfer_details.Where(r => r.status == 0).OrderByDescending(u => u.transfer_id).FirstOrDefault();
+                    wh_transfer_details wtd = dbContext.wh_transfer_details
+                                                       .Where(r => r.status != 200)
+                                                       .Where(r => r.status < 50)
+                                                       //.OrderByDescending(u => u.transfer_id)
+                                                       .OrderBy(u => u.status)
+                                                       .FirstOrDefault();
                     if (wtd != null)
                     {
-                        listTransferDetails = dbContext.wh_transfer_details.Where(r => r.status == 0).Where(r => r.transfer_id == wtd.transfer_id).Take(RecordsPerSync).ToList();
+                        listTransferDetails = dbContext.wh_transfer_details.Where(r => r.status == wtd.status)
+                                                                           .Where(r => r.status != 200)
+                                                                           .Where(r => r.status < 50)
+                                                                           .Where(r => r.transfer_id == wtd.transfer_id)
+                                                                           .Take(RecordsPerSync).ToList();
                         if (listTransferDetails.Count > 0)
                         {
                             string url_transfer = "transfers/" + Convert.ToString(wtd.transfer_id);
@@ -102,7 +111,7 @@ namespace LabelPrint.Business
                                         para_transfer_detail += "\"productName\": \"" + td.product_name + "\", ";
                                         para_transfer_detail += "\"doneQuantity\": " + td.done_quantity + ", ";
                                         para_transfer_detail += "\"manId\": " + td.man_id + ", ";
-                                        if (td.man_pn != null) para_transfer_detail += "\"manPn\": \"" + td.man_pn + "\", ";
+                                        if (td.man_pn != null && td.man_pn.Length > 0) para_transfer_detail += "\"manPn\": \"" + td.man_pn + "\", ";
                                         para_transfer_detail += "\"productId\": " + td.product_id + ", ";
                                         para_transfer_detail += "\"reserved\": " + td.done_quantity + ", ";
                                         para_transfer_detail += "\"srcLocationId\": " + td.src_location_id + ", ";
@@ -119,6 +128,7 @@ namespace LabelPrint.Business
                                     values["transferDetails"] = (object)para_transfer_detail;
 
                                     string param_put = Common.DictionaryObjectToJson(values);
+                                    param_put = param_put.Replace("\r", "").Trim();
 
                                     //PUT DATA
                                     string url = "transfers/" + Convert.ToString(wtd.transfer_id);
@@ -129,20 +139,29 @@ namespace LabelPrint.Business
                                         //@TODO: Mark as sync for finished records
                                         foreach (wh_transfer_details td in listTransferDetails)
                                         {
-                                            td.status = 1;
+                                            td.status = 200;
                                         }
                                         dbContext.SaveChanges();
-                                        Console.WriteLine("Sync transfer details --> OK ");
+                                        //Console.WriteLine("Sync transfer details --> OK ");
                                     }
                                     else
                                     {
-                                        Console.WriteLine("Sync transfer details --> FAIL ");
+                                        foreach (wh_transfer_details td in listTransferDetails)
+                                        {
+                                            td.status++;
+                                        }
+                                        dbContext.SaveChanges();
+                                        //Console.WriteLine("Sync transfer details --> FAIL ");
                                     }
 
                                 }
                                 catch (Exception ex)
                                 {
-                                    //MessageBox.Show("Không load được dữ liệu !");
+                                    foreach (wh_transfer_details td in listTransferDetails)
+                                    {
+                                        td.status++;
+                                    }
+                                    dbContext.SaveChanges();
                                 };
                             }
                             else

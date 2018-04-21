@@ -29,13 +29,16 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject9 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject10 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject11 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject12 = new DevExpress.Utils.SerializableAppearanceObject();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TransferReceipts));
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject21 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject22 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject23 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject24 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject7 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject8 = new DevExpress.Utils.SerializableAppearanceObject();
             this.xtraTabControl1 = new DevExpress.XtraTab.XtraTabControl();
             this.tabTransfer = new DevExpress.XtraTab.XtraTabPage();
+            this.btnRefresh = new DevExpress.XtraEditors.SimpleButton();
             this.gluTransferNumber = new DevExpress.XtraEditors.GridLookUpEdit();
             this.gridLookUpEdit1View = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.columnID = new DevExpress.XtraGrid.Columns.GridColumn();
@@ -117,7 +120,6 @@
             this.clmSpq = new DevExpress.XtraGrid.Columns.GridColumn();
             this.clmPrint = new DevExpress.XtraGrid.Columns.GridColumn();
             this.repositoryItemButtonEdit2 = new DevExpress.XtraEditors.Repository.RepositoryItemButtonEdit();
-            this.repositoryItemCheckEdit1 = new DevExpress.XtraEditors.Repository.RepositoryItemCheckEdit();
             this.gridView4 = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.lblDocumentValue = new DevExpress.XtraEditors.LabelControl();
             this.lblDocument = new DevExpress.XtraEditors.LabelControl();
@@ -130,9 +132,26 @@
             this.lblRequestName = new DevExpress.XtraEditors.LabelControl();
             this.lblRequest = new DevExpress.XtraEditors.LabelControl();
             this.tabID = new DevExpress.XtraTab.XtraTabPage();
+            this.simpleButton3 = new DevExpress.XtraEditors.SimpleButton();
+            this.simpleButton2 = new DevExpress.XtraEditors.SimpleButton();
+            this.simpleButton1 = new DevExpress.XtraEditors.SimpleButton();
+            this.gridControl1 = new DevExpress.XtraGrid.GridControl();
+            this.gridView3 = new DevExpress.XtraGrid.Views.Grid.GridView();
+            this.vgSearchID = new DevExpress.XtraGrid.GridControl();
+            this.gridView1 = new DevExpress.XtraGrid.Views.Grid.GridView();
+            this.clmPackageNumber = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.clmUomPackage = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.clmLocationName = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.clmQuantity = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.clmPrintAgain = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.btnPrintAgain = new DevExpress.XtraEditors.Repository.RepositoryItemButtonEdit();
+            this.clmSplitPackage = new DevExpress.XtraGrid.Columns.GridColumn();
+            this.btnRepackage = new DevExpress.XtraEditors.Repository.RepositoryItemButtonEdit();
+            this.txtSearchID = new DevExpress.XtraEditors.TextEdit();
             this.panelControl1 = new DevExpress.XtraEditors.PanelControl();
             this.imgCbxLanguage = new DevExpress.XtraEditors.ImageComboBoxEdit();
             this.imgLanguage = new DevExpress.Utils.ImageCollection(this.components);
+            this.ttError = new DevExpress.Utils.ToolTipController(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.xtraTabControl1)).BeginInit();
             this.xtraTabControl1.SuspendLayout();
             this.tabTransfer.SuspendLayout();
@@ -164,8 +183,15 @@
             ((System.ComponentModel.ISupportInitialize)(this.vgListProduct)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.grvListPart)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.repositoryItemButtonEdit2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.repositoryItemCheckEdit1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView4)).BeginInit();
+            this.tabID.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridView3)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.vgSearchID)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridView1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.btnPrintAgain)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.btnRepackage)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtSearchID.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl1)).BeginInit();
             this.panelControl1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.imgCbxLanguage.Properties)).BeginInit();
@@ -192,6 +218,7 @@
             // 
             this.tabTransfer.Appearance.Header.Font = new System.Drawing.Font("Tahoma", 10F);
             this.tabTransfer.Appearance.Header.Options.UseFont = true;
+            this.tabTransfer.Controls.Add(this.btnRefresh);
             this.tabTransfer.Controls.Add(this.gluTransferNumber);
             this.tabTransfer.Controls.Add(this.cbxViewPackage);
             this.tabTransfer.Controls.Add(this.btnPrint);
@@ -212,6 +239,17 @@
             this.tabTransfer.Name = "tabTransfer";
             this.tabTransfer.Size = new System.Drawing.Size(1016, 664);
             this.tabTransfer.Text = "Theo Transfer";
+            // 
+            // btnRefresh
+            // 
+            this.btnRefresh.Location = new System.Drawing.Point(353, 251);
+            this.btnRefresh.LookAndFeel.SkinName = "Blue";
+            this.btnRefresh.LookAndFeel.UseDefaultLookAndFeel = false;
+            this.btnRefresh.Name = "btnRefresh";
+            this.btnRefresh.Size = new System.Drawing.Size(75, 23);
+            this.btnRefresh.TabIndex = 31;
+            this.btnRefresh.Text = "Refresh";
+            this.btnRefresh.Click += new System.EventHandler(this.btnRefresh_Click);
             // 
             // gluTransferNumber
             // 
@@ -259,7 +297,7 @@
             // 
             // cbxViewPackage
             // 
-            this.cbxViewPackage.Location = new System.Drawing.Point(353, 252);
+            this.cbxViewPackage.Location = new System.Drawing.Point(434, 252);
             this.cbxViewPackage.Name = "cbxViewPackage";
             this.cbxViewPackage.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 10F);
             this.cbxViewPackage.Properties.Appearance.ForeColor = System.Drawing.SystemColors.HotTrack;
@@ -812,7 +850,7 @@
             // 
             this.repositoryItemButtonEdit1.AutoHeight = false;
             this.repositoryItemButtonEdit1.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
-            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Glyph, "In lại", -1, true, true, false, DevExpress.XtraEditors.ImageLocation.MiddleCenter, ((System.Drawing.Image)(resources.GetObject("repositoryItemButtonEdit1.Buttons"))), new DevExpress.Utils.KeyShortcut(System.Windows.Forms.Keys.None), serializableAppearanceObject21, "In lại", null, null, true)});
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Glyph, "In lại", -1, true, true, false, DevExpress.XtraEditors.ImageLocation.MiddleCenter, ((System.Drawing.Image)(resources.GetObject("repositoryItemButtonEdit1.Buttons"))), new DevExpress.Utils.KeyShortcut(System.Windows.Forms.Keys.None), serializableAppearanceObject9, "In lại", null, null, true)});
             this.repositoryItemButtonEdit1.ButtonsStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
             this.repositoryItemButtonEdit1.LookAndFeel.SkinName = "Blue";
             this.repositoryItemButtonEdit1.LookAndFeel.UseDefaultLookAndFeel = false;
@@ -832,7 +870,7 @@
             // 
             this.btnEdit.AutoHeight = false;
             this.btnEdit.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
-            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Glyph, "Chỉnh sửa", -1, true, true, false, DevExpress.XtraEditors.ImageLocation.MiddleCenter, ((System.Drawing.Image)(resources.GetObject("btnEdit.Buttons"))), new DevExpress.Utils.KeyShortcut(System.Windows.Forms.Keys.None), serializableAppearanceObject22, "Chỉnh sửa", null, null, true)});
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Glyph, "Chỉnh sửa", -1, true, true, false, DevExpress.XtraEditors.ImageLocation.MiddleCenter, ((System.Drawing.Image)(resources.GetObject("btnEdit.Buttons"))), new DevExpress.Utils.KeyShortcut(System.Windows.Forms.Keys.None), serializableAppearanceObject10, "Chỉnh sửa", null, null, true)});
             this.btnEdit.LookAndFeel.SkinName = "Blue";
             this.btnEdit.LookAndFeel.UseDefaultLookAndFeel = false;
             this.btnEdit.Name = "btnEdit";
@@ -852,7 +890,7 @@
             // 
             this.btnDeletePack.AutoHeight = false;
             this.btnDeletePack.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
-            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Glyph, "Xóa", -1, true, true, false, DevExpress.XtraEditors.ImageLocation.MiddleCenter, ((System.Drawing.Image)(resources.GetObject("btnDeletePack.Buttons"))), new DevExpress.Utils.KeyShortcut(System.Windows.Forms.Keys.None), serializableAppearanceObject23, "Xóa", null, null, true)});
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Glyph, "Xóa", -1, true, true, false, DevExpress.XtraEditors.ImageLocation.MiddleCenter, ((System.Drawing.Image)(resources.GetObject("btnDeletePack.Buttons"))), new DevExpress.Utils.KeyShortcut(System.Windows.Forms.Keys.None), serializableAppearanceObject11, "Xóa", null, null, true)});
             this.btnDeletePack.LookAndFeel.SkinName = "Blue";
             this.btnDeletePack.LookAndFeel.UseDefaultLookAndFeel = false;
             this.btnDeletePack.Name = "btnDeletePack";
@@ -911,8 +949,7 @@
             this.vgListProduct.Margin = new System.Windows.Forms.Padding(2);
             this.vgListProduct.Name = "vgListProduct";
             this.vgListProduct.RepositoryItems.AddRange(new DevExpress.XtraEditors.Repository.RepositoryItem[] {
-            this.repositoryItemButtonEdit2,
-            this.repositoryItemCheckEdit1});
+            this.repositoryItemButtonEdit2});
             this.vgListProduct.Size = new System.Drawing.Size(1016, 148);
             this.vgListProduct.TabIndex = 22;
             this.vgListProduct.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
@@ -1044,15 +1081,10 @@
             // 
             this.repositoryItemButtonEdit2.AutoHeight = false;
             this.repositoryItemButtonEdit2.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
-            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Glyph, "In lại", -1, true, true, false, DevExpress.XtraEditors.ImageLocation.MiddleCenter, ((System.Drawing.Image)(resources.GetObject("repositoryItemButtonEdit2.Buttons"))), new DevExpress.Utils.KeyShortcut(System.Windows.Forms.Keys.None), serializableAppearanceObject24, "In lại", null, null, true)});
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Glyph, "In lại", -1, true, true, false, DevExpress.XtraEditors.ImageLocation.MiddleCenter, ((System.Drawing.Image)(resources.GetObject("repositoryItemButtonEdit2.Buttons"))), new DevExpress.Utils.KeyShortcut(System.Windows.Forms.Keys.None), serializableAppearanceObject12, "In lại", null, null, true)});
             this.repositoryItemButtonEdit2.ButtonsStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
             this.repositoryItemButtonEdit2.Name = "repositoryItemButtonEdit2";
             this.repositoryItemButtonEdit2.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.HideTextEditor;
-            // 
-            // repositoryItemCheckEdit1
-            // 
-            this.repositoryItemCheckEdit1.AutoHeight = false;
-            this.repositoryItemCheckEdit1.Name = "repositoryItemCheckEdit1";
             // 
             // gridView4
             // 
@@ -1171,9 +1203,184 @@
             // 
             // tabID
             // 
+            this.tabID.Controls.Add(this.simpleButton3);
+            this.tabID.Controls.Add(this.simpleButton2);
+            this.tabID.Controls.Add(this.simpleButton1);
+            this.tabID.Controls.Add(this.gridControl1);
+            this.tabID.Controls.Add(this.vgSearchID);
+            this.tabID.Controls.Add(this.txtSearchID);
             this.tabID.Name = "tabID";
-            this.tabID.Size = new System.Drawing.Size(1016, 651);
+            this.tabID.Size = new System.Drawing.Size(1016, 664);
             this.tabID.Text = "Theo ID";
+            // 
+            // simpleButton3
+            // 
+            this.simpleButton3.Appearance.Font = new System.Drawing.Font("Tahoma", 10F);
+            this.simpleButton3.Appearance.Options.UseFont = true;
+            this.simpleButton3.Location = new System.Drawing.Point(212, 13);
+            this.simpleButton3.LookAndFeel.SkinName = "Blue";
+            this.simpleButton3.LookAndFeel.UseDefaultLookAndFeel = false;
+            this.simpleButton3.Name = "simpleButton3";
+            this.simpleButton3.Size = new System.Drawing.Size(85, 23);
+            this.simpleButton3.TabIndex = 5;
+            this.simpleButton3.Text = "Lưu";
+            // 
+            // simpleButton2
+            // 
+            this.simpleButton2.Appearance.Font = new System.Drawing.Font("Tahoma", 10F);
+            this.simpleButton2.Appearance.Options.UseFont = true;
+            this.simpleButton2.Location = new System.Drawing.Point(121, 173);
+            this.simpleButton2.LookAndFeel.SkinName = "Blue";
+            this.simpleButton2.LookAndFeel.UseDefaultLookAndFeel = false;
+            this.simpleButton2.Name = "simpleButton2";
+            this.simpleButton2.Size = new System.Drawing.Size(106, 23);
+            this.simpleButton2.TabIndex = 4;
+            this.simpleButton2.Text = "Xóa tem";
+            // 
+            // simpleButton1
+            // 
+            this.simpleButton1.Appearance.Font = new System.Drawing.Font("Tahoma", 10F);
+            this.simpleButton1.Appearance.Options.UseFont = true;
+            this.simpleButton1.Location = new System.Drawing.Point(9, 173);
+            this.simpleButton1.LookAndFeel.SkinName = "Blue";
+            this.simpleButton1.LookAndFeel.UseDefaultLookAndFeel = false;
+            this.simpleButton1.Name = "simpleButton1";
+            this.simpleButton1.Size = new System.Drawing.Size(106, 23);
+            this.simpleButton1.TabIndex = 3;
+            this.simpleButton1.Text = "In tem";
+            // 
+            // gridControl1
+            // 
+            this.gridControl1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.gridControl1.Location = new System.Drawing.Point(0, 202);
+            this.gridControl1.LookAndFeel.SkinName = "Blue";
+            this.gridControl1.LookAndFeel.UseDefaultLookAndFeel = false;
+            this.gridControl1.MainView = this.gridView3;
+            this.gridControl1.Name = "gridControl1";
+            this.gridControl1.Size = new System.Drawing.Size(1017, 458);
+            this.gridControl1.TabIndex = 2;
+            this.gridControl1.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
+            this.gridView3});
+            // 
+            // gridView3
+            // 
+            this.gridView3.GridControl = this.gridControl1;
+            this.gridView3.Name = "gridView3";
+            // 
+            // vgSearchID
+            // 
+            this.vgSearchID.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.vgSearchID.Location = new System.Drawing.Point(-1, 44);
+            this.vgSearchID.LookAndFeel.SkinName = "Blue";
+            this.vgSearchID.LookAndFeel.UseDefaultLookAndFeel = false;
+            this.vgSearchID.MainView = this.gridView1;
+            this.vgSearchID.Name = "vgSearchID";
+            this.vgSearchID.RepositoryItems.AddRange(new DevExpress.XtraEditors.Repository.RepositoryItem[] {
+            this.btnPrintAgain,
+            this.btnRepackage});
+            this.vgSearchID.Size = new System.Drawing.Size(1017, 111);
+            this.vgSearchID.TabIndex = 1;
+            this.vgSearchID.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
+            this.gridView1});
+            // 
+            // gridView1
+            // 
+            this.gridView1.Columns.AddRange(new DevExpress.XtraGrid.Columns.GridColumn[] {
+            this.clmPackageNumber,
+            this.clmUomPackage,
+            this.clmLocationName,
+            this.clmQuantity,
+            this.clmPrintAgain,
+            this.clmSplitPackage});
+            this.gridView1.GridControl = this.vgSearchID;
+            this.gridView1.Name = "gridView1";
+            // 
+            // clmPackageNumber
+            // 
+            this.clmPackageNumber.Caption = "ID";
+            this.clmPackageNumber.FieldName = "srcPackageNumber";
+            this.clmPackageNumber.Name = "clmPackageNumber";
+            this.clmPackageNumber.Visible = true;
+            this.clmPackageNumber.VisibleIndex = 0;
+            this.clmPackageNumber.Width = 166;
+            // 
+            // clmUomPackage
+            // 
+            this.clmUomPackage.Caption = "Kiểu bao gói";
+            this.clmUomPackage.Name = "clmUomPackage";
+            this.clmUomPackage.Visible = true;
+            this.clmUomPackage.VisibleIndex = 1;
+            this.clmUomPackage.Width = 166;
+            // 
+            // clmLocationName
+            // 
+            this.clmLocationName.Caption = "Vị trí";
+            this.clmLocationName.FieldName = "locationName";
+            this.clmLocationName.Name = "clmLocationName";
+            this.clmLocationName.Visible = true;
+            this.clmLocationName.VisibleIndex = 2;
+            this.clmLocationName.Width = 256;
+            // 
+            // clmQuantity
+            // 
+            this.clmQuantity.Caption = "Số lượng";
+            this.clmQuantity.FieldName = "quantity";
+            this.clmQuantity.Name = "clmQuantity";
+            this.clmQuantity.Visible = true;
+            this.clmQuantity.VisibleIndex = 3;
+            // 
+            // clmPrintAgain
+            // 
+            this.clmPrintAgain.Caption = "In tem";
+            this.clmPrintAgain.ColumnEdit = this.btnPrintAgain;
+            this.clmPrintAgain.Name = "clmPrintAgain";
+            this.clmPrintAgain.Visible = true;
+            this.clmPrintAgain.VisibleIndex = 4;
+            this.clmPrintAgain.Width = 121;
+            // 
+            // btnPrintAgain
+            // 
+            this.btnPrintAgain.AutoHeight = false;
+            this.btnPrintAgain.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Glyph, "In lại tem", -1, true, true, false, DevExpress.XtraEditors.ImageLocation.MiddleCenter, ((System.Drawing.Image)(resources.GetObject("btnPrintAgain.Buttons"))), new DevExpress.Utils.KeyShortcut(System.Windows.Forms.Keys.None), serializableAppearanceObject7, "In lại tem", null, null, true)});
+            this.btnPrintAgain.LookAndFeel.SkinName = "Blue";
+            this.btnPrintAgain.LookAndFeel.UseDefaultLookAndFeel = false;
+            this.btnPrintAgain.Name = "btnPrintAgain";
+            this.btnPrintAgain.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.HideTextEditor;
+            this.btnPrintAgain.Click += new System.EventHandler(this.btnPrintAgain_Click);
+            // 
+            // clmSplitPackage
+            // 
+            this.clmSplitPackage.Caption = "Tách package";
+            this.clmSplitPackage.ColumnEdit = this.btnRepackage;
+            this.clmSplitPackage.Name = "clmSplitPackage";
+            this.clmSplitPackage.Visible = true;
+            this.clmSplitPackage.VisibleIndex = 5;
+            this.clmSplitPackage.Width = 123;
+            // 
+            // btnRepackage
+            // 
+            this.btnRepackage.AutoHeight = false;
+            this.btnRepackage.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Glyph, "Đóng gói lại", -1, true, true, false, DevExpress.XtraEditors.ImageLocation.MiddleCenter, ((System.Drawing.Image)(resources.GetObject("btnRepackage.Buttons"))), new DevExpress.Utils.KeyShortcut(System.Windows.Forms.Keys.None), serializableAppearanceObject8, "Đóng gói lại", null, null, true)});
+            this.btnRepackage.Name = "btnRepackage";
+            this.btnRepackage.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.HideTextEditor;
+            this.btnRepackage.Click += new System.EventHandler(this.btnRepackage_Click);
+            // 
+            // txtSearchID
+            // 
+            this.txtSearchID.Location = new System.Drawing.Point(9, 14);
+            this.txtSearchID.Name = "txtSearchID";
+            this.txtSearchID.Properties.Appearance.Font = new System.Drawing.Font("Tahoma", 10F);
+            this.txtSearchID.Properties.Appearance.Options.UseFont = true;
+            this.txtSearchID.Properties.LookAndFeel.SkinName = "Blue";
+            this.txtSearchID.Properties.NullText = "Search ID";
+            this.txtSearchID.Size = new System.Drawing.Size(197, 22);
+            this.txtSearchID.TabIndex = 0;
+            this.txtSearchID.EditValueChanged += new System.EventHandler(this.txtSearchID_EditValueChanged);
+            this.txtSearchID.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtSearchID_KeyDown);
             // 
             // panelControl1
             // 
@@ -1209,6 +1416,15 @@
             this.imgLanguage.ImageStream = ((DevExpress.Utils.ImageCollectionStreamer)(resources.GetObject("imgLanguage.ImageStream")));
             this.imgLanguage.Images.SetKeyName(0, "if_Australia_2361509.png");
             this.imgLanguage.Images.SetKeyName(1, "if_Vietnam_flat_92420.png");
+            // 
+            // ttError
+            // 
+            this.ttError.Appearance.ForeColor = System.Drawing.Color.Red;
+            this.ttError.Appearance.Options.UseForeColor = true;
+            this.ttError.CloseOnClick = DevExpress.Utils.DefaultBoolean.True;
+            this.ttError.Rounded = true;
+            this.ttError.ShowBeak = true;
+            this.ttError.ToolTipLocation = DevExpress.Utils.ToolTipLocation.TopCenter;
             // 
             // TransferReceipts
             // 
@@ -1255,8 +1471,15 @@
             ((System.ComponentModel.ISupportInitialize)(this.vgListProduct)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.grvListPart)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.repositoryItemButtonEdit2)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.repositoryItemCheckEdit1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView4)).EndInit();
+            this.tabID.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.gridControl1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridView3)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.vgSearchID)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridView1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.btnPrintAgain)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.btnRepackage)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.txtSearchID.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl1)).EndInit();
             this.panelControl1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.imgCbxLanguage.Properties)).EndInit();
@@ -1290,7 +1513,6 @@
         private DevExpress.XtraGrid.Columns.GridColumn clmProductDescription;
         private DevExpress.XtraGrid.Columns.GridColumn clmPrint;
         private DevExpress.XtraEditors.Repository.RepositoryItemButtonEdit repositoryItemButtonEdit2;
-        private DevExpress.XtraEditors.Repository.RepositoryItemCheckEdit repositoryItemCheckEdit1;
         private DevExpress.XtraGrid.Views.Grid.GridView gridView4;
         private DevExpress.XtraGrid.GridControl vgListPackage;
         private DevExpress.XtraGrid.Views.Grid.GridView grvListPackage;
@@ -1366,6 +1588,24 @@
         private DevExpress.XtraGrid.Columns.GridColumn clmInternalReference;
         private DevExpress.XtraGrid.Columns.GridColumn clmSrcLocationName;
         private DevExpress.XtraGrid.Columns.GridColumn clmDestLocationName;
+        private DevExpress.XtraEditors.TextEdit txtSearchID;
+        private DevExpress.XtraGrid.GridControl vgSearchID;
+        private DevExpress.XtraGrid.Views.Grid.GridView gridView1;
+        private DevExpress.XtraEditors.SimpleButton simpleButton3;
+        private DevExpress.XtraEditors.SimpleButton simpleButton2;
+        private DevExpress.XtraEditors.SimpleButton simpleButton1;
+        private DevExpress.XtraGrid.GridControl gridControl1;
+        private DevExpress.XtraGrid.Views.Grid.GridView gridView3;
+        private DevExpress.Utils.ToolTipController ttError;
+        private DevExpress.XtraGrid.Columns.GridColumn clmPackageNumber;
+        private DevExpress.XtraGrid.Columns.GridColumn clmUomPackage;
+        private DevExpress.XtraGrid.Columns.GridColumn clmLocationName;
+        private DevExpress.XtraGrid.Columns.GridColumn clmPrintAgain;
+        private DevExpress.XtraEditors.Repository.RepositoryItemButtonEdit btnPrintAgain;
+        private DevExpress.XtraGrid.Columns.GridColumn clmSplitPackage;
+        private DevExpress.XtraEditors.Repository.RepositoryItemButtonEdit btnRepackage;
+        private DevExpress.XtraEditors.SimpleButton btnRefresh;
+        private DevExpress.XtraGrid.Columns.GridColumn clmQuantity;
 
     }
 }
