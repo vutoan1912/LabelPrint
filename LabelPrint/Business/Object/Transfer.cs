@@ -8,8 +8,6 @@ namespace LabelPrint.Business
 {
     class TransferItem
     {
-        //private string _manPn = null;
-
         public object created { get; set; }
         public object updated { get; set; }
         public string createdBy { get; set; }
@@ -31,11 +29,7 @@ namespace LabelPrint.Business
         public bool selected { get; set; }
         public double foc { get; set; }
         public string manPn { get; set; }
-        //public string manPn
-        //{
-        //    get { return _manPn; }
-        //    set { _manPn = value ?? _manPn; }
-        //}
+        public double restQuantity { get; set; }
     }
 
     class TransferDetail
@@ -58,6 +52,7 @@ namespace LabelPrint.Business
         public string productDescription { get; set; }
         public int transferItemId { get; set; }
         public int? destPackageId { get; set; }
+        public string srcPackageNumber { get; set; }
         public string destPackageNumber { get; set; }
         public string reference { get; set; }
         public string srcLocationName { get; set; }

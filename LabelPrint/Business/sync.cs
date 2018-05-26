@@ -74,7 +74,7 @@ namespace LabelPrint.Business
                 {
                     wh_transfer_details wtd = dbContext.wh_transfer_details
                                                        .Where(r => r.status != 200)
-                                                       .Where(r => r.status < 50)
+                                                       .Where(r => r.status < 10)
                                                        //.OrderByDescending(u => u.transfer_id)
                                                        .OrderBy(u => u.status)
                                                        .FirstOrDefault();
@@ -82,7 +82,7 @@ namespace LabelPrint.Business
                     {
                         listTransferDetails = dbContext.wh_transfer_details.Where(r => r.status == wtd.status)
                                                                            .Where(r => r.status != 200)
-                                                                           .Where(r => r.status < 50)
+                                                                           .Where(r => r.status < 10)
                                                                            .Where(r => r.transfer_id == wtd.transfer_id)
                                                                            .Take(RecordsPerSync).ToList();
                         if (listTransferDetails.Count > 0)
@@ -102,21 +102,23 @@ namespace LabelPrint.Business
                                     try { values.Remove("active"); } catch { };
                                     try { values.Remove("manOrderTransfer"); }catch { };
                                     try { values.Remove("returnedTransfer"); }catch { };
+                                    try { values.Remove("backOrderTransfer"); }catch { };
 
                                     string para_transfer_detail = " [ ";
                                     foreach (wh_transfer_details td in listTransferDetails)
                                     {
                                         para_transfer_detail += " { \"destLocationId\": " + td.dest_location_id + ", ";
+                                        if (td.src_package_number != null && td.src_package_number.Length > 0) para_transfer_detail += "\"srcPackageNumber\": \"" + td.src_package_number + "\", ";
                                         if (td.dest_package_number != null) para_transfer_detail += "\"destPackageNumber\": \"" + td.dest_package_number + "\", ";
                                         para_transfer_detail += "\"productName\": \"" + td.product_name + "\", ";
                                         para_transfer_detail += "\"doneQuantity\": " + td.done_quantity + ", ";
-                                        para_transfer_detail += "\"manId\": " + td.man_id + ", ";
+                                        if (td.man_id != null) para_transfer_detail += "\"manId\": " + td.man_id + ", ";
                                         if (td.man_pn != null && td.man_pn.Length > 0) para_transfer_detail += "\"manPn\": \"" + td.man_pn + "\", ";
                                         para_transfer_detail += "\"productId\": " + td.product_id + ", ";
                                         para_transfer_detail += "\"reserved\": " + td.done_quantity + ", ";
-                                        para_transfer_detail += "\"srcLocationId\": " + td.src_location_id + ", ";
-                                        if(td.trace_number != null) para_transfer_detail += "\"traceNumber\": \"" + td.trace_number + "\", ";
-                                        para_transfer_detail += "\"internalReference\": \"" + td.internal_reference + "\", ";
+                                        if (td.src_location_id != null) para_transfer_detail += "\"srcLocationId\": " + td.src_location_id + ", ";
+                                        if (td.trace_number != null) para_transfer_detail += "\"traceNumber\": \"" + td.trace_number + "\", ";
+                                        if (td.man_id != null && td.internal_reference != null && td.internal_reference.Length > 0) para_transfer_detail += "\"internalReference\": \"" + td.internal_reference + "\", ";
                                         para_transfer_detail += "\"reference\": \"" + td.reference + "\", ";
                                         para_transfer_detail += "\"transferId\": " + td.transfer_id + ", ";
                                         para_transfer_detail += "\"transferItemId\": " + td.transfer_item_id + " },";

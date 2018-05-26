@@ -27,6 +27,7 @@ namespace LabelPrint.App_Data
     
         public DbSet<base_privilege_entity> base_privilege_entity { get; set; }
         public DbSet<base_user> base_user { get; set; }
+        public DbSet<wh_split_package> wh_split_package { get; set; }
         public DbSet<wh_transfer_details> wh_transfer_details { get; set; }
     }
 }

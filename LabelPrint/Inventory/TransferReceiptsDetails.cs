@@ -288,6 +288,8 @@ namespace LabelPrint.Inventory
                 transfer_info_delete.Remove("active");
                 try { transfer_info_delete.Remove("manOrderTransfer"); }catch { };
                 try { transfer_info_delete.Remove("returnedTransfer"); }catch { };
+                try { transfer_info_delete.Remove("backOrderTransfer"); }catch { };
+
                 string _id_delete = "[";
                 foreach (var index in grvListLot.GetSelectedRows())
                 {
@@ -325,7 +327,7 @@ namespace LabelPrint.Inventory
             }
 
             DialogResult dr = new DialogResult();
-            dr = MessageBox.Show("Bạn có chắc chắn muốn xóa tem?.", "Xóa tem", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+            dr = MessageBox.Show("Are you sure you want to delete record?", "Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
             if (dr == DialogResult.Yes)
             {
                 Dictionary<string, dynamic> transfer_info_delete = transfer_info;
@@ -336,6 +338,8 @@ namespace LabelPrint.Inventory
                 transfer_info_delete.Remove("active");
                 try { transfer_info_delete.Remove("manOrderTransfer"); }catch { };
                 try { transfer_info_delete.Remove("returnedTransfer"); }catch { };
+                try { transfer_info_delete.Remove("backOrderTransfer"); }catch { };
+
                 DataRow row = grvListLot.GetDataRow(grvListLot.FocusedRowHandle);
                 string _id_delete = "[" + Convert.ToString(row["id"]) + "]";
                 transfer_info_delete["removedTransferDetails"] = _id_delete;
@@ -366,6 +370,9 @@ namespace LabelPrint.Inventory
             transfer_info_put.Remove("removedTransferItems");
             transfer_info_put.Remove("removedTransferDetails");
             transfer_info_put.Remove("active");
+            try { transfer_info_put.Remove("manOrderTransfer"); }catch { };
+            try { transfer_info_put.Remove("returnedTransfer"); }catch { };
+            try { transfer_info_put.Remove("backOrderTransfer"); }catch { };
 
             DataRow row = grvListLot.GetDataRow(grvListLot.FocusedRowHandle);
             string _id_delete = "[" + Convert.ToString(row["id"]) + "]";
@@ -459,7 +466,7 @@ namespace LabelPrint.Inventory
                     {
                         wh_transfer_details wtd = new wh_transfer_details();
                         wtd.created = DateTime.Now;
-                        wtd.src_package_number = txtSourceNumber.Text;
+                        wtd.src_package_number = txtSourceNumber.Text.Trim();
                         wtd.dest_location_id = Common.ConvertInt(gluDestinationLocation.EditValue);
                         wtd.dest_package_number = PackageID;
                         wtd.done_quantity = Common.ConvertDouble(txtNumberPerLot.Text);

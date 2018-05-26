@@ -15,7 +15,11 @@ namespace LabelPrint.Business
             {
                 return GetConfig("API_URL");
             }
-            set { SaveConfig("API_URL", value); }
+            set
+            {
+                SaveConfig("API_URL", value);
+                WriteConfig("API_URL", value);
+            }
         }
 
         public static string API_KEY
@@ -45,7 +49,6 @@ namespace LabelPrint.Business
             set { SaveConfig("MQTT_TOPIC_INLKNK", value); }
         }
 
-
         public static string PRINTER_ID
         {
             get
@@ -53,7 +56,6 @@ namespace LabelPrint.Business
                 return GetConfig("PRINTER_ID");
             }
         }
-
 
         public static string MQTT_BASE_TOPIC
         {
@@ -206,7 +208,6 @@ namespace LabelPrint.Business
                     WriteConfig("Latest_ID", value);
                 }
             }
-
         }
 
         private static void SaveConfig(string Key, string Value)

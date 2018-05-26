@@ -19,8 +19,8 @@ namespace LabelPrint.Business
         public int? lotId { get; set; }
         public int? productId { get; set; }
         public int? manId { get; set; }
-        public int? reserved { get; set; }
-        public int? onHand { get; set; }
+        public double reserved { get; set; }
+        public double onHand { get; set; }
         public int? productVersionId { get; set; }
     }
 }

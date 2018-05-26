@@ -8,6 +8,7 @@
         <EntityContainer Name="erpModelStoreContainer">
           <EntitySet Name="base_privilege_entity" EntityType="erpModel.Store.base_privilege_entity" store:Type="Tables" Schema="dbo" />
           <EntitySet Name="base_user" EntityType="erpModel.Store.base_user" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="wh_split_package" EntityType="erpModel.Store.wh_split_package" store:Type="Tables" Schema="dbo" />
           <EntitySet Name="wh_transfer_details" EntityType="erpModel.Store.wh_transfer_details" store:Type="Tables" Schema="dbo" />
         </EntityContainer>
         <EntityType Name="base_privilege_entity">
@@ -25,6 +26,28 @@
           <Property Name="id" Type="int" Nullable="false" />
           <Property Name="user" Type="nvarchar" MaxLength="50" />
           <Property Name="authorities" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="wh_split_package">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="bigint" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="productId" Type="bigint" />
+          <Property Name="productName" Type="nvarchar" MaxLength="100" />
+          <Property Name="srcPackageNumber" Type="nvarchar" MaxLength="50" />
+          <Property Name="destPackageNumber" Type="nvarchar" MaxLength="50" />
+          <Property Name="transferId" Type="bigint" />
+          <Property Name="transferNumber" Type="nvarchar" MaxLength="50" />
+          <Property Name="locationId" Type="bigint" />
+          <Property Name="locationName" Type="nvarchar" MaxLength="200" />
+          <Property Name="quantity" Type="float" />
+          <Property Name="supplier" Type="nvarchar" MaxLength="100" />
+          <Property Name="project" Type="nvarchar" MaxLength="50" />
+          <Property Name="manId" Type="bigint" />
+          <Property Name="companyCode" Type="nvarchar" MaxLength="50" />
+          <Property Name="internalReference" Type="nvarchar" MaxLength="50" />
+          <Property Name="created" Type="datetime" />
+          <Property Name="updated" Type="datetime" />
         </EntityType>
         <EntityType Name="wh_transfer_details">
           <Key>
@@ -58,6 +81,7 @@
         <EntityContainer Name="erpEntities" p1:LazyLoadingEnabled="true">
           <EntitySet Name="base_privilege_entity" EntityType="erpModel.base_privilege_entity" />
           <EntitySet Name="base_user" EntityType="erpModel.base_user" />
+          <EntitySet Name="wh_split_package" EntityType="erpModel.wh_split_package" />
           <EntitySet Name="wh_transfer_details" EntityType="erpModel.wh_transfer_details" />
         </EntityContainer>
         <EntityType Name="base_privilege_entity">
@@ -75,6 +99,28 @@
           <Property Name="id" Type="Int32" Nullable="false" />
           <Property Name="user" Type="String" MaxLength="50" Unicode="true" FixedLength="false" />
           <Property Name="authorities" Type="String" MaxLength="50" Unicode="true" FixedLength="false" />
+        </EntityType>
+        <EntityType Name="wh_split_package">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int64" Nullable="false" p1:StoreGeneratedPattern="Identity" />
+          <Property Name="productId" Type="Int64" />
+          <Property Name="productName" Type="String" MaxLength="100" Unicode="true" FixedLength="false" />
+          <Property Name="srcPackageNumber" Type="String" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="destPackageNumber" Type="String" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="transferId" Type="Int64" />
+          <Property Name="transferNumber" Type="String" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="locationId" Type="Int64" />
+          <Property Name="locationName" Type="String" MaxLength="200" Unicode="true" FixedLength="false" />
+          <Property Name="quantity" Type="Double" />
+          <Property Name="supplier" Type="String" MaxLength="100" Unicode="true" FixedLength="false" />
+          <Property Name="project" Type="String" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="manId" Type="Int64" />
+          <Property Name="companyCode" Type="String" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="internalReference" Type="String" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Type="DateTime" Name="created" Precision="3" />
+          <Property Type="DateTime" Name="updated" Precision="3" />
         </EntityType>
         <EntityType Name="wh_transfer_details">
           <Key>
@@ -98,8 +144,8 @@
           <Property Name="status" Type="Int32" />
           <Property Name="trace_number" Type="String" MaxLength="50" Unicode="true" FixedLength="false" />
           <Property Name="src_package_number" Type="String" MaxLength="50" Unicode="true" FixedLength="false" />
-          <Property Type="String" Name="internal_reference" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Type="String" Name="reference" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="internal_reference" Type="String" MaxLength="50" Unicode="true" FixedLength="false" />
+          <Property Name="reference" Type="String" MaxLength="50" Unicode="true" FixedLength="false" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
@@ -125,11 +171,32 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="wh_split_package">
+            <EntityTypeMapping TypeName="erpModel.wh_split_package">
+              <MappingFragment StoreEntitySet="wh_split_package">
+                <ScalarProperty Name="updated" ColumnName="updated" />
+                <ScalarProperty Name="created" ColumnName="created" />
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="productId" ColumnName="productId" />
+                <ScalarProperty Name="productName" ColumnName="productName" />
+                <ScalarProperty Name="srcPackageNumber" ColumnName="srcPackageNumber" />
+                <ScalarProperty Name="destPackageNumber" ColumnName="destPackageNumber" />
+                <ScalarProperty Name="transferId" ColumnName="transferId" />
+                <ScalarProperty Name="transferNumber" ColumnName="transferNumber" />
+                <ScalarProperty Name="locationId" ColumnName="locationId" />
+                <ScalarProperty Name="locationName" ColumnName="locationName" />
+                <ScalarProperty Name="quantity" ColumnName="quantity" />
+                <ScalarProperty Name="supplier" ColumnName="supplier" />
+                <ScalarProperty Name="project" ColumnName="project" />
+                <ScalarProperty Name="manId" ColumnName="manId" />
+                <ScalarProperty Name="companyCode" ColumnName="companyCode" />
+                <ScalarProperty Name="internalReference" ColumnName="internalReference" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="wh_transfer_details">
             <EntityTypeMapping TypeName="erpModel.wh_transfer_details">
               <MappingFragment StoreEntitySet="wh_transfer_details">
-                <ScalarProperty Name="reference" ColumnName="reference" />
-                <ScalarProperty Name="internal_reference" ColumnName="internal_reference" />
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="created" ColumnName="created" />
                 <ScalarProperty Name="updated" ColumnName="updated" />
@@ -148,6 +215,8 @@
                 <ScalarProperty Name="status" ColumnName="status" />
                 <ScalarProperty Name="trace_number" ColumnName="trace_number" />
                 <ScalarProperty Name="src_package_number" ColumnName="src_package_number" />
+                <ScalarProperty Name="internal_reference" ColumnName="internal_reference" />
+                <ScalarProperty Name="reference" ColumnName="reference" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

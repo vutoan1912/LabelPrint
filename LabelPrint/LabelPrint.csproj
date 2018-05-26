@@ -455,6 +455,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>erpModel.edmx</DependentUpon>
     </Compile>
+    <Compile Include="App_Data\wh_split_package.cs">
+      <DependentUpon>erpModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="App_Data\wh_transfer_details.cs">
       <DependentUpon>erpModel.tt</DependentUpon>
     </Compile>
@@ -475,6 +478,12 @@
     <Compile Include="Business\Zebra\SetupApi.cs" />
     <Compile Include="Business\Zebra\UsbPrinterconnector.cs" />
     <Compile Include="Business\Zebra\ZebraUsbStream.cs" />
+    <Compile Include="Dashboard\ConfigApiUrl.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dashboard\ConfigApiUrl.Designer.cs">
+      <DependentUpon>ConfigApiUrl.cs</DependentUpon>
+    </Compile>
     <Compile Include="Dashboard\DashboardFactory.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -486,6 +495,12 @@
     </Compile>
     <Compile Include="Dashboard\DashboardInventory.Designer.cs">
       <DependentUpon>DashboardInventory.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Inventory\Split.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Inventory\Split.Designer.cs">
+      <DependentUpon>Split.cs</DependentUpon>
     </Compile>
     <Compile Include="Inventory\TransferReceipts.cs">
       <SubType>Form</SubType>
@@ -513,8 +528,14 @@
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Dashboard\ConfigApiUrl.resx">
+      <DependentUpon>ConfigApiUrl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Dashboard\DashboardInventory.resx">
       <DependentUpon>DashboardInventory.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Inventory\split.resx">
+      <DependentUpon>Split.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Inventory\TransferReceipts.resx">
       <DependentUpon>TransferReceipts.cs</DependentUpon>

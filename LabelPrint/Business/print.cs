@@ -681,6 +681,7 @@ namespace LabelPrint.Business
             string data = encode.Start;
 
             //qrdata = "[)>@06@PHY5ND35N000001@3SPKG_00072@@";
+            Supplier = Common.RemoveSign4VietnameseString(Supplier);
 
             data += encode.set_Vertical("90") + encode.set_Horizontal("40") + encode.gen_data_matrix_barcode(barcode_data);
 
@@ -872,6 +873,7 @@ namespace LabelPrint.Business
             string data = encode.Start;
 
             //qrdata = "[)>@06@PHY5ND35N000001@3SPKG_00072@@";
+            Supplier = Common.RemoveSign4VietnameseString(Supplier);
 
             data += encode.set_Vertical("170") + encode.set_Horizontal("20") + encode.gen_data_matrix_barcode(barcode_data);
 

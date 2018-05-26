@@ -4,6 +4,7 @@ using EasyHttp.Http;
 using LabelPrint.App_Data;
 using LabelPrint.Business;
 using Newtonsoft.Json;
+using PagedList;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -201,7 +202,7 @@ namespace LabelPrint.Inventory
 
             cbxViewPackage.Properties.Items.Add("All");
             cbxViewPackage.Properties.Items.Add("Package");
-            cbxViewPackage.Properties.Items.Add("Lot");
+            cbxViewPackage.Properties.Items.Add("UID");
             cbxViewPackage.SelectedIndex = 0;
         }
 
@@ -241,103 +242,116 @@ namespace LabelPrint.Inventory
                         this._state = Convert.ToString(data["state"]);
                         this._state = this._state.ToLower();
 
-                        #region Get operations type
                         try
                         {
-                            string url_op = "operation-types/" + Convert.ToString(data["operationTypeId"]);
-                            var param_op = new { };
-                            HttpResponse res_op = HTTP.Instance.Get(url_op, param_op);
-
-                            if (res_op.StatusCode == System.Net.HttpStatusCode.OK)
+                            if (!Convert.ToBoolean(data["manOrderTransfer"]))
                             {
+                                #region Get source location
                                 try
                                 {
-                                    var serializer_op = new JavaScriptSerializer();
-                                    dynamic data_op = serializer_op.Deserialize(res_op.RawText, typeof(object));
+                                    string url_srcLocation = "locations/search?query=id==" + Convert.ToString(data["srcLocationId"]);
+                                    var param_srcLocation = new { };
+                                    HttpResponse res_srcLocation = HTTP.Instance.Get(url_srcLocation, param_srcLocation);
 
-                                    if (data_op["type"] != "manufacturing")
+                                    if (res_srcLocation.StatusCode == System.Net.HttpStatusCode.OK)
                                     {
-                                        #region Get source location
                                         try
                                         {
-                                            string url_srcLocation = "locations/search?query=id==" + Convert.ToString(data["srcLocationId"]);
-                                            var param_srcLocation = new { };
-                                            HttpResponse res_srcLocation = HTTP.Instance.Get(url_srcLocation, param_srcLocation);
+                                            List<ExpandoObject> list_srcLocation = new List<ExpandoObject>(res_srcLocation.DynamicBody);
+                                            DataTable dt_srcLocation = Common.ToDataTable(list_srcLocation);
 
-                                            if (res_srcLocation.StatusCode == System.Net.HttpStatusCode.OK)
+                                            if (dt_srcLocation.Rows.Count > 0)
                                             {
-                                                try
-                                                {
-                                                    List<ExpandoObject> list_srcLocation = new List<ExpandoObject>(res_srcLocation.DynamicBody);
-                                                    DataTable dt_srcLocation = Common.ToDataTable(list_srcLocation);
+                                                lblSourceLocationValue.Text = Convert.ToString(dt_srcLocation.Rows[0]["completeName"]);
 
-                                                    if (dt_srcLocation.Rows.Count > 0)
-                                                    {
-                                                        lblSourceLocationValue.Text = Convert.ToString(dt_srcLocation.Rows[0]["completeName"]);
-
-                                                        this.gluSourceLocation.Properties.DataSource = dt_srcLocation;
-                                                        this.gluSourceLocation.Properties.DisplayMember = "completeName";
-                                                        this.gluSourceLocation.Properties.ValueMember = "id";
-                                                        gluSourceLocation.EditValue = dt_srcLocation.Rows[0]["id"];
-                                                    }
-                                                    
-                                                }
-                                                catch (Exception ex)
-                                                {
-                                                    //MessageBox.Show("Không tồn tại dữ liệu !");
-                                                };
+                                                this.gluSourceLocation.Properties.DataSource = dt_srcLocation;
+                                                this.gluSourceLocation.Properties.DisplayMember = "completeName";
+                                                this.gluSourceLocation.Properties.ValueMember = "id";
+                                                gluSourceLocation.EditValue = dt_srcLocation.Rows[0]["id"];
                                             }
-                                        }
-                                        catch { lblSourceLocationValue.Text = ""; };
-                                        #endregion
 
-                                        #region Get destination location
-                                        try
+                                        }
+                                        catch (Exception ex)
                                         {
-                                            string url_destLocation = "locations/search?query=id==" + Convert.ToString(data["destLocationId"]);
-                                            var param_destLocation = new { };
-                                            HttpResponse res_destLocation = HTTP.Instance.Get(url_destLocation, param_destLocation);
-
-                                            if (res_destLocation.StatusCode == System.Net.HttpStatusCode.OK)
-                                            {
-                                                try
-                                                {
-                                                    List<ExpandoObject> list_destLocation = new List<ExpandoObject>(res_destLocation.DynamicBody);
-                                                    DataTable dt_destLocation = Common.ToDataTable(list_destLocation);
-
-                                                    if (dt_destLocation.Rows.Count > 0)
-                                                    {
-                                                        this.gluDestinationLocation.Properties.DataSource = dt_destLocation;
-                                                        this.gluDestinationLocation.Properties.DisplayMember = "completeName";
-                                                        this.gluDestinationLocation.Properties.ValueMember = "id";
-                                                        gluDestinationLocation.EditValue = dt_destLocation.Rows[0]["id"];
-                                                    }
-
-                                                }
-                                                catch (Exception ex)
-                                                {
-                                                    //MessageBox.Show("Không tồn tại dữ liệu !");
-                                                };
-                                            }
-                                        }
-                                        catch { };
-                                        #endregion
-
-                                        panelControl2.Enabled = true;
-                                    }
-                                    else
-                                    {
-                                        panelControl2.Enabled = false;
+                                            //MessageBox.Show("Không tồn tại dữ liệu !");
+                                        };
                                     }
                                 }
-                                catch (Exception ex)
-                                {
-                                    //MessageBox.Show("Không tồn tại dữ liệu !");
-                                };
-                            }
+                                catch { lblSourceLocationValue.Text = ""; };
+                                #endregion
 
+                                #region Get destination location
+                                try
+                                {
+                                    string url_destLocation = "locations/search?query=id==" + Convert.ToString(data["destLocationId"]);
+                                    var param_destLocation = new { };
+                                    HttpResponse res_destLocation = HTTP.Instance.Get(url_destLocation, param_destLocation);
+
+                                    if (res_destLocation.StatusCode == System.Net.HttpStatusCode.OK)
+                                    {
+                                        try
+                                        {
+                                            List<ExpandoObject> list_destLocation = new List<ExpandoObject>(res_destLocation.DynamicBody);
+                                            DataTable dt_destLocation = Common.ToDataTable(list_destLocation);
+
+                                            if (dt_destLocation.Rows.Count > 0)
+                                            {
+                                                this.gluDestinationLocation.Properties.DataSource = dt_destLocation;
+                                                this.gluDestinationLocation.Properties.DisplayMember = "completeName";
+                                                this.gluDestinationLocation.Properties.ValueMember = "id";
+                                                gluDestinationLocation.EditValue = dt_destLocation.Rows[0]["id"];
+                                            }
+
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            //MessageBox.Show("Không tồn tại dữ liệu !");
+                                        };
+                                    }
+                                }
+                                catch { };
+                                #endregion
+
+                                panelControl2.Enabled = true;
+                            }
+                            else
+                            {
+                                //Xuất cho sản xuất
+                                panelControl2.Enabled = false;
+                            }
                         }
-                        catch { };
+                        catch { }
+
+                        #region Get operations type
+                        //try
+                        //{
+                        //    string url_op = "operation-types/" + Convert.ToString(data["operationTypeId"]);
+                        //    var param_op = new { };
+                        //    HttpResponse res_op = HTTP.Instance.Get(url_op, param_op);
+
+                        //    if (res_op.StatusCode == System.Net.HttpStatusCode.OK)
+                        //    {
+                        //        try
+                        //        {
+                        //            var serializer_op = new JavaScriptSerializer();
+                        //            dynamic data_op = serializer_op.Deserialize(res_op.RawText, typeof(object));
+
+                        //            if (data_op["type"] != "manufacturing")
+                        //            {
+                                        
+                        //            }
+                        //            else
+                        //            {
+                                        
+                        //            }
+                        //        }
+                        //        catch (Exception ex)
+                        //        {
+                        //        };
+                        //    }
+
+                        //}
+                        //catch { };
                         #endregion
 
                         #region Get partner information
@@ -395,42 +409,7 @@ namespace LabelPrint.Inventory
                         try { lblDocumentValue.Text = (string)data["sourceDocument"]; } catch { lblDocumentValue.Text = ""; };
 
                         #region Get list part in request paper
-                        try
-                        {
-                            string url_list_part = "transfer-items/search?query=transferId==" + this.gluTransferNumber.EditValue.ToString() + "&size=2000";
-                            var param_list_part = new { };
-                            HttpResponse res_list_part = HTTP.Instance.Get(url_list_part, param_list_part);
-
-                            if (res_list_part.StatusCode == System.Net.HttpStatusCode.OK)
-                            {
-                                try
-                                {
-                                    List<TransferItem> RootObject = JsonConvert.DeserializeObject<List<TransferItem>>(res_list_part.RawText, new JsonSerializerSettings
-                                    {
-                                        NullValueHandling = NullValueHandling.Ignore
-                                    });
-
-                                    List<TransferItem> list_parts = RootObject as List<TransferItem>;
-                                    dt_products = Common.ToDataTableClass<TransferItem>(list_parts);
-
-                                    try
-                                    {
-                                        this.vgListProduct.DataSource = dt_products;
-                                        loadDataListPackage();
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    this.vgListProduct.DataSource = null;
-                                    MessageBox.Show("List product is empty !");
-                                };
-                            }
-                        }
-                        catch { this.vgListProduct.DataSource = null; };
+                        loadListPart();
                         #endregion
                     }
                     catch (Exception ex)
@@ -445,6 +424,51 @@ namespace LabelPrint.Inventory
                     this.vgListPackage.DataSource = null;
                 }
             }
+        }
+
+        private void loadListPart()
+        {
+            try
+            {
+                string url_list_part = "transfer-items/search?query=transferId==" + this.gluTransferNumber.EditValue.ToString() + "&size=2000";
+                var param_list_part = new { };
+                HttpResponse res_list_part = HTTP.Instance.Get(url_list_part, param_list_part);
+
+                if (res_list_part.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    try
+                    {
+                        List<TransferItem> RootObject = JsonConvert.DeserializeObject<List<TransferItem>>(res_list_part.RawText, new JsonSerializerSettings
+                        {
+                            NullValueHandling = NullValueHandling.Ignore
+                        });
+
+                        List<TransferItem> list_parts = RootObject as List<TransferItem>;
+                        foreach (TransferItem item in list_parts)
+                        {
+                            if (item.internalReference == null) item.internalReference = item.productName + "NA";
+                            item.restQuantity = item.initialQuantity - item.doneQuantity;
+                        }
+                        dt_products = Common.ToDataTableClass<TransferItem>(list_parts);
+
+                        try
+                        {
+                            this.vgListProduct.DataSource = dt_products;
+                            loadDataListPackage();
+                        }
+                        catch (Exception ex)
+                        {
+
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        this.vgListProduct.DataSource = null;
+                        MessageBox.Show("List product is empty !");
+                    };
+                }
+            }
+            catch { this.vgListProduct.DataSource = null; };
         }
 
         private void grvListPart_FocusedRowChanged(object sender, DevExpress.XtraGrid.Views.Base.FocusedRowChangedEventArgs e)
@@ -534,6 +558,38 @@ namespace LabelPrint.Inventory
                 return;
             }
 
+            DataRow data = grvListPart.GetDataRow(grvListPart.GetSelectedRows().FirstOrDefault());
+            //double NumberAllocate = 0;
+
+            if (Common.ConvertDouble(txtNumberPerPackage.Text.Trim()) > 0 && Common.ConvertDouble(txtNumberPackage.Text.Trim()) > 0
+                && (Common.ConvertDouble(txtNumberPerPackage.Text.Trim()) * Common.ConvertDouble(txtNumberPackage.Text.Trim()) + Common.ConvertDouble(data["doneQuantity"])) > Common.ConvertDouble(data["initialQuantity"]))
+            {
+                DialogResult dr = new DialogResult();
+                dr = MessageBox.Show("The number of print is greater than the number required?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+                if (dr != DialogResult.Yes)
+                {
+                    return;
+                }
+                else
+                {
+                    //NumberAllocate = Common.ConvertDouble(txtNumberPerPackage.Text.Trim()) * Common.ConvertDouble(txtNumberPackage.Text.Trim());
+                }
+            }
+            else if (Common.ConvertDouble(txtNumberPerLot.Text.Trim()) > 0 && Common.ConvertDouble(txtNumberLot.Text.Trim()) > 0
+               && (Common.ConvertDouble(txtNumberPerLot.Text.Trim()) * Common.ConvertDouble(txtNumberLot.Text.Trim()) + Common.ConvertDouble(data["doneQuantity"])) > Common.ConvertDouble(data["initialQuantity"]))
+            {
+                DialogResult dr = new DialogResult();
+                dr = MessageBox.Show("The number of print is greater than the number required?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+                if (dr != DialogResult.Yes)
+                {
+                    return;
+                }
+                else
+                {
+                    
+                }
+            }
+
             //if (Common.ConvertDouble(txtNumberPerPackage.Text) < (Common.ConvertDouble(txtNumberPerLot.Text) * Common.ConvertInt(txtNumberLot.Text)))
             //{
             //    MessageBox.Show("The total amount of lot is greater than the number of the package");
@@ -608,12 +664,11 @@ namespace LabelPrint.Inventory
 
             if (status_reserve)
             {
-                DataRow data = grvListPart.GetDataRow(grvListPart.GetSelectedRows().FirstOrDefault());
                 long maxID = 0;
                 using (erpEntities dbContext = new erpEntities())
                 {
                     wh_transfer_details wtd = dbContext.wh_transfer_details.OrderByDescending(u => u.id).FirstOrDefault();
-                    if (wtd != null) maxID = wtd.id + 1;
+                    if (wtd != null) maxID = wtd.id + 1; else maxID = 1;
                 }
                 this.dt_trans_details = checkStructureDatatable(dt_trans_details);
 
@@ -622,7 +677,7 @@ namespace LabelPrint.Inventory
 
                 if (List_allocate_package.Count > 0 && List_allocate_lot.Count > 0)
                 {
-                    #region allocate package & lot
+                    #region allocate package & uid
 
                     #region allocate package
                     //foreach (string pack in List_allocate_package)
@@ -662,7 +717,7 @@ namespace LabelPrint.Inventory
                     {
                         wh_transfer_details wtd = new wh_transfer_details();
                         wtd.created = DateTime.Now;
-                        wtd.src_package_number = txtSourceNumber.Text;
+                        wtd.src_package_number = txtSourceNumber.Text.Trim();
                         wtd.dest_location_id = Common.ConvertInt(gluDestinationLocation.EditValue);
                         wtd.dest_package_number = List_allocate_package[i];
                         wtd.done_quantity = Common.ConvertDouble(txtNumberPerLot.Text);
@@ -710,7 +765,7 @@ namespace LabelPrint.Inventory
                     foreach (string pack in List_allocate_package)
                     {
                         wh_transfer_details wtd = new wh_transfer_details();
-                        wtd.src_package_number = txtSourceNumber.Text;
+                        wtd.src_package_number = txtSourceNumber.Text.Trim();
                         wtd.created = DateTime.Now;
                         wtd.dest_location_id = Common.ConvertInt(gluDestinationLocation.EditValue);
                         wtd.dest_package_number = pack;
@@ -726,8 +781,7 @@ namespace LabelPrint.Inventory
                         wtd.status = 0;
                         wtd.transfer_id = Common.ConvertInt(gluTransferNumber.EditValue);
                         wtd.transfer_item_id = Common.ConvertInt(data["id"]);
-                        wtd.trace_number = null;
-                        wtd.src_package_number = txtSourceNumber.Text;
+                        wtd.trace_number = null;                        
                         wtd.internal_reference = Convert.ToString(data["internalReference"]);
                         wtd.reference = Convert.ToString(this.transfer_info["transferNumber"]);
                         list_transfer_details.Add(wtd);
@@ -752,7 +806,7 @@ namespace LabelPrint.Inventory
                     {
                         wh_transfer_details wtd = new wh_transfer_details();
                         wtd.created = DateTime.Now;
-                        wtd.src_package_number = txtSourceNumber.Text;
+                        wtd.src_package_number = txtSourceNumber.Text.Trim();
                         wtd.dest_location_id = Common.ConvertInt(gluDestinationLocation.EditValue);
                         wtd.dest_package_number = null;
                         wtd.done_quantity = Common.ConvertDouble(txtNumberPerLot.Text);
@@ -785,6 +839,8 @@ namespace LabelPrint.Inventory
                     }
                     #endregion
                 }
+
+                //data["doneQuantity"] = Common.ConvertDouble(data["doneQuantity"]) - NumberAllocate;
 
                 vgListPackage.DataSource = dt_trans_details;
 
@@ -878,12 +934,28 @@ namespace LabelPrint.Inventory
             {
                 try
                 {
+                    if (txtNumberPerPackage.Text != null && txtNumberPerPackage.Text.Length > 0)
+                    {
+                        dynamic data = grvListPart.GetFocusedRow();
+                        double quantity = Common.ConvertDouble(data["initialQuantity"]) - Common.ConvertDouble(data["doneQuantity"]);
+                        if (quantity > 0)
+                        {
+                            if (quantity % Common.ConvertDouble(txtNumberPerPackage.Text) == 0)
+                                this.txtNumberPackage.Text = Convert.ToString(quantity / Common.ConvertDouble(txtNumberPerPackage.Text));
+                            else
+                                this.txtNumberPackage.Text = Convert.ToString(Math.Floor(quantity / Common.ConvertDouble(txtNumberPerPackage.Text)) + 1);
+                        }
+                    }
+                }
+                catch { }
+                try
+                {
                     if (txtNumberPerLot.Text != null && txtNumberPerLot.Text.Length > 0)
                     {
                         if (Common.ConvertDouble(txtNumberPerPackage.Text) % Common.ConvertDouble(txtNumberPerLot.Text) == 0)
                             txtNumberLot.Text = Convert.ToString(Common.ConvertDouble(txtNumberPerPackage.Text) / Common.ConvertDouble(txtNumberPerLot.Text));
                         else
-                            txtNumberLot.Text = Convert.ToString(Math.Floor((Common.ConvertDouble(txtNumberPerPackage.Text) / Common.ConvertDouble(txtNumberPerLot.Text))) + 1);
+                            txtNumberLot.Text = Convert.ToString(Math.Floor(Common.ConvertDouble(txtNumberPerPackage.Text) / Common.ConvertDouble(txtNumberPerLot.Text)) + 1);
                     }
                     else if (txtNumberLot.Text != null && txtNumberLot.Text.Length > 0)
                     {
@@ -894,18 +966,63 @@ namespace LabelPrint.Inventory
             }
         }
 
-        private void txtNumberPerLot_KeyDown(object sender, KeyEventArgs e)
+        private void txtNumberPackage_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
             {
                 try
                 {
-                    if (Common.ConvertDouble(txtNumberPerPackage.Text) % Common.ConvertDouble(txtNumberPerLot.Text) == 0)
-                        txtNumberLot.Text = Convert.ToString(Common.ConvertDouble(txtNumberPerPackage.Text) / Common.ConvertDouble(txtNumberPerLot.Text));
-                    else
-                        txtNumberLot.Text = Convert.ToString(Math.Floor((Common.ConvertDouble(txtNumberPerPackage.Text) / Common.ConvertDouble(txtNumberPerLot.Text))) + 1);
+                    if (txtNumberPackage.Text != null && txtNumberPackage.Text.Length > 0)
+                    {
+                        dynamic data = grvListPart.GetFocusedRow();
+                        double quantity = Common.ConvertDouble(data["initialQuantity"]) - Common.ConvertDouble(data["doneQuantity"]);
+                        if (quantity > 0)
+                        {
+                            if (quantity % Common.ConvertDouble(txtNumberPackage.Text) == 0)
+                                this.txtNumberPerPackage.Text = Convert.ToString(quantity / Common.ConvertDouble(txtNumberPackage.Text));
+                            else
+                                this.txtNumberPerPackage.Text = Convert.ToString(Math.Floor(quantity / Common.ConvertDouble(txtNumberPackage.Text)));
+                        }
+                    }
                 }
                 catch { }
+            }
+        }
+
+        private void txtNumberPerLot_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                if (txtNumberPerLot.Text != null && txtNumberPerLot.Text.Length > 0)
+                {
+                    if (txtNumberPerPackage.Text != null && txtNumberPerPackage.Text.Length > 0 && Common.ConvertDouble(txtNumberPerPackage.Text.Trim()) > 0)
+                    {
+                        try
+                        {
+                            if (Common.ConvertDouble(txtNumberPerPackage.Text) % Common.ConvertDouble(txtNumberPerLot.Text) == 0)
+                                txtNumberLot.Text = Convert.ToString(Common.ConvertDouble(txtNumberPerPackage.Text) / Common.ConvertDouble(txtNumberPerLot.Text));
+                            else
+                                txtNumberLot.Text = Convert.ToString(Math.Floor((Common.ConvertDouble(txtNumberPerPackage.Text) / Common.ConvertDouble(txtNumberPerLot.Text))) + 1);
+                        }
+                        catch { }
+                    }
+                    else
+                    {
+                        try
+                        {
+                            dynamic data = grvListPart.GetFocusedRow();
+                            double quantity = Common.ConvertDouble(data["initialQuantity"]) - Common.ConvertDouble(data["doneQuantity"]);
+                            if (quantity > 0)
+                            {
+                                if (quantity % Common.ConvertDouble(txtNumberPerLot.Text) == 0)
+                                    this.txtNumberLot.Text = Convert.ToString(quantity / Common.ConvertDouble(txtNumberPerLot.Text));
+                                else
+                                    this.txtNumberLot.Text = Convert.ToString(Math.Floor(quantity / Common.ConvertDouble(txtNumberPerLot.Text)) + 1);
+                            }
+                        }
+                        catch { }
+                    }
+                }
             }
         }
 
@@ -913,21 +1030,43 @@ namespace LabelPrint.Inventory
         {
             if (e.KeyCode == Keys.Enter)
             {
-                try
+                if (txtNumberLot.Text != null && txtNumberLot.Text.Length > 0)
                 {
-                    if (Common.ConvertDouble(txtNumberPerPackage.Text) % Common.ConvertDouble(txtNumberLot.Text) == 0)
-                        txtNumberPerLot.Text = Convert.ToString(Common.ConvertDouble(txtNumberPerPackage.Text) / Common.ConvertDouble(txtNumberLot.Text));
+                    if (txtNumberPerPackage.Text != null && txtNumberPerPackage.Text.Length > 0 && Common.ConvertDouble(txtNumberPerPackage.Text.Trim()) > 0)
+                    {
+                        try
+                        {
+                            if (Common.ConvertDouble(txtNumberPerPackage.Text) % Common.ConvertDouble(txtNumberLot.Text) == 0)
+                                txtNumberPerLot.Text = Convert.ToString(Common.ConvertDouble(txtNumberPerPackage.Text) / Common.ConvertDouble(txtNumberLot.Text));
+                            else
+                                txtNumberPerLot.Text = Convert.ToString(Math.Floor(Common.ConvertDouble(txtNumberPerPackage.Text) / Common.ConvertDouble(txtNumberLot.Text)));
+                        }
+                        catch { }
+                    }
                     else
-                        txtNumberPerLot.Text = Convert.ToString(Math.Floor(Common.ConvertDouble(txtNumberPerPackage.Text) / Common.ConvertDouble(txtNumberLot.Text)));
+                    {
+                        try
+                        {
+                            dynamic data = grvListPart.GetFocusedRow();
+                            double quantity = Common.ConvertDouble(data["initialQuantity"]) - Common.ConvertDouble(data["doneQuantity"]);
+                            if (quantity > 0)
+                            {
+                                if (quantity % Common.ConvertDouble(txtNumberLot.Text) == 0)
+                                    this.txtNumberPerLot.Text = Convert.ToString(quantity / Common.ConvertDouble(txtNumberLot.Text));
+                                else
+                                    this.txtNumberPerLot.Text = Convert.ToString(Math.Floor(quantity / Common.ConvertDouble(txtNumberLot.Text)));
+                            }
+                        }
+                        catch { }
+                    }
                 }
-                catch { }
             }
         }
 
         private void btnPrint_Click(object sender, EventArgs e)
         {
             DialogResult dr = new DialogResult();
-            dr = MessageBox.Show("Bạn có chắc chắn muốn in lại tem?.", "In lại tem", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+            dr = MessageBox.Show("Are you sure you want to print label?", "Print", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
             if (dr == DialogResult.Yes)
             {
                 var data = grvListPart.GetDataRow(grvListPart.GetSelectedRows().FirstOrDefault());
@@ -957,7 +1096,7 @@ namespace LabelPrint.Inventory
                     if (row["traceNumber"] != null && Convert.ToString(row["traceNumber"]).Length > 0) { grvListPackage.DeleteRow(i); i--; }
                 }
             }
-            else if (cbxViewPackage.EditValue.ToString() == "Lot")
+            else if (cbxViewPackage.EditValue.ToString() == "UID")
             {
                 vgListPackage.DataSource = this.dt_trans_details;
                 for (int i = 0; i < grvListPackage.DataRowCount; i++)
@@ -1023,7 +1162,7 @@ namespace LabelPrint.Inventory
             }
 
             DialogResult dr = new DialogResult();
-            dr = MessageBox.Show("Bạn có chắc chắn muốn xóa tem?.", "Xóa tem", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+            dr = MessageBox.Show("Are you sure you want to delete record?", "Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
             if (dr == DialogResult.Yes)
             {
                 Dictionary<string, dynamic> transfer_info_delete = transfer_info;
@@ -1034,6 +1173,8 @@ namespace LabelPrint.Inventory
                 transfer_info_delete.Remove("active");
                 try { transfer_info_delete.Remove("manOrderTransfer"); }catch { };
                 try { transfer_info_delete.Remove("returnedTransfer"); }catch { };
+                try { transfer_info_delete.Remove("backOrderTransfer"); }catch { };
+
                 DataRow row = grvListPackage.GetDataRow(grvListPackage.FocusedRowHandle);
                 string _id_delete = "[" + Convert.ToString(row["id"]) + "]";
                 transfer_info_delete["removedTransferDetails"] = _id_delete;
@@ -1046,6 +1187,11 @@ namespace LabelPrint.Inventory
 
                 if (res.StatusCode == HttpStatusCode.OK)
                 {
+                    //calculate rest quantity of transfer item
+                    DataRow rowItem = grvListPart.GetDataRow(this.grvListPart.FocusedRowHandle);
+                    rowItem["restQuantity"] = Common.ConvertDouble(rowItem["restQuantity"]) + Common.ConvertDouble(row["doneQuantity"]);
+                    rowItem["doneQuantity"] = Common.ConvertDouble(rowItem["doneQuantity"]) - Common.ConvertDouble(row["doneQuantity"]);
+
                     grvListPackage.DeleteRow(grvListPackage.FocusedRowHandle);
                 }
                 else
@@ -1064,7 +1210,7 @@ namespace LabelPrint.Inventory
             }
 
             DialogResult dr = new DialogResult();
-            dr = MessageBox.Show("Bạn có chắc chắn muốn xóa tem?.", "Xóa tem", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+            dr = MessageBox.Show("Are you sure you want to delete record?", "Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
             if (dr == DialogResult.Yes)
             {
                 Dictionary<string, dynamic> transfer_info_delete = transfer_info;
@@ -1075,6 +1221,8 @@ namespace LabelPrint.Inventory
                 transfer_info_delete.Remove("active");
                 try { transfer_info_delete.Remove("manOrderTransfer"); }catch { };
                 try { transfer_info_delete.Remove("returnedTransfer"); }catch { };
+                try { transfer_info_delete.Remove("backOrderTransfer"); }catch { };
+
                 string _id_delete = "[";
                 foreach (var index in grvListPackage.GetSelectedRows())
                 {
@@ -1094,6 +1242,15 @@ namespace LabelPrint.Inventory
 
                 if (res.StatusCode == HttpStatusCode.OK)
                 {
+                    //calculate rest quantity of transfer item
+                    DataRow rowItem = grvListPart.GetDataRow(this.grvListPart.FocusedRowHandle);
+                    foreach (var index in grvListPackage.GetSelectedRows())
+                    {
+                        dynamic row = this.grvListPackage.GetRow(index);
+                        rowItem["restQuantity"] = Common.ConvertDouble(rowItem["restQuantity"]) + Common.ConvertDouble(row["doneQuantity"]);
+                        rowItem["doneQuantity"] = Common.ConvertDouble(rowItem["doneQuantity"]) - Common.ConvertDouble(row["doneQuantity"]);
+                    }
+
                     grvListPackage.DeleteSelectedRows();
                 }
                 else
@@ -1150,6 +1307,7 @@ namespace LabelPrint.Inventory
         private void btnRefresh_Click(object sender, EventArgs e)
         {
             loadDataListPackage();
+            loadListPart();
         }
 
         #region TextBox KeyPress
@@ -1461,6 +1619,7 @@ namespace LabelPrint.Inventory
         // ---------------------------------------------------------- TAB ID ------------------------------------------------------------------ //
 
         private int packageID;
+        private bool enableSplit = true;
 
         private void OnTimedEvent(object source, ElapsedEventArgs e)
         {
@@ -1475,6 +1634,7 @@ namespace LabelPrint.Inventory
         private void TransferReceipts_KeyPress(object sender, KeyPressEventArgs e)
         {
             code_read.Append(e.KeyChar);
+            if (e.KeyChar == (char)8) code_read.Clear();
             if (e.KeyChar == (char)13)
             {
                 //Push Queue
@@ -1486,6 +1646,17 @@ namespace LabelPrint.Inventory
         private void TransferReceipts_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (ThreadScan != null && ThreadScan.IsAlive) ThreadScan.Abort();
+        }
+
+        private void txtSearchID_KeyDown(object sender, KeyEventArgs e)
+        {
+            //code_read.Clear();
+            if (e.KeyCode == Keys.Delete || e.KeyCode == Keys.Back) code_read.Clear();
+
+            if (e.KeyCode == Keys.Enter)
+            {
+                LoadDataSearch();
+            }
         }
 
         private void PopQueueScan()
@@ -1520,8 +1691,8 @@ namespace LabelPrint.Inventory
                         LoadDataSearch();
                         return;
                     }
-                    
-                    ttError.ShowHint("Định dạng ID sai"); 
+
+                    MessageBox.Show("Wrong package/lot QRCode format !");
                     return;
 
                     //double n;
@@ -1549,13 +1720,13 @@ namespace LabelPrint.Inventory
             dt.Columns.Add("destPackageNumber", typeof(string));
             dt.Columns.Add("transferId", typeof(int));
             dt.Columns.Add("transferNumber", typeof(string));
-            dt.Columns.Add("locationId", typeof(string));
+            dt.Columns.Add("locationId", typeof(int));
             dt.Columns.Add("locationName", typeof(string));
             dt.Columns.Add("quantity", typeof(double));
             dt.Columns.Add("supplier", typeof(string));
             dt.Columns.Add("project", typeof(string));
             dt.Columns.Add("manId", typeof(int));
-            dt.Columns.Add("companyCode", typeof(int));
+            dt.Columns.Add("companyCode", typeof(string));
             dt.Columns.Add("internalReference", typeof(string));
             return dt;
         }
@@ -1567,9 +1738,12 @@ namespace LabelPrint.Inventory
 
         private void LoadDataSearch()
         {
+            this.vgSearchID.DataSource = null;
             DataTable dt = buildTableSearchID();
             DataRow dr = dt.NewRow();
             string packNumber = this.txtSearchID.Text.Trim();
+            enableSplit = true;
+
             try
             {
                 string url = "";
@@ -1596,61 +1770,101 @@ namespace LabelPrint.Inventory
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show("Error during load information package/lot !");
+                        MessageBox.Show("Error during load information package/uid !");
                         return;
                     };
                 }
             }
             catch
             {
-                dr["packageNumber"] = "";
-                MessageBox.Show("Error during load information package/lot !");
+                dr["srcPackageNumber"] = "";
+                MessageBox.Show("Error during load information package/uid !");
                 return;
             }
 
             #region Find Stock
             try
             {
-                string url = "quants/search?query=packageId==" + this.packageID.ToString() + ";onHand>0";
-                var param = new { };
-                HttpResponse res = HTTP.Instance.Get(url, param);
 
-                if (res.StatusCode == System.Net.HttpStatusCode.OK)
+                if (packNumber.StartsWith(Config.PackPrefix))
                 {
-                    try
+                    string url = "quants/search?query=packageId==" + this.packageID.ToString() + ";onHand>0";
+
+                    var param = new { };
+                    HttpResponse res = HTTP.Instance.Get(url, param);
+
+                    if (res.StatusCode == System.Net.HttpStatusCode.OK)
                     {
-                        List<StockQuantity> ListStockQuant = JsonConvert.DeserializeObject<List<StockQuantity>>(res.RawText, new JsonSerializerSettings
+                        try
                         {
-                            NullValueHandling = NullValueHandling.Ignore
-                        });
-                        if (ListStockQuant.Count == 0)
-                        {
-                            MessageBox.Show("Package/Lot does not exist in stock!");
-                            return;
+                            List<StockQuantity> ListStockQuant = JsonConvert.DeserializeObject<List<StockQuantity>>(res.RawText, new JsonSerializerSettings
+                            {
+                                NullValueHandling = NullValueHandling.Ignore
+                            });
+                            if (ListStockQuant.Count == 0)
+                            {
+                                MessageBox.Show("Package/Uid does not exist in stock!");
+                                return;
+                            }
+                            else if (ListStockQuant.Count > 1)
+                            {
+                                enableSplit = false;
+                                dr["productId"] = ListStockQuant[0].productId;
+                                dr["quantity"] = ListStockQuant[0].onHand;
+                                dr["locationId"] = ListStockQuant[0].locationId;
+                                dr["manId"] = ListStockQuant[0].manId;
+                            }
+                            else
+                            {
+                                dr["productId"] = ListStockQuant[0].productId;
+                                dr["quantity"] = ListStockQuant[0].onHand;
+                                dr["locationId"] = ListStockQuant[0].locationId;
+                                dr["manId"] = ListStockQuant[0].manId;
+                            }
                         }
-                        else if (ListStockQuant.Count > 1)
-                        {
-                            MessageBox.Show("You can not split packages including roll!");
-                            return;
-                        }
-                        else
-                        {
-                            dr["productId"] = ListStockQuant[0].productId;
-                            dr["quantity"] = ListStockQuant[0].onHand;
-                            dr["locationId"] = ListStockQuant[0].locationId;
-                            dr["manId"] = ListStockQuant[0].manId;
-                        }
+                        catch (Exception ex)
+                        { };
                     }
-                    catch (Exception ex)
-                    { };
+                }
+                else if (packNumber.StartsWith(Config.LotPrefix))
+                {
+                    string url = "quants/search?query=lotId==" + this.packageID.ToString() + ";onHand>0&sort=created,desc";
+                    var param = new { };
+                    HttpResponse res = HTTP.Instance.Get(url, param);
+
+                    if (res.StatusCode == System.Net.HttpStatusCode.OK)
+                    {
+                        try
+                        {
+                            List<StockQuantity> ListStockQuant = JsonConvert.DeserializeObject<List<StockQuantity>>(res.RawText, new JsonSerializerSettings
+                            {
+                                NullValueHandling = NullValueHandling.Ignore
+                            });
+                            if (ListStockQuant.Count == 0)
+                            {
+                                MessageBox.Show("Package/Uid does not exist in stock!");
+                                return;
+                            }
+                            else
+                            {
+                                dr["productId"] = ListStockQuant[0].productId;
+                                dr["quantity"] = ListStockQuant[0].onHand;
+                                dr["locationId"] = ListStockQuant[0].locationId;
+                                dr["manId"] = ListStockQuant[0].manId;
+                            }
+                        }
+                        catch (Exception ex)
+                        { };
+                    }
                 }
             }
             catch
             {
-                dr["packageNumber"] = "";
-                MessageBox.Show("Error during load information package/lot !");
+                dr["srcPackageNumber"] = "";
+                MessageBox.Show("Error during load information package/Uid !");
                 return;
             };
+        
             #endregion
 
             #region Find location
@@ -1729,7 +1943,7 @@ namespace LabelPrint.Inventory
                     {
                         var serializer = new JavaScriptSerializer();
                         dynamic data = serializer.Deserialize(res.RawText, typeof(object));
-                        dr["companyCode"] = data["name"];
+                        dr["companyCode"] = Convert.ToString(data["companyCode"]);
                     }
                     catch (Exception ex)
                     { };
@@ -1756,6 +1970,7 @@ namespace LabelPrint.Inventory
                         var serializer = new JavaScriptSerializer();
                         dynamic data = serializer.Deserialize(res.RawText, typeof(object));
                         dr["transferNumber"] = data["transferNumber"];
+                        dr["transferId"] = data["id"];
 
                         #region Get partner information
                         try
@@ -1801,27 +2016,370 @@ namespace LabelPrint.Inventory
             #endregion
 
             dt.Rows.Add(dr);
-            this.vgSearchID.DataSource = dt;
+
+            this.vgSearchID.Invoke(new MethodInvoker(delegate { this.vgSearchID.DataSource = dt; }));
+            
         }
 
         private void btnPrintAgain_Click(object sender, EventArgs e)
         {
-            //LabelPackage labelPackage = new LabelPackage(wtd.internal_reference, List_allocate_package[i], "", this.transfer_info["transferNumber"], this._supplier, this._project);
-            //labelPackage.Template();
+            DialogResult dr = new DialogResult();
+            dr = MessageBox.Show("Do you want to be sure to reprint label?", "Print", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+            if (dr == DialogResult.Yes)
+            {
+                try
+                {
+                    DataRow row = this.gridView1.GetDataRow(gridView1.FocusedRowHandle);
+                    LabelPackage labelPackage = new LabelPackage(Convert.ToString(row["internalReference"]), Convert.ToString(row["srcPackageNumber"]), "",
+                        Convert.ToString(row["transferNumber"]), Convert.ToString(row["supplier"]), Convert.ToString(row["project"]));
+                    labelPackage.Template();
+                }
+                catch { MessageBox.Show("Error during print label !"); }
+            }
         }
 
+        private wh_split_package newRecordSplit(dynamic data, long maxID, string packageNumber, double quantity)
+        {
+            wh_split_package wtd = new wh_split_package();
+            wtd.companyCode = data["companyCode"];
+            wtd.destPackageNumber = packageNumber;
+            wtd.id = maxID;
+            wtd.internalReference = data["internalReference"];
+            wtd.locationId = data["locationId"];
+            wtd.locationName = data["locationName"];
+            wtd.manId = data["manId"];
+            wtd.productId = data["productId"];
+            wtd.productName = data["productName"];
+            wtd.quantity = quantity;
+            wtd.srcPackageNumber = data["srcPackageNumber"];
+            wtd.created = DateTime.Now;
+            wtd.updated = DateTime.Now;
+            if (data["transferId"] != null && Convert.ToString(data["transferId"]) != "") wtd.transferId = data["transferId"];
+            if (data["transferNumber"] != null && Convert.ToString(data["transferNumber"]) != "") wtd.transferNumber = data["transferNumber"];
+            if (data["supplier"] != null && Convert.ToString(data["supplier"]) != "") wtd.supplier = data["supplier"]; else wtd.supplier = null;
+            if (data["project"] != null && Convert.ToString(data["project"]) != "") wtd.project = data["project"]; else wtd.project = null;
+            
+            return wtd;
+        }
+
+        private DataTable dtSplit = new DataTable();
         private void btnRepackage_Click(object sender, EventArgs e)
         {
+            if (!this.enableSplit)
+            {
+                MessageBox.Show("You can not split packages including roll!");
+                return;
+            }
+
+            dynamic data = gridView1.GetFocusedRow();
+            Split split = new Split();
+            split.PackageId = data["srcPackageNumber"];
+            split.Quantity = data["quantity"];
+            split.ShowDialog();
+
+            double quantityNew = split.quantityNew;
+
+            if (quantityNew > 0)
+            {
+
+                bool status_reserve = true;
+                List<string> List_allocate_package = new List<string>();
+                List<string> List_allocate_lot = new List<string>();
+
+                if (data["srcPackageNumber"].StartsWith(Config.PackPrefix))
+                {
+                    #region reserve package
+                    string url_package = "sequences/" + Config.PackReserveId + "/reserve/1";
+                    HttpResponse res_package = HTTP.Instance.Post(url_package, null);
+
+                    if (res_package.StatusCode == System.Net.HttpStatusCode.OK)
+                    {
+                        try
+                        {
+                            var serializer_package = new JavaScriptSerializer();
+                            dynamic data_package = serializer_package.Deserialize(res_package.RawText, typeof(object));
+
+                            List_allocate_package = Common.CreateSequential(Convert.ToInt32(data_package["nextNumber"]), Convert.ToInt32(data_package["step"]), Convert.ToInt32(data_package["length"]), 1, data_package["prefix"]);
+                        }
+                        catch (Exception ex)
+                        {
+                            status_reserve = false;
+                        };
+                    }
+                    else
+                    {
+                        status_reserve = false;
+                    }
+                    #endregion
+                }
+                else if (data["srcPackageNumber"].StartsWith(Config.LotPrefix))
+                {
+                    #region reserve lot
+                    string url_lot = "sequences/" + Config.LotReserveId + "/reserve/1";
+                    HttpResponse res_lot = HTTP.Instance.Post(url_lot, null);
+
+                    if (res_lot.StatusCode == System.Net.HttpStatusCode.OK)
+                    {
+                        try
+                        {
+                            var serializer_lot = new JavaScriptSerializer();
+                            dynamic data_lot = serializer_lot.Deserialize(res_lot.RawText, typeof(object));
+
+                            List_allocate_lot = Common.CreateSequential(Common.ConvertInt(data_lot["nextNumber"]), Common.ConvertInt(data_lot["step"]), Common.ConvertInt(data_lot["length"]), 1, data_lot["prefix"]);
+                        }
+                        catch (Exception ex)
+                        {
+                            status_reserve = false;
+                        };
+                    }
+                    else
+                    {
+                        status_reserve = false;
+                    }
+                    #endregion
+                }
+                else
+                {
+                    status_reserve = false;
+                }
+
+                if (status_reserve)
+                {
+                    long maxID = 0;
+                    using (erpEntities dbContext = new erpEntities())
+                    {
+                        wh_split_package wtd = dbContext.wh_split_package.OrderByDescending(u => u.id).FirstOrDefault();
+                        if (wtd != null) maxID = wtd.id + 1; else maxID = 1;
+                    }
+
+                    List<wh_split_package> listSplitPack = new List<wh_split_package>();
+                    SplitPackageRepository splitPackageRepository = new SplitPackageRepository();
+
+                    if (List_allocate_package.Count > 0)
+                    {
+                        #region split Package
+                        if (postSplit(data["srcPackageNumber"], List_allocate_package[0], quantityNew))
+                        {
+                            wh_split_package wtd_src = newRecordSplit(data, maxID, data["srcPackageNumber"], Common.ConvertDouble(data["quantity"]) - quantityNew);
+                            listSplitPack.Add(wtd_src);
+                            wh_split_package wtd_dest = newRecordSplit(data, maxID, List_allocate_package[0], quantityNew);
+                            listSplitPack.Add(wtd_dest);
+
+                            splitPackageRepository.Add(listSplitPack.ToArray());
+                            LoadList();
+
+                            data["quantity"] = Common.ConvertDouble(data["quantity"]) - quantityNew;
+
+                            //Print package
+                            LabelPackage labelPackage = new LabelPackage(Convert.ToString(data["internalReference"]), List_allocate_package[0], "",
+                                                        Convert.ToString(data["transferNumber"]), Convert.ToString(data["supplier"]), Convert.ToString(data["project"]));
+                            labelPackage.Template();
+                        }
+                        else
+                        {
+                            MessageBox.Show("Error during split package !");
+                        }
+                        #endregion
+                    }
+                    else if (List_allocate_lot.Count > 0)
+                    {
+                        #region split Lot
+                        if (postSplit(data["srcPackageNumber"], List_allocate_lot[0], quantityNew))
+                        {
+                            wh_split_package wtd_src = newRecordSplit(data, maxID, data["srcPackageNumber"], Common.ConvertDouble(data["quantity"]) - quantityNew);
+                            listSplitPack.Add(wtd_src);
+                            wh_split_package wtd_dest = newRecordSplit(data, maxID, List_allocate_lot[0], quantityNew);
+                            listSplitPack.Add(wtd_dest);
+
+                            splitPackageRepository.Add(listSplitPack.ToArray());
+                            LoadList();
+
+                            data["quantity"] = Common.ConvertDouble(data["quantity"]) - quantityNew;
+
+                            //Print package
+                            LabelPackage labelPackage = new LabelPackage(Convert.ToString(data["internalReference"]), List_allocate_lot[0], "",
+                                                        Convert.ToString(data["transferNumber"]), Convert.ToString(data["supplier"]), Convert.ToString(data["project"]));
+                            labelPackage.Template();
+                        }
+                        else
+                        {
+                            MessageBox.Show("Error during split uid !");
+                        }
+                        #endregion
+                    }
+                }
+            }
+        }
+
+        private bool postSplit(string srcPackageNumber, string destPackageNumber, double quantityNew)
+        {
+            string url = "smart-devices/split";
+            string param = "{ \"destNumber\": \"" + destPackageNumber + "\", \"quantity\": " + quantityNew.ToString() + ", \"srcNumber\": \"" + srcPackageNumber + "\" }";
+            HttpResponse res = HTTP.Instance.Post(url, param);
+            if (res.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                var serializer = new JavaScriptSerializer();
+                dynamic data = serializer.Deserialize(res.RawText, typeof(object));
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        #region Paging
+
+        int pageNumber = 1;
+        IPagedList<wh_split_package> ListID;
+        public async Task<IPagedList<wh_split_package>> GetPageListAsync(int pageNumber = 1, int pageSize = 20)
+        {
+            return await Task.Factory.StartNew(() =>
+            {
+                using (erpEntities dbContext = new erpEntities())
+                {
+                    return dbContext.wh_split_package
+                                    //.Where(p => p.digital_resources_id == digital_resources_id)
+                                    //.Where(p => p.production_orders_id == production_orders_id)
+                                    //.Where(p => p.routing_id == routing_id)
+                                    //.Where(p => p.vnpt_pn.Contains(txtSearch.Text.Trim()) || p.id_cuon.Contains(txtSearch.Text.Trim()))
+                                    .OrderByDescending(p => p.id).ToPagedList(pageNumber, pageSize);
+                }
+            });
+        }
+
+        private async void LoadList()
+        {
+            ListID = await GetPageListAsync();
+            btnBack.Enabled = ListID.HasPreviousPage;
+            btnNext.Enabled = ListID.HasNextPage;
+            btnFirst.Enabled = ListID.HasPreviousPage;
+            btnLast.Enabled = ListID.HasNextPage;
+            btnBack5.Enabled = ListID.HasPreviousPage;
+            btnNext5.Enabled = ListID.HasNextPage;
+            this.vgListSplit.DataSource = ListID.ToList();
+            lblPageNumber.Text = string.Format("{0}-{1} trên {2} bản ghi", (pageNumber - 1) * 20 + 1, (pageNumber - 1) * 20 + 20, ListID.PageCount * 20);
+        }
+
+        private async void btnBack_Click(object sender, EventArgs e)
+        {
+            if (ListID.HasPreviousPage)
+            {
+                ListID = await GetPageListAsync(pageNumber: --pageNumber);
+                btnBack.Enabled = ListID.HasPreviousPage;
+                btnNext.Enabled = ListID.HasNextPage;
+                btnFirst.Enabled = ListID.HasPreviousPage;
+                btnLast.Enabled = ListID.HasNextPage;
+                btnBack5.Enabled = ListID.HasPreviousPage;
+                btnNext5.Enabled = ListID.HasNextPage;
+                this.vgListSplit.DataSource = ListID.ToList();
+                lblPageNumber.Text = string.Format("{0}-{1} trên {2} bản ghi", (pageNumber - 1) * 20 + 1, (pageNumber - 1) * 20 + 20, ListID.PageCount * 20);
+            }
+        }
+
+        private async void btnNext_Click(object sender, EventArgs e)
+        {
+            if (ListID.HasNextPage)
+            {
+                ListID = await GetPageListAsync(pageNumber: ++pageNumber);
+                btnBack.Enabled = ListID.HasPreviousPage;
+                btnNext.Enabled = ListID.HasNextPage;
+                btnFirst.Enabled = ListID.HasPreviousPage;
+                btnLast.Enabled = ListID.HasNextPage;
+                btnBack5.Enabled = ListID.HasPreviousPage;
+                btnNext5.Enabled = ListID.HasNextPage;
+                this.vgListSplit.DataSource = ListID.ToList();
+                lblPageNumber.Text = string.Format("{0}-{1} trên {2} bản ghi", (pageNumber - 1) * 20 + 1, (pageNumber - 1) * 20 + 20, ListID.PageCount * 20);
+            }
+        }
+
+        private async void btnFirst_Click(object sender, EventArgs e)
+        {
+            if (ListID.HasPreviousPage)
+            {
+                this.pageNumber = 1;
+                ListID = await GetPageListAsync(pageNumber: this.pageNumber);
+                btnBack.Enabled = ListID.HasPreviousPage;
+                btnNext.Enabled = ListID.HasNextPage;
+                btnFirst.Enabled = ListID.HasPreviousPage;
+                btnLast.Enabled = ListID.HasNextPage;
+                btnBack5.Enabled = ListID.HasPreviousPage;
+                btnNext5.Enabled = ListID.HasNextPage;
+                this.vgListSplit.DataSource = ListID.ToList();
+                lblPageNumber.Text = string.Format("{0}-{1} trên {2} bản ghi", (pageNumber - 1) * 20 + 1, (pageNumber - 1) * 20 + 20, ListID.PageCount * 20);
+            }
+        }
+
+        private async void btnLast_Click(object sender, EventArgs e)
+        {
+            if (ListID.HasNextPage)
+            {
+                this.pageNumber = ListID.PageCount;
+                ListID = await GetPageListAsync(pageNumber: this.pageNumber);
+                btnBack.Enabled = ListID.HasPreviousPage;
+                btnNext.Enabled = ListID.HasNextPage;
+                btnFirst.Enabled = ListID.HasPreviousPage;
+                btnLast.Enabled = ListID.HasNextPage;
+                btnBack5.Enabled = ListID.HasPreviousPage;
+                btnNext5.Enabled = ListID.HasNextPage;
+                this.vgListSplit.DataSource = ListID.ToList();
+                lblPageNumber.Text = string.Format("{0}-{1} trên {2} bản ghi", (pageNumber - 1) * 20 + 1, (pageNumber - 1) * 20 + 20, ListID.PageCount * 20);
+            }
+        }
+
+        private async void btnNext5_Click(object sender, EventArgs e)
+        {
+            if ((this.pageNumber + 5) > ListID.PageCount) this.pageNumber = ListID.PageCount; else this.pageNumber = this.pageNumber + 5;
+            if (ListID.HasNextPage)
+            {
+                ListID = await GetPageListAsync(pageNumber: this.pageNumber);
+                btnBack.Enabled = ListID.HasPreviousPage;
+                btnNext.Enabled = ListID.HasNextPage;
+                btnFirst.Enabled = ListID.HasPreviousPage;
+                btnLast.Enabled = ListID.HasNextPage;
+                btnBack5.Enabled = ListID.HasPreviousPage;
+                btnNext5.Enabled = ListID.HasNextPage;
+                this.vgListSplit.DataSource = ListID.ToList();
+                lblPageNumber.Text = string.Format("{0}-{1} trên {2} bản ghi", (pageNumber - 1) * 20 + 1, (pageNumber - 1) * 20 + 20, ListID.PageCount * 20);
+            }
 
         }
 
-        private void txtSearchID_KeyDown(object sender, KeyEventArgs e)
+        private async void btnBack5_Click(object sender, EventArgs e)
         {
-            code_read.Clear();
-            if (e.KeyCode == Keys.Enter)
+            if (this.pageNumber <= 5) this.pageNumber = 1; else this.pageNumber = this.pageNumber - 5;
+            if (ListID.HasPreviousPage)
             {
-                LoadDataSearch();
+                ListID = await GetPageListAsync(pageNumber: this.pageNumber);
+                btnBack.Enabled = ListID.HasPreviousPage;
+                btnNext.Enabled = ListID.HasNextPage;
+                btnFirst.Enabled = ListID.HasPreviousPage;
+                btnLast.Enabled = ListID.HasNextPage;
+                btnBack5.Enabled = ListID.HasPreviousPage;
+                btnNext5.Enabled = ListID.HasNextPage;
+                this.vgListSplit.DataSource = ListID.ToList();
+                lblPageNumber.Text = string.Format("{0}-{1} trên {2} bản ghi", (pageNumber - 1) * 20 + 1, (pageNumber - 1) * 20 + 20, ListID.PageCount * 20);
             }
+        }
+
+        #endregion
+
+        private void btnPrintAgain2_ButtonClick(object sender, DevExpress.XtraEditors.Controls.ButtonPressedEventArgs e)
+        {
+            try
+            {
+                dynamic data = gridView3.GetFocusedRow();
+                //Print package
+                LabelPackage labelPackage = new LabelPackage((string)data.internalReference, (string)data.destPackageNumber, "",
+                                (string)data.transferNumber, (string)data.supplier, (string)data.project);
+                labelPackage.Template();
+            }
+            catch { }
+        }
+
+        private void xtraTabControl1_SelectedPageChanged(object sender, DevExpress.XtraTab.TabPageChangedEventArgs e)
+        {
+            if (this.xtraTabControl1.SelectedTabPageIndex == 1) LoadList();
         }
 
     }

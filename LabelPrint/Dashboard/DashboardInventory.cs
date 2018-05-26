@@ -82,5 +82,16 @@ namespace LabelPrint.Dashboard
             Thread thread_printer_init = new Thread(printer_init);
             thread_printer_init.Start();
         }
+
+        private void apiUrlToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ConfigApiUrl configApiUrl = new ConfigApiUrl();
+            configApiUrl.ShowDialog();
+        }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
     }
 }

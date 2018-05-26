@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TransferReceiptsDetails));
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject4 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject5 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject6 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject1 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject2 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject3 = new DevExpress.Utils.SerializableAppearanceObject();
             this.panelControl2 = new DevExpress.XtraEditors.PanelControl();
             this.txtNumberPerPackage = new DevExpress.XtraEditors.TextEdit();
             this.labelControl5 = new DevExpress.XtraEditors.LabelControl();
@@ -355,12 +355,12 @@
             // 
             this.labelControl7.Appearance.Font = new System.Drawing.Font("Tahoma", 9F);
             this.labelControl7.Appearance.ForeColor = System.Drawing.SystemColors.HotTrack;
-            this.labelControl7.Location = new System.Drawing.Point(7, 256);
+            this.labelControl7.Location = new System.Drawing.Point(9, 255);
             this.labelControl7.LookAndFeel.SkinName = "Blue";
             this.labelControl7.Name = "labelControl7";
-            this.labelControl7.Size = new System.Drawing.Size(57, 14);
+            this.labelControl7.Size = new System.Drawing.Size(73, 14);
             this.labelControl7.TabIndex = 42;
-            this.labelControl7.Text = "SL Lot/Gói";
+            this.labelControl7.Text = "SL UnitID/Gói";
             // 
             // txtNumberPerLot
             // 
@@ -378,9 +378,9 @@
             this.labelControl8.Location = new System.Drawing.Point(9, 226);
             this.labelControl8.LookAndFeel.SkinName = "Blue";
             this.labelControl8.Name = "labelControl8";
-            this.labelControl8.Size = new System.Drawing.Size(72, 14);
+            this.labelControl8.Size = new System.Drawing.Size(56, 14);
             this.labelControl8.TabIndex = 40;
-            this.labelControl8.Text = "Số lượng/Lot";
+            this.labelControl8.Text = "SL/Unit ID";
             // 
             // labelControl9
             // 
@@ -389,9 +389,9 @@
             this.labelControl9.Location = new System.Drawing.Point(9, 197);
             this.labelControl9.LookAndFeel.SkinName = "Blue";
             this.labelControl9.Name = "labelControl9";
-            this.labelControl9.Size = new System.Drawing.Size(45, 14);
+            this.labelControl9.Size = new System.Drawing.Size(65, 14);
             this.labelControl9.TabIndex = 38;
-            this.labelControl9.Text = "Kiểu Lot";
+            this.labelControl9.Text = "Kiểu Unit ID";
             // 
             // labelControl4
             // 
@@ -557,7 +557,7 @@
             // 
             // clmDetailsTraceNumber
             // 
-            this.clmDetailsTraceNumber.Caption = "Lot";
+            this.clmDetailsTraceNumber.Caption = "Unit ID";
             this.clmDetailsTraceNumber.FieldName = "traceNumber";
             this.clmDetailsTraceNumber.Name = "clmDetailsTraceNumber";
             this.clmDetailsTraceNumber.Visible = true;
@@ -621,7 +621,7 @@
             // 
             this.btnGrvPrint.AutoHeight = false;
             this.btnGrvPrint.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
-            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Glyph, "In lại", -1, true, true, false, DevExpress.XtraEditors.ImageLocation.MiddleCenter, ((System.Drawing.Image)(resources.GetObject("btnGrvPrint.Buttons"))), new DevExpress.Utils.KeyShortcut(System.Windows.Forms.Keys.None), serializableAppearanceObject4, "In lại", null, null, true)});
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Glyph, "In lại", -1, true, true, false, DevExpress.XtraEditors.ImageLocation.MiddleCenter, ((System.Drawing.Image)(resources.GetObject("btnGrvPrint.Buttons"))), new DevExpress.Utils.KeyShortcut(System.Windows.Forms.Keys.None), serializableAppearanceObject1, "In lại", null, null, true)});
             this.btnGrvPrint.ButtonsStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
             this.btnGrvPrint.LookAndFeel.SkinName = "Blue";
             this.btnGrvPrint.LookAndFeel.UseDefaultLookAndFeel = false;
@@ -640,7 +640,7 @@
             // 
             this.btnGrvEdit.AutoHeight = false;
             this.btnGrvEdit.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
-            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Glyph, "Sửa", -1, true, true, false, DevExpress.XtraEditors.ImageLocation.MiddleCenter, ((System.Drawing.Image)(resources.GetObject("btnGrvEdit.Buttons"))), new DevExpress.Utils.KeyShortcut(System.Windows.Forms.Keys.None), serializableAppearanceObject5, "Chính sửa", null, null, true)});
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Glyph, "Sửa", -1, true, true, false, DevExpress.XtraEditors.ImageLocation.MiddleCenter, ((System.Drawing.Image)(resources.GetObject("btnGrvEdit.Buttons"))), new DevExpress.Utils.KeyShortcut(System.Windows.Forms.Keys.None), serializableAppearanceObject2, "Chính sửa", null, null, true)});
             this.btnGrvEdit.LookAndFeel.SkinName = "Blue";
             this.btnGrvEdit.LookAndFeel.UseDefaultLookAndFeel = false;
             this.btnGrvEdit.Name = "btnGrvEdit";
@@ -659,7 +659,7 @@
             // 
             this.btnGrvDelete.AutoHeight = false;
             this.btnGrvDelete.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
-            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Glyph, "Xóa", -1, true, true, false, DevExpress.XtraEditors.ImageLocation.MiddleCenter, ((System.Drawing.Image)(resources.GetObject("btnGrvDelete.Buttons"))), new DevExpress.Utils.KeyShortcut(System.Windows.Forms.Keys.None), serializableAppearanceObject6, "Xóa", null, null, true)});
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Glyph, "Xóa", -1, true, true, false, DevExpress.XtraEditors.ImageLocation.MiddleCenter, ((System.Drawing.Image)(resources.GetObject("btnGrvDelete.Buttons"))), new DevExpress.Utils.KeyShortcut(System.Windows.Forms.Keys.None), serializableAppearanceObject3, "Xóa", null, null, true)});
             this.btnGrvDelete.LookAndFeel.SkinName = "Blue";
             this.btnGrvDelete.LookAndFeel.UseDefaultLookAndFeel = false;
             this.btnGrvDelete.Name = "btnGrvDelete";
