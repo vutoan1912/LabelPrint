@@ -1,6 +1,7 @@
 ﻿using EasyHttp.Http;
 using LabelPrint.App_Data;
 using LabelPrint.Business;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -45,7 +46,7 @@ namespace LabelPrint.Inventory
             set { this._state = value; }
             get { return this._state; }
         }
-
+        public double quantityChange = 0;
         
         public Dictionary<string, dynamic> transfer_info;
         public dynamic package_info;
@@ -268,8 +269,39 @@ namespace LabelPrint.Inventory
 
         }
 
+        private bool loadInfoTransfer()
+        {
+            string url = "transfers/" + TransferId.ToString();
+            var param = new { };
+            HttpResponse res = HTTP.Instance.Get(url, param);
+
+            if (res.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                try
+                {
+                    var serializer = new JavaScriptSerializer();
+                    dynamic data = serializer.Deserialize(res.RawText, typeof(object));
+
+                    transfer_info = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(res.RawText);
+
+                    this._state = Convert.ToString(data["state"]);
+                    this._state = this._state.ToLower();
+                }
+                catch (Exception ex)
+                {
+                    return false;
+                };
+            }
+            else
+            {
+                return false;
+            }
+            return true;
+        }
+
         private void btnDelete_Click(object sender, EventArgs e)
         {
+            if (!loadInfoTransfer()) return;
             if (this._state == "done")
             {
                 MessageBox.Show("The selected transaction has completed, not allowed to delete !");
@@ -291,11 +323,13 @@ namespace LabelPrint.Inventory
                 try { transfer_info_delete.Remove("backOrderTransfer"); }catch { };
 
                 string _id_delete = "[";
+                double quantityDelete = 0;
                 foreach (var index in grvListLot.GetSelectedRows())
                 {
                     dynamic row = this.grvListLot.GetRow(index);
                     if (_id_delete.Length >= 2) _id_delete += "," + Convert.ToString(row["id"]);
                     else _id_delete += Convert.ToString(row["id"]);
+                    quantityDelete += Common.ConvertDouble(Convert.ToString(row["doneQuantity"]));
                 }
                 _id_delete += "]";
 
@@ -310,6 +344,8 @@ namespace LabelPrint.Inventory
                 if (res.StatusCode == HttpStatusCode.OK)
                 {
                     grvListLot.DeleteSelectedRows();
+
+                    this.quantityChange -= quantityDelete;
                 }
                 else
                 {
@@ -320,6 +356,7 @@ namespace LabelPrint.Inventory
 
         private void btnGrvDelete_Click(object sender, EventArgs e)
         {
+            if (!loadInfoTransfer()) return;
             if (this._state == "done")
             {
                 MessageBox.Show("The selected transaction has completed, not allowed to delete !");
@@ -353,6 +390,8 @@ namespace LabelPrint.Inventory
                 if (res.StatusCode == HttpStatusCode.OK)
                 {
                     grvListLot.DeleteRow(grvListLot.FocusedRowHandle);
+
+                    this.quantityChange -= Common.ConvertDouble(Convert.ToString(row["doneQuantity"]));
                 }
                 else
                 {
@@ -412,6 +451,7 @@ namespace LabelPrint.Inventory
 
         private void btnAllocate_Click(object sender, EventArgs e)
         {
+            if (!loadInfoTransfer()) return;
             if (this._state == "done")
             {
                 MessageBox.Show("The selected transaction has completed, action not implemented !");
@@ -503,6 +543,7 @@ namespace LabelPrint.Inventory
 
                 //delete package parent
                 CheckAllocate = true;
+                this.quantityChange += (Common.ConvertDouble(txtNumberPerLot.Text) * Convert.ToInt32(txtNumberLot.Text.Trim()));
             }
         }
 

@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 using System.Timers;
 using System.Web.Script.Serialization;
 using System.Windows.Forms;
+//using System.Numerics;
 
 namespace LabelPrint.Inventory
 {
@@ -221,6 +222,43 @@ namespace LabelPrint.Inventory
             if(gluTransferNumber.EditValue != null) loadDataTransfer();
         }
 
+        private bool loadInfoTransfer()
+        {
+            if (this.gluTransferNumber.EditValue != null)
+            {
+                string url = "transfers/" + this.gluTransferNumber.EditValue.ToString();
+                var param = new { };
+                HttpResponse res = HTTP.Instance.Get(url, param);
+
+                if (res.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    try
+                    {
+                        var serializer = new JavaScriptSerializer();
+                        dynamic data = serializer.Deserialize(res.RawText, typeof(object));
+
+                        transfer_info = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(res.RawText);
+
+                        this._state = Convert.ToString(data["state"]);
+                        this._state = this._state.ToLower();
+                    }
+                    catch (Exception ex)
+                    {
+                        return false;
+                    };
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+            return true;
+        }
+
         private void loadDataTransfer()
         {
             if (this.gluTransferNumber.EditValue != null && IsTransferScan == false)
@@ -405,7 +443,15 @@ namespace LabelPrint.Inventory
                         catch { this._project = ""; };
                         #endregion
 
-                        try { lblCreatedValue.Text = Convert.ToString(data["created"]); } catch { lblCreatedValue.Text = ""; };
+                        try {
+                            //long createdTimestamp = Common.ConvertInt(data["created"]);
+                            //string createdString = Convert.ToString(data["created"]);
+                            //BigInteger bigInteger = BigInteger.Parse(createdString);
+
+                            long createdLong = Common.ConvertLong(Convert.ToString(data["created"]));
+                            DateTime createdDatetime = Common.JavaTimeStampToDateTime(createdLong);
+                            lblCreatedValue.Text = createdDatetime.ToString("dd-MM-yyyy HH:MM:ss");
+                        } catch { lblCreatedValue.Text = ""; };
                         try { lblDocumentValue.Text = (string)data["sourceDocument"]; } catch { lblDocumentValue.Text = ""; };
 
                         #region Get list part in request paper
@@ -473,11 +519,17 @@ namespace LabelPrint.Inventory
 
         private void grvListPart_FocusedRowChanged(object sender, DevExpress.XtraGrid.Views.Base.FocusedRowChangedEventArgs e)
         {
+            //BeginInvoke(new MethodInvoker(delegate
+            //{
+            //    loadDataListPackage();
+            //}
+            //));
+        }
+
+        private void grvListPart_FocusedRowObjectChanged(object sender, DevExpress.XtraGrid.Views.Base.FocusedRowObjectChangedEventArgs e)
+        {
             BeginInvoke(new MethodInvoker(delegate
             {
-                //MessageBox.Show("Focus state: focused row - " + grvListPart.FocusedRowHandle.ToString());
-                //MessageBox.Show("Selection state: selected row - " + grvListPart.GetSelectedRows().FirstOrDefault());
-
                 loadDataListPackage();
             }
             ));
@@ -533,8 +585,6 @@ namespace LabelPrint.Inventory
             {
                 vgListPackage.DataSource = null;
             }
-            
-                
         }
 
         private void gluUomPackage_EditValueChanged(object sender, EventArgs e)
@@ -545,6 +595,8 @@ namespace LabelPrint.Inventory
 
         private void btnAllocate_Click(object sender, EventArgs e)
         {
+            if (!loadInfoTransfer()) return;
+
             if (this._state == "done")
             {
                 MessageBox.Show("The selected transaction has completed, actions are not allowed !");
@@ -1132,11 +1184,52 @@ namespace LabelPrint.Inventory
 
             frmTransferReceiptsDetails.ShowDialog();
 
+            double quantityChange = frmTransferReceiptsDetails.quantityChange;
+            bool CheckAllocate = frmTransferReceiptsDetails.CheckAllocate;
+
             //data back
-            if (frmTransferReceiptsDetails.CheckAllocate)
+            if (Convert.ToString(row["destPackageNumber"]).Length > 0 && CheckAllocate
+                && (row["traceNumber"] == null || Convert.ToString(row["traceNumber"]).Length == 0))
             {
-                grvListPackage.DeleteRow(grvListPackage.FocusedRowHandle);
+                //delete if is package
+                Dictionary<string, dynamic> transfer_info_delete = transfer_info;
+                //transfer_info
+                transfer_info_delete.Remove("transferItems");
+                transfer_info_delete.Remove("removedTransferItems");
+                transfer_info_delete.Remove("transferDetails");
+                transfer_info_delete.Remove("active");
+                try { transfer_info_delete.Remove("manOrderTransfer"); }
+                catch { };
+                try { transfer_info_delete.Remove("returnedTransfer"); }
+                catch { };
+                try { transfer_info_delete.Remove("backOrderTransfer"); }
+                catch { };
+
+                DataRow row_delete = grvListPackage.GetDataRow(grvListPackage.FocusedRowHandle);
+                string _id_delete = "[" + Convert.ToString(row_delete["id"]) + "]";
+                transfer_info_delete["removedTransferDetails"] = _id_delete;
+                string param_put = Common.DictionaryObjectToJson(transfer_info_delete);
+
+                //PUT DATA
+                string url = "transfers/" + Convert.ToString(transfer_info_delete["id"]);
+
+                HttpResponse res = HTTP.Instance.Put(url, param_put);
+
+                if (res.StatusCode == HttpStatusCode.OK)
+                {
+                    //calculate rest quantity of transfer item
+                    DataRow rowItem = grvListPart.GetDataRow(this.grvListPart.FocusedRowHandle);
+                    rowItem["restQuantity"] = Common.ConvertDouble(rowItem["restQuantity"]) + Common.ConvertDouble(row_delete["doneQuantity"]);
+                    rowItem["doneQuantity"] = Common.ConvertDouble(rowItem["doneQuantity"]) - Common.ConvertDouble(row_delete["doneQuantity"]);
+
+                    grvListPackage.DeleteRow(grvListPackage.FocusedRowHandle);
+                }
             }
+
+            //cộng số lượng cấp thêm hoặc trừ số lượng xóa đi trong package
+            DataRow rowPart = grvListPart.GetDataRow(this.grvListPart.FocusedRowHandle);
+            rowPart["restQuantity"] = Common.ConvertDouble(rowPart["restQuantity"]) - quantityChange;
+            rowPart["doneQuantity"] = Common.ConvertDouble(rowPart["doneQuantity"]) + quantityChange;
             
             //merge lots allocate
             this.dt_trans_details = checkStructureDatatable(dt_trans_details);
@@ -1155,6 +1248,8 @@ namespace LabelPrint.Inventory
 
         private void btnDeletePack_Click(object sender, EventArgs e)
         {
+            if (!loadInfoTransfer()) return;
+
             if (this._state == "done")
             {
                 MessageBox.Show("The selected transaction has completed, not allowed to delete !");
@@ -1203,6 +1298,8 @@ namespace LabelPrint.Inventory
 
         private void btnDelete_Click(object sender, EventArgs e)
         {
+            if (!loadInfoTransfer()) return;
+
             if (this._state == "done")
             {
                 MessageBox.Show("The selected transaction has completed, not allowed to delete !");
@@ -1264,23 +1361,24 @@ namespace LabelPrint.Inventory
         {
             if (e.Column.Caption == "edit")
             {
-                //var _id = grvListPackage.GetRowCellValue(e.RowHandle, "id");
-                var _traceNumber = grvListPackage.GetRowCellValue(e.RowHandle, "traceNumber");
-                //if (Common.ConvertInt(_id) == -1 || Convert.ToString(_traceNumber).Length > 0)
-                if (Convert.ToString(_traceNumber).Length > 0)
+                var _id = grvListPackage.GetRowCellValue(e.RowHandle, "id");
+
+                //var _traceNumber = grvListPackage.GetRowCellValue(e.RowHandle, "traceNumber");
+                var _destPackageNumber = grvListPackage.GetRowCellValue(e.RowHandle, "destPackageNumber");
+                if (Convert.ToString(_destPackageNumber).Length > 0 && Common.ConvertInt(_id) > 0)
+                {
+                    btnEdit.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.HideTextEditor;
+                    btnEdit.ReadOnly = true;
+                    btnEdit.Buttons[0].Visible = true;
+                    e.RepositoryItem = btnEdit;
+                }
+                else
                 {
                     RepositoryItemButtonEdit ritem = new RepositoryItemButtonEdit();
                     ritem.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.HideTextEditor;
                     ritem.ReadOnly = true;
                     ritem.Buttons[0].Visible = false;
                     e.RepositoryItem = ritem;
-                }
-                else
-                {
-                    btnEdit.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.HideTextEditor;
-                    btnEdit.ReadOnly = true;
-                    btnEdit.Buttons[0].Visible = true;
-                    e.RepositoryItem = btnEdit;
                 }
             }
             if (e.Column.Caption == "delete")

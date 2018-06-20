@@ -221,7 +221,7 @@ namespace LabelPrint.Business
             catch { return null; }
         }
 
-        public static int? ConvertLong(dynamic value)
+        public static long? ConvertLong(dynamic value)
         {
             try
             {
@@ -508,6 +508,22 @@ namespace LabelPrint.Business
                     str = str.Replace(VietnameseSigns[i][j], VietnameseSigns[0][i - 1]);
             }
             return str;
+        }
+
+        public static DateTime UnixTimeStampToDateTime(long unixTimeStamp)
+        {
+            // Unix timestamp is seconds past epoch
+            System.DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
+            dtDateTime = dtDateTime.AddMilliseconds(unixTimeStamp).ToLocalTime();
+            return dtDateTime;
+        }
+
+        public static DateTime JavaTimeStampToDateTime(long javaTimeStamp)
+        {
+            // Java timestamp is milliseconds past epoch
+            System.DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
+            dtDateTime = dtDateTime.AddMilliseconds(javaTimeStamp).ToLocalTime();
+            return dtDateTime;
         }
     }
 
